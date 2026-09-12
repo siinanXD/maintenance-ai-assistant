@@ -8,6 +8,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- The agent is now the default chat mode (`AI_CHAT_MODE=agent`); the rule-based
+  router became a deterministic fast path inside the agent
+  (`AI_AGENT_STRUCTURED_FAST_PATH`) and LangGraph checkpointers persist agent
+  session memory (`AI_AGENT_CHECKPOINTER`: postgres, sqlite, memory, none)
 - Tool-using maintenance agent (`POST /api/v1/ai/agent`, `AI_CHAT_MODE=agent`):
   LangGraph loop with safety guard, permission-gated tool registry over the
   existing services, provider tool calling (OpenAI function calling, offline mock

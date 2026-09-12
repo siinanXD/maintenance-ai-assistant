@@ -206,6 +206,7 @@ def test_agent_answers_with_tools_offline(app, make_user, make_task):
     admin = make_user(username="agent_loop_admin", role=Role.MASTER_ADMIN, department_name=None)
     make_task("Dichtung an Presse 3 pruefen", admin["username"])
 
+    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     with app.app_context():
         result = run_agent(
             "Welche offenen Tasks gibt es?", _user(admin["id"]), session_id="agent-s1"
@@ -286,6 +287,7 @@ def test_agent_stops_at_iteration_limit(app, make_user):
                 metadata={"input_tokens": 10, "output_tokens": 5, "total_tokens": 15},
             )
 
+    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     provider = LoopingProvider()
     with app.app_context():
         app.config["AI_AGENT_MAX_ITERATIONS"] = 2
@@ -313,6 +315,7 @@ def test_agent_reports_provider_failure_with_fallback(app, make_user):
             """Simulate a rate limit."""
             raise AIServiceError("rate limited", error_code="rate_limit")
 
+    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     with app.app_context():
         result = run_agent(
             "Welche Tasks sind offen?", _user(admin["id"]), provider=FailingProvider()
@@ -350,9 +353,80 @@ def test_agent_ignores_unknown_tool_calls(app, make_user):
     assert result["answer"].startswith("## Ergebnis")
 
 
-def test_agent_uses_session_history(app, make_user, monkeypatch):
-    """Verify prior turns of the same session are passed to the provider."""
+def test_agent_checkpoint_memory_carries_session_history(app, make_user):
+    """Verify a checkpointed thread passes prior turns to the provider without ChatMessage rows."""
     admin = make_user(username="agent_history_admin", role=Role.MASTER_ADMIN, department_name=None)
+    captured = []
+
+    class RecordingProvider:
+        """Provider double that records the messages it receives."""
+
+        name = "recording"
+        supports_tool_calls = True
+
+        def chat_with_tools(self, messages, tools, workflow="agent"):
+            """Record messages and answer directly."""
+            captured.append(list(messages))
+            return ToolCallResponse(
+                content=f"## Ergebnis\n- Antwort {len(captured)}", tool_calls=[]
+            )
+
+    with app.app_context():
+        first = run_agent(
+            "Wie tausche ich den Filter laut Wartungswissen?",
+            _user(admin["id"]),
+            session_id="hist-1",
+            provider=RecordingProvider(),
+        )
+        second = run_agent(
+            "Und wie oft sollte das passieren?",
+            _user(admin["id"]),
+            session_id="hist-1",
+            provider=RecordingProvider(),
+        )
+
+    roles = [message["role"] for message in captured[1]]
+    assert first["diagnostics"]["memory_backend"] == "memory"
+    assert roles == ["system", "user", "assistant", "user"]
+    assert captured[1][1]["content"] == "Wie tausche ich den Filter laut Wartungswissen?"
+    assert captured[1][2]["content"] == "## Ergebnis\n- Antwort 1"
+    assert captured[1][-1]["content"] == "Und wie oft sollte das passieren?"
+    assert second["rag"]["agent"]["turn_count"] == 2
+
+
+def test_agent_checkpoint_threads_are_isolated_per_user(app, make_user):
+    """Verify another user with the same session id never sees the first user's turns."""
+    first_user = make_user(username="agent_thread_a", role=Role.MASTER_ADMIN, department_name=None)
+    second_user = make_user(username="agent_thread_b", role=Role.MASTER_ADMIN, department_name=None)
+    captured = []
+
+    class RecordingProvider:
+        """Provider double that records the messages it receives."""
+
+        name = "recording"
+        supports_tool_calls = True
+
+        def chat_with_tools(self, messages, tools, workflow="agent"):
+            """Record messages and answer directly."""
+            captured.append(list(messages))
+            return ToolCallResponse(content="## Ergebnis\n- ok", tool_calls=[])
+
+    with app.app_context():
+        run_agent(
+            "Wie tausche ich den Filter?", _user(first_user["id"]), "shared", RecordingProvider()
+        )
+        run_agent(
+            "Wie tausche ich den Filter?", _user(second_user["id"]), "shared", RecordingProvider()
+        )
+
+    assert [message["role"] for message in captured[1]] == ["system", "user"]
+
+
+def test_agent_falls_back_to_chat_message_history_without_checkpointer(app, make_user):
+    """Verify ChatMessage rows seed the conversation when no checkpointer is configured."""
+    admin = make_user(
+        username="agent_history_fallback", role=Role.MASTER_ADMIN, department_name=None
+    )
     captured = {}
 
     class RecordingProvider:
@@ -363,34 +437,76 @@ def test_agent_uses_session_history(app, make_user, monkeypatch):
 
         def chat_with_tools(self, messages, tools, workflow="agent"):
             """Record messages and answer directly."""
-            captured["messages"] = messages
+            captured["messages"] = list(messages)
             return ToolCallResponse(content="## Ergebnis\n- ok", tool_calls=[])
 
     with app.app_context():
-        first = run_agent("Welche Tasks sind offen?", _user(admin["id"]), session_id="hist-1")
+        app.config["AI_AGENT_CHECKPOINTER"] = "none"
+        app.extensions.pop("agent_checkpointer", None)
         from app.ai.services import save_chat_message
 
         save_chat_message(
-            _user(admin["id"]), "Welche Tasks sind offen?", first, session_id="hist-1"
-        )
-        run_agent(
-            "Und welche davon sind dringend?",
             _user(admin["id"]),
-            session_id="hist-1",
-            provider=RecordingProvider(),
+            "Wie tausche ich den Filter?",
+            {"answer": "## Ergebnis\n- Filter loesen", "type": "agent"},
+            session_id="hist-2",
+        )
+        result = run_agent(
+            "Und wie oft?", _user(admin["id"]), session_id="hist-2", provider=RecordingProvider()
         )
 
-    roles = [message["role"] for message in captured["messages"]]
-    assert roles == ["system", "user", "assistant", "user"]
-    assert captured["messages"][1]["content"] == "Welche Tasks sind offen?"
-    assert captured["messages"][-1]["content"] == "Und welche davon sind dringend?"
+    assert result["diagnostics"]["memory_backend"] == "none"
+    assert [message["role"] for message in captured["messages"]] == [
+        "system",
+        "user",
+        "assistant",
+        "user",
+    ]
+    assert captured["messages"][1]["content"] == "Wie tausche ich den Filter?"
+
+
+def test_structured_fast_path_answers_without_model_call(app, make_user, make_task):
+    """Verify deterministic rule handlers answer structured questions before the loop."""
+    user = make_user(username="agent_fast_path_user", role=Role.PRODUKTION)
+    make_task("Riemen pruefen", user["username"])
+
+    class ExplodingProvider:
+        """Provider double that must not be called."""
+
+        name = "exploding"
+        supports_tool_calls = True
+
+        def chat_with_tools(self, messages, tools, workflow="agent"):
+            """Fail loudly if the fast path did not match."""
+            raise AssertionError("fast path should have answered")
+
+    with app.app_context():
+        result = run_agent(
+            "Wie viele Tasks sind offen?", _user(user["id"]), provider=ExplodingProvider()
+        )
+
+    assert result["diagnostics"]["agent_fast_path"] == "structured_rules"
+    assert result["rag"]["agent"]["engine"] == "fast_path"
+    assert result["type"] != "agent"
+    assert "1" in result["answer"]
+    assert result["diagnostics"]["audit_event_id"]
+
+
+def test_chat_mode_defaults_to_agent():
+    """Verify the shipped configuration routes chat through the agent."""
+    import os
+
+    from app.config import Config
+
+    assert Config.AI_CHAT_MODE == (os.getenv("AI_CHAT_MODE") or "agent").strip().lower()
 
 
 def test_agent_fallback_runner_matches_langgraph(app, make_user, make_task, monkeypatch):
     """Verify the deterministic runner produces the same node sequence without LangGraph."""
     admin = make_user(username="agent_fallback_admin", role=Role.MASTER_ADMIN, department_name=None)
     make_task("Riemen spannen", admin["username"])
-    monkeypatch.setattr(agent_graph, "_compiled_graph", lambda: None)
+    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
+    monkeypatch.setattr(agent_graph, "_compiled_graph", lambda *args, **kwargs: None)
     monkeypatch.setattr(agent_graph, "_workflow_engine_name", lambda: "fallback")
 
     with app.app_context():
@@ -523,6 +639,7 @@ def test_agent_route_persists_chat_and_lists_tools(app, client, make_user, make_
     """Verify the agent endpoint stores history and the tools endpoint is permission-aware."""
     user = make_user(username="agent_route_user", role=Role.PRODUKTION)
     make_task("Sensor reinigen", user["username"])
+    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     headers = auth_headers(user["username"])
 
     response = client.post(
@@ -551,6 +668,7 @@ def test_chat_endpoint_routes_through_agent_when_configured(
     """Verify AI_CHAT_MODE=agent switches the existing chat endpoint to the agent."""
     user = make_user(username="agent_mode_user", role=Role.PRODUKTION)
     make_task("Kette schmieren", user["username"])
+    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     app.config["AI_CHAT_MODE"] = "agent"
 
     response = client.post(
@@ -650,3 +768,32 @@ def test_agent_cli_eval_command_runs(app, make_user):
     assert result.exit_code == 0, result.output
     assert "accuracy=1.0" in result.output
     assert "create_task" in tools_result.output
+
+
+def test_sqlite_checkpointer_persists_turns(app, make_user):
+    """Verify the SQLite checkpointer backend stores and continues a thread."""
+    admin = make_user(username="agent_sqlite_admin", role=Role.MASTER_ADMIN, department_name=None)
+    captured = []
+
+    class RecordingProvider:
+        """Provider double that records the messages it receives."""
+
+        name = "recording"
+        supports_tool_calls = True
+
+        def chat_with_tools(self, messages, tools, workflow="agent"):
+            """Record messages and answer directly."""
+            captured.append(list(messages))
+            return ToolCallResponse(content="## Ergebnis" + chr(10) + "- ok", tool_calls=[])
+
+    with app.app_context():
+        app.config["AI_AGENT_CHECKPOINTER"] = "sqlite"
+        app.config["AI_AGENT_CHECKPOINT_PATH"] = ":memory:"
+        app.extensions.pop("agent_checkpointer", None)
+        first = run_agent(
+            "Wie tausche ich den Filter?", _user(admin["id"]), "sq-1", RecordingProvider()
+        )
+        run_agent("Und danach?", _user(admin["id"]), "sq-1", RecordingProvider())
+
+    assert first["diagnostics"]["memory_backend"] == "sqlite"
+    assert [message["role"] for message in captured[1]] == ["system", "user", "assistant", "user"]

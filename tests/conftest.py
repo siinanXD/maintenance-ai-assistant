@@ -40,6 +40,10 @@ def app(tmp_path):
         JWT_SECRET_KEY = "test-secret-key-with-enough-length"
         AI_PROVIDER = "mock"
         EMBEDDING_PROVIDER = "hashing"
+        # The legacy suites exercise the rule-based router directly; agent tests
+        # opt in with AI_CHAT_MODE="agent". Checkpoints stay in-process.
+        AI_CHAT_MODE = "legacy"
+        AI_AGENT_CHECKPOINTER = "memory"
         OPENAI_API_KEY = ""
         OPENAI_MODEL = "test-model"
         UPLOAD_FOLDER = str(tmp_path / "uploads")
