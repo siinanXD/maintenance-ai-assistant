@@ -146,3 +146,93 @@ def is_structured_follow_up(value):
     """Return whether a question asks to refine the previous structured scope."""
     text = normalize_text(value)
     return any(pattern in text for pattern in FOLLOW_UP_PATTERNS)
+
+
+ERROR_QUESTION_TERMS = ("fehler", "stoerung", "error", "fehlercode", "ursache")
+ERROR_CODE_TOKEN = re.compile(r"\b[A-Z]{0,3}\d{2,5}\b")
+
+
+def mentions_error_question(value):
+    """Return whether a question asks for fault or error-catalog help."""
+    text = normalize_text(value)
+    if any(term in text for term in ERROR_QUESTION_TERMS):
+        return True
+    match = ERROR_CODE_TOKEN.search(str(value or "").upper())
+    if not match:
+        return False
+    token = match.group(0)
+    if any(char.isalpha() for char in token):
+        return True
+    return not (1900 <= int(token) <= 2099)
+
+
+SCOPE_KEYWORDS = {
+    "tasks": ("task", "tasks", "aufgabe", "aufgaben", "arbeit", "arbeiten", "todo"),
+    "errors": (
+        "fehler",
+        "stoerung",
+        "stoerungen",
+        "stoerfall",
+        "stoerfaelle",
+        "problem",
+        "probleme",
+        "error",
+        "fehlercode",
+        "ursache",
+        "not-halt",
+        "not halt",
+        "not-aus",
+        "sicherheitskreis",
+    ),
+    "employees": (
+        "mitarbeiter",
+        "personal",
+        "personaldaten",
+        "gehalt",
+        "gehaltsklasse",
+        "adresse",
+        "geburtsdatum",
+        "qualifikation",
+    ),
+    "machines": (
+        "maschine",
+        "maschinen",
+        "anlage",
+        "anlagen",
+        "machine",
+        "wartungsplan",
+        "wartungsplaene",
+        "maintenance",
+    ),
+    "inventory": ("lager", "bestand", "material", "materialien", "ersatzteil", "inventory"),
+    "documents": (
+        "dokument",
+        "dokumente",
+        "unterlage",
+        "unterlagen",
+        "doku",
+        "bericht",
+        "berichte",
+        "report",
+    ),
+    "shiftplans": ("schichtplan", "schichtplanung", "dienstplan", "schicht"),
+    "admin_users": ("user", "users", "nutzer", "benutzer", "accounts"),
+}
+TODAY_TERMS = ("heute", "heutige", "heutigen", "today", "anstehend")
+
+
+def detect_requested_scopes(value):
+    """Return dashboard scopes explicitly referenced by a question (retrieval hints)."""
+    text = normalize_text(value)
+    scopes = {
+        scope
+        for scope, keywords in SCOPE_KEYWORDS.items()
+        if contains_any_lookup_term(text, keywords)
+    }
+    if mentions_error_question(value) and ERROR_CODE_TOKEN.search(str(value or "").upper()):
+        scopes.add("errors")
+    if contains_any_lookup_term(text, SCOPE_KEYWORDS["tasks"]) and any(
+        term in text for term in TODAY_TERMS
+    ):
+        scopes.add("tasks")
+    return scopes

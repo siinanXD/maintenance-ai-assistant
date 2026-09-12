@@ -507,7 +507,9 @@ def _machine_reference(text):
         return ""
     reference = " ".join(match.group(1).split())
     words = reference.split(" ")
-    if len(words) > 1 and words[0].lower() in {"maschine", "anlage"}:
+    if len(words) == 1:
+        return ""
+    if words[0].lower() in {"maschine", "anlage"}:
         reference = " ".join(words[1:])
     return reference[:120]
 

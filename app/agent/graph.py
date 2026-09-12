@@ -763,6 +763,9 @@ def _safe_arguments(arguments):
     """Return bounded tool arguments for diagnostics."""
     safe = {}
     for key, value in (arguments or {}).items():
+        if isinstance(value, bool | int | float) or value is None:
+            safe[str(key)] = value
+            continue
         text = str(value)
         safe[str(key)] = text if len(text) <= 120 else text[:120] + "..."
     return safe

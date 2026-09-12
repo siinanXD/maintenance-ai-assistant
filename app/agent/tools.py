@@ -380,12 +380,13 @@ def _search_knowledge(user, arguments):
     fallback, safety, conflicts, explainability). When nothing is found, the
     grounded no-answer text is included so the model can answer honestly.
     """
+    from app.services.ai_question_normalizer import detect_requested_scopes
     from app.services.empty_retrieval_response_service import build_empty_retrieval_answer
     from app.services.langgraph_rag_workflow import prompt_rules_for_retrieval
     from app.services.rag_service import build_rag_context
 
     query = arguments["query"]
-    retrieval = build_rag_context(query, user)
+    retrieval = build_rag_context(query, user, requested_scopes=detect_requested_scopes(query))
     rag = retrieval.get("rag") or {}
     sources = list(retrieval.get("sources") or [])
     cards = compact_sources(sources)
@@ -718,9 +719,17 @@ register_tool(
 
 def _daily_briefing(user, arguments):
     """Return today's briefing sections for the user."""
-    from app.ai.briefings import daily_briefing
+    from app.ai.briefings import (
+        daily_briefing,
+        daily_briefing_source_cards,
+        format_daily_briefing_answer,
+    )
 
     briefing = daily_briefing(user)
+    raw_sections = [
+        section for section in list(briefing.get("sections") or []) if isinstance(section, dict)
+    ]
+    item_count = sum(int(section.get("count") or 0) for section in raw_sections)
     sections = []
     for section in list(briefing.get("sections") or [])[:8]:
         if not isinstance(section, dict):
@@ -737,9 +746,14 @@ def _daily_briefing(user, arguments):
         content={
             "date": briefing.get("date"),
             "summary": briefing.get("summary"),
+            "count": item_count,
             "sections": sections,
+            "answer_markdown": format_daily_briefing_answer(briefing, raw_sections, item_count),
+            "structured_context": {"entity_type": "daily_briefing"},
         },
+        sources=compact_sources(daily_briefing_source_cards(raw_sections, user)),
         summary=str(briefing.get("summary") or "Briefing erstellt"),
+        structured_context={"entity_type": "daily_briefing"},
     )
 
 

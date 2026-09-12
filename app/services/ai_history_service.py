@@ -1,10 +1,16 @@
 """Services for AI chat history and admin chat search."""
 
 import json
+import logging
 
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.extensions import db
 from app.models import ChatMessage
 from app.services.ai_answer_quality_service import answer_quality_from_history_item
 from app.services.conversation_context_service import normalize_session_id
+
+logger = logging.getLogger(__name__)
 
 
 def save_chat_exchange(user, message, result, session_id=""):
@@ -102,4 +108,18 @@ def _optional_int(value):
     try:
         return int(value)
     except (TypeError, ValueError):
+        return None
+
+
+def save_chat_message(user, message, response, session_id=""):
+    """Persist a chat message and its assistant response in the database."""
+    result = response if isinstance(response, dict) else {"answer": response}
+    chat = save_chat_exchange(user, message, result, session_id=session_id)
+    db.session.add(chat)
+    try:
+        db.session.commit()
+        return chat
+    except SQLAlchemyError:
+        db.session.rollback()
+        logger.exception("ai_chat_save_failed user_id=%s", getattr(user, "id", None))
         return None

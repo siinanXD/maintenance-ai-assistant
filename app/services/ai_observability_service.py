@@ -64,38 +64,6 @@ STRUCTURED_ENTITY_DOMAINS = {
     "shiftplan": "shiftplans",
     "inventory": "inventory",
 }
-STRUCTURED_SCOPE_DOMAINS = {
-    "tasks": "tasks",
-    "errors": "errors",
-    "machines": "machines",
-    "employees": "employees",
-    "documents": "documents",
-    "shiftplans": "shiftplans",
-    "inventory": "inventory",
-}
-STRUCTURED_RESPONSE_TYPE_DOMAINS = {
-    "structured_scope": "",
-    "tasks_status": "tasks",
-    "tasks_today": "tasks",
-    "tasks_count": "tasks",
-    "errors_count": "errors",
-    "machines_count": "machines",
-    "employee_count": "employees",
-    "employees_count": "employees",
-    "documents_count": "documents",
-    "shiftplans_count": "shiftplans",
-    "inventory_count": "inventory",
-}
-STRUCTURED_RESPONSE_TYPE_PREFIX_DOMAINS = (
-    ("task_", "tasks"),
-    ("incident_", "errors"),
-    ("machine_", "machines"),
-    ("vacation_", "vacations"),
-    ("employee_", "employees"),
-    ("document_", "documents"),
-    ("shiftplan_", "shiftplans"),
-    ("inventory_", "inventory"),
-)
 
 
 def ai_observability_dashboard(args=None):
@@ -2025,6 +1993,9 @@ def _is_structured_answer(chat):
 
 def _is_rag_answer(chat):
     """Return whether a chat looks like a RAG-backed unstructured answer."""
+    diagnostics = chat.diagnostics()
+    if str(diagnostics.get("answer_category") or "") == "rag":
+        return True
     if _is_structured_answer(chat) or int(chat.source_count or 0) <= 0:
         return False
     return str(chat.response_type or "") not in {"permission_denied", "local_answer"}
@@ -2033,21 +2004,14 @@ def _is_rag_answer(chat):
 def _structured_domain(chat):
     """Return the structured business domain for a chat, if it used app data."""
     response_type = str(chat.response_type or "").strip()
-    if response_type == "permission_denied":
-        return None
-
     diagnostics = chat.diagnostics()
+    if response_type == "permission_denied" or diagnostics.get("status") == "permission_denied":
+        return None
     domain = _structured_domain_from_context(diagnostics.get("structured_context") or {})
     if domain:
         return domain
-
-    domain = _structured_domain_from_response_type(response_type)
-    if domain:
-        return domain
-
-    scopes = {str(scope).strip() for scope in diagnostics.get("scopes") or [] if scope}
-    if response_type == "structured_scope":
-        return _structured_domain_from_scopes(scopes) or "unknown"
+    if str(diagnostics.get("answer_category") or "") == "structured_data":
+        return "unknown"
     return None
 
 
@@ -2057,27 +2021,6 @@ def _structured_domain_from_context(context):
         return ""
     entity_type = str(context.get("entity_type") or "").strip()
     return STRUCTURED_ENTITY_DOMAINS.get(entity_type, "")
-
-
-def _structured_domain_from_response_type(response_type):
-    """Return a structured domain from a known response type."""
-    if response_type in STRUCTURED_RESPONSE_TYPE_DOMAINS:
-        return STRUCTURED_RESPONSE_TYPE_DOMAINS[response_type]
-    for prefix, domain in STRUCTURED_RESPONSE_TYPE_PREFIX_DOMAINS:
-        if response_type.startswith(prefix):
-            return domain
-    if response_type.endswith("_count"):
-        scope = response_type.removesuffix("_count")
-        return STRUCTURED_SCOPE_DOMAINS.get(scope, "")
-    return ""
-
-
-def _structured_domain_from_scopes(scopes):
-    """Return a structured domain from a single dashboard scope."""
-    domains = {
-        STRUCTURED_SCOPE_DOMAINS[scope] for scope in scopes if scope in STRUCTURED_SCOPE_DOMAINS
-    }
-    return next(iter(domains)) if len(domains) == 1 else ""
 
 
 def _is_answered_chat(chat):

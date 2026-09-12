@@ -1,7 +1,5 @@
-"""AI orchestration services for permission-aware workflows."""
-# ruff: noqa: F401, F821
+"""Answer diagnostics, audit metadata and provider status for agent chats."""
 
-import inspect
 import logging
 
 from flask import current_app
@@ -10,6 +8,7 @@ from app.services.ai_answer_quality_service import answer_quality_from_result
 from app.services.ai_audit_service import ai_analytics_summary, create_ai_audit_event
 from app.services.ai_confidence_service import attach_confidence_to_result
 from app.services.ai_provider_readiness_service import ai_provider_readiness_snapshot
+from app.services.ai_question_normalizer import mentions_error_question
 from app.services.ai_routing import local_metadata, workflow_profile
 from app.services.ai_safety_service import (
     apply_post_generation_safety_to_result,
@@ -19,18 +18,9 @@ from app.services.ai_safety_service import (
     enforce_post_generation_safety,
     reapply_post_generation_penalty,
 )
-from app.services.ai_service import (
-    AIServiceError,
-    ai_provider_catalog,
-    ai_provider_fallback_reason,
-    get_ai_provider,
-    provider_fallback_error_message,
-)
-from app.services.conversation_context_service import (
-    build_structured_context_metadata,
-)
+from app.services.ai_service import ai_provider_catalog
+from app.services.conversation_context_service import build_structured_context_metadata
 from app.services.embedding_service import embedding_provider_catalog
-from app.services.empty_retrieval_response_service import build_empty_retrieval_answer
 from app.services.langfuse_service import langfuse_status
 from app.services.query_understanding_service import classify_query
 from app.services.retrieval_debug_service import (
@@ -48,96 +38,6 @@ ANSWER_CATEGORY_RAG = "rag"
 ANSWER_CATEGORY_GENERAL = "general_ai_knowledge"
 MODEL_KNOWLEDGE_LABEL = "Modellwissen"
 
-DASHBOARD_SCOPE_LABELS = {
-    "tasks": "Tasks",
-    "errors": "Fehlerkatalog",
-    "employees": "Mitarbeiter",
-    "machines": "Maschinen",
-    "inventory": "Lager",
-    "documents": "Dokumente",
-    "shiftplans": "Schichtplanung",
-    "admin_users": "Admin Users",
-}
-
-SCOPE_KEYWORDS = {
-    "tasks": ["task", "tasks", "aufgabe", "aufgaben", "todo"],
-    "errors": [
-        "fehler",
-        "stoerung",
-        "störung",
-        "error",
-        "fehlercode",
-        "ursache",
-    ],
-    "employees": [
-        "mitarbeiter",
-        "personal",
-        "personaldaten",
-        "gehalt",
-        "gehaltsklasse",
-        "adresse",
-        "geburtsdatum",
-        "qualifikation",
-    ],
-    "machines": ["maschine", "maschinen", "anlage", "anlagen", "machine"],
-    "inventory": ["lager", "bestand", "material", "ersatzteil", "inventory"],
-    "documents": ["dokument", "dokumente", "bericht", "berichte", "report"],
-    "shiftplans": ["schichtplan", "schichtplanung", "dienstplan", "schicht"],
-    "admin_users": ["user", "users", "nutzer", "benutzer", "accounts"],
-}
-
-COUNT_WORDS = [
-    "wie viele",
-    "wie vile",
-    "wieviele",
-    "wievile",
-    "anzahl",
-    "count",
-    "many",
-]
-
-GENERAL_KNOWLEDGE_PREFIXES = (
-    "was ist",
-    "was bedeutet",
-    "wie funktioniert",
-    "warum",
-    "wer ist",
-    "erklaere",
-    "erkläre",
-    "what is",
-    "how does",
-    "why",
-)
-
-APP_DATA_INTENT_PHRASES = (
-    "bei uns",
-    "im system",
-    "in der app",
-    "in unserer datenbank",
-    "meine",
-    "mein",
-    "unsere",
-    "unser",
-    "sichtbar",
-    "vorhanden",
-    "angelegt",
-    "offen",
-    "heute",
-    "morgen",
-    "anstehend",
-    "zeige",
-    "liste",
-    "auflisten",
-    "anzeigen",
-    "gibt es",
-    "erstellen",
-    "anlegen",
-    "loeschen",
-    "löschen",
-    "aendern",
-    "ändern",
-)
-
 
 def answer_mode_for_message(message, response_type="", diagnostics=None):
     """Return the product-facing answer mode used by chat UX and diagnostics."""
@@ -145,12 +45,8 @@ def answer_mode_for_message(message, response_type="", diagnostics=None):
     query_understanding = diagnostics.get("query_understanding") or {}
     query_type = query_understanding.get("query_type")
     text = str(message or "").lower()
-    if response_type == "tasks_today" or "task" in response_type:
+    if response_type == "agent_action":
         return "task_help"
-    if response_type == "order_plan":
-        return "task_prioritization"
-    if response_type == "general_chat":
-        return "summary"
     if query_type == "document_question" or any(
         word in text for word in ("dokument", "handbuch", "anleitung", "pdf")
     ):
@@ -159,68 +55,13 @@ def answer_mode_for_message(message, response_type="", diagnostics=None):
         word in text for word in ("aehnlich", "ähnlich", "wiederkehrend", "historie")
     ):
         return "similar_errors"
-    if response_type == "error_help" or looks_like_error_question(message):
+    if mentions_error_question(message):
         return "error_analysis"
     if query_type == "machine_question" or any(
         word in text for word in ("maschine", "anlage", "presse")
     ):
         return "machine_knowledge"
     return "maintenance_assistant"
-
-
-def retrieval_has_evidence(retrieval):
-    """Return whether a RAG retrieval payload contains usable answer evidence."""
-    return bool(retrieval.get("sources"))
-
-
-def should_generate_without_evidence():
-    """Return whether a configured provider should still receive unsourced prompts.
-
-    The policy is explicit: ``AI_GENERATE_WITHOUT_EVIDENCE`` must be enabled and
-    a non-mock provider must be configured. Otherwise empty retrieval stays a
-    local, grounded no-answer and no LLM call is made.
-    """
-    if not _config_flag("AI_GENERATE_WITHOUT_EVIDENCE", False):
-        return False
-    provider = get_ai_provider()
-    configured_provider = current_app.config.get("AI_PROVIDER", "openai").lower()
-    return provider.name != "mock" or configured_provider != "mock"
-
-
-def _config_flag(key, default=False):
-    """Return a boolean config flag that tolerates string values."""
-    value = current_app.config.get(key, default)
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on"}
-    return bool(value)
-
-
-def empty_retrieval_diagnostics():
-    """Return diagnostics for a grounded no-answer that skipped generation.
-
-    Provider misconfiguration stays visible (for example ``api_key_missing``)
-    so admins can distinguish a deliberate evidence gate from a broken setup.
-    """
-    configured_provider = str(current_app.config.get("AI_PROVIDER", "openai") or "").lower()
-    reason = ""
-    if configured_provider != "mock":
-        reason = ai_provider_fallback_reason(current_app.config)
-    if reason:
-        diagnostics = ai_diagnostics(
-            reason,
-            fallback_used=True,
-            error=provider_fallback_error_message(reason),
-            metadata=local_metadata("local", "chat"),
-        )
-    else:
-        diagnostics = ai_diagnostics("local_answer", fallback_used=True)
-    diagnostics["generation_skipped"] = "no_evidence"
-    return diagnostics
-
-
-def grounded_empty_retrieval_answer(message, retrieval=None, user=None):
-    """Return a non-hallucinating fallback when no relevant source was retrieved."""
-    return build_empty_retrieval_answer(message, retrieval=retrieval, user=user)
 
 
 def chat_quality_warnings(result, message=""):
@@ -236,7 +77,7 @@ def chat_quality_warnings(result, message=""):
                 "type": "empty_retrieval",
                 "severity": "warning",
                 "message": (
-                    "Keine Quellen gefunden; Antwort nur als vorsichtige " "Orientierung nutzen."
+                    "Keine Quellen gefunden; Antwort nur als vorsichtige Orientierung nutzen."
                 ),
             }
         )
@@ -250,8 +91,8 @@ def chat_quality_warnings(result, message=""):
         )
     if (
         not sources
-        and result.get("type") in {"assistant", "error_help"}
-        and looks_like_error_question(message)
+        and answer_category in {ANSWER_CATEGORY_RAG, ANSWER_CATEGORY_GENERAL}
+        and mentions_error_question(message)
     ):
         warnings.append(
             {
@@ -301,11 +142,6 @@ def finalize_chat_result_quality(result, message):
     )
     result["answer_quality"] = answer_quality_from_result(result, diagnostics, warnings)
     return result
-
-
-def answer_quality_payload(result, diagnostics, warnings):
-    """Return a compact UI-facing answer quality summary."""
-    return answer_quality_from_result(result, diagnostics, warnings)
 
 
 def ai_diagnostics(
@@ -359,10 +195,7 @@ def _answer_category_for_result(result):
     explicit = result.get("answer_category") or diagnostics.get("answer_category")
     if explicit:
         return str(explicit)
-    response_type = str(result.get("type") or "")
-    if response_type == "general_chat":
-        return ANSWER_CATEGORY_GENERAL
-    if result.get("rag") is not None or response_type in {"assistant", "error_help"}:
+    if result.get("rag") is not None:
         return ANSWER_CATEGORY_RAG
     return ANSWER_CATEGORY_STRUCTURED
 
@@ -387,14 +220,10 @@ def attach_audit_metadata(
     allowed_scopes=None,
     workflow=None,
     message="",
-    conversation_context=None,
 ):
     """Attach source diagnostics and metadata-only audit id to a chat result."""
     diagnostics = result.setdefault("diagnostics", ai_diagnostics("local_answer"))
     rag = result.get("rag") or {}
-    if conversation_context is not None:
-        diagnostics["conversation_context"] = conversation_context.diagnostics()
-        diagnostics["session_id"] = conversation_context.session_id
     query_understanding = rag.get("query_understanding")
     if not query_understanding:
         query_understanding = classify_query(message, requested_scopes).to_dict()
@@ -469,7 +298,7 @@ def attach_audit_metadata(
     finalize_chat_result_quality(result, message)
     event_id = create_ai_audit_event(
         user,
-        workflow or result.get("type", "assistant"),
+        workflow or result.get("type", "agent"),
         diagnostics,
         requested_scopes=requested_scopes or [],
         allowed_scopes=allowed_scopes or [],
@@ -489,7 +318,7 @@ def redacted_status_error(error):
 
 
 def ai_status():
-    """Return redacted OpenAI configuration status for admins."""
+    """Return redacted provider configuration status for admins."""
     last_error = redacted_status_error(LAST_OPENAI_ERROR)
     provider_readiness = ai_provider_readiness_snapshot(
         current_app.config,
@@ -520,242 +349,3 @@ def ai_status():
         "last_error": last_error,
         "analytics": ai_analytics_summary(7),
     }
-
-
-def redacted_openai_error(error):
-    """Return a user-safe error category for OpenAI failures."""
-    if isinstance(error, AIServiceError):
-        return error.error_code
-    name = error.__class__.__name__
-    return name if name.endswith("Error") else "OpenAIError"
-
-
-def _call_answer_question(provider, message, context, extra_rules=None):
-    """Call ``answer_question`` and pass extra rules only when the provider accepts them."""
-    if not extra_rules:
-        return provider.answer_question(message, context)
-    try:
-        parameters = inspect.signature(provider.answer_question).parameters
-    except (TypeError, ValueError):
-        return provider.answer_question(message, context)
-    accepts_rules = "extra_rules" in parameters or any(
-        parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
-    )
-    if accepts_rules:
-        return provider.answer_question(message, context, extra_rules=extra_rules)
-    return provider.answer_question(message, context)
-
-
-def openai_assistant_answer(message, context, extra_rules=None):
-    """Generate an AI answer using OpenAI and permission-aware context."""
-    global LAST_OPENAI_ERROR
-    provider = get_ai_provider()
-
-    configured_provider = current_app.config.get("AI_PROVIDER", "openai").lower()
-    if provider.name == "mock" and configured_provider != "mock":
-        fallback_reason = ai_provider_fallback_reason(current_app.config)
-        LAST_OPENAI_ERROR = fallback_reason or "provider_unavailable"
-        logger.warning("ai_fallback workflow=chat reason=%s", LAST_OPENAI_ERROR)
-        return None, ai_diagnostics(
-            LAST_OPENAI_ERROR,
-            fallback_used=True,
-            error=provider_fallback_error_message(LAST_OPENAI_ERROR),
-            metadata=local_metadata("local", "chat"),
-        )
-
-    try:
-        answer = _call_answer_question(provider, message, context, extra_rules)
-    except AIServiceError as exc:
-        LAST_OPENAI_ERROR = redacted_openai_error(exc)
-        logger.exception("ai_call_failed workflow=chat provider=%s", provider.name)
-        return None, ai_diagnostics(
-            "openai_error",
-            fallback_used=True,
-            error=LAST_OPENAI_ERROR,
-            provider=provider.name,
-            metadata=getattr(provider, "last_call_metadata", {}),
-        )
-
-    LAST_OPENAI_ERROR = None
-    metadata = getattr(provider, "last_call_metadata", {})
-    if provider.name == "mock":
-        return answer, ai_diagnostics(
-            "local_answer",
-            provider=provider.name,
-            metadata=metadata,
-        )
-    return answer, ai_diagnostics(
-        "openai_used",
-        provider=provider.name,
-        metadata=metadata,
-    )
-
-
-def general_tracking_notice():
-    """Return the required tracking notice for hybrid-mode answers."""
-    return (
-        "\n\n- **Hinweis:** Allgemeine AI-Fragen werden in der Chat-Historie "
-        "und als AI-Nutzungsmetadaten protokolliert."
-    )
-
-
-def with_general_tracking_notice(answer):
-    """Return an answer with exactly one general-chat tracking notice."""
-    text = str(answer or "").strip()
-    notice = general_tracking_notice().strip()
-    if notice in text:
-        return text
-    return f"{text}\n\n{notice}" if text else notice
-
-
-def local_general_chat_answer(reason):
-    """Return a concise local fallback for general questions."""
-    if reason == "api_key_missing":
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** OpenAI ist nicht konfiguriert\n"
-            "- **Naechster Schritt:** OPENAI_API_KEY in der .env setzen und Server neu starten"
-        )
-    if reason == "base_url_missing":
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** OpenAI-kompatibler Provider ist nicht vollstaendig konfiguriert\n"
-            "- **Naechster Schritt:** AI_BASE_URL fuer den lokalen Endpoint setzen"
-        )
-    if reason == "unsupported_provider":
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** Der konfigurierte AI-Provider hat noch keinen Adapter\n"
-            "- **Naechster Schritt:** AI_PROVIDER auf openai, openai_compatible oder mock setzen"
-        )
-    if reason in {"model_not_found", "model_not_allowed"}:
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** Das konfigurierte OpenAI-Modell ist nicht freigeschaltet\n"
-            "- **Naechster Schritt:** OPENAI_MODEL auf ein verfuegbares Modell setzen"
-        )
-    if reason == "rate_limit":
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** OpenAI-Rate-Limit erreicht\n"
-            "- **Naechster Schritt:** Kurz warten oder ein Modell mit hoeherem Limit nutzen"
-        )
-    if reason == "authentication_error":
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** OpenAI-Key wurde abgelehnt\n"
-            "- **Naechster Schritt:** OPENAI_API_KEY pruefen oder neu erstellen"
-        )
-    if reason in {"connection_error", "timeout"}:
-        return (
-            "## Allgemeine Antwort\n"
-            "- **Status:** Verbindung zu OpenAI nicht erfolgreich\n"
-            "- **Naechster Schritt:** Netzwerk, Firewall und Timeout-Konfiguration pruefen"
-        )
-    return (
-        "## Allgemeine Antwort\n"
-        "- **Status:** OpenAI ist gerade nicht erreichbar\n"
-        "- **Naechster Schritt:** API-Key, Modellname, Netzwerk und OpenAI-Status pruefen"
-    )
-
-
-def openai_general_answer(message, context=""):
-    """Generate a short general AI answer for hybrid mode."""
-    global LAST_OPENAI_ERROR
-    provider = get_ai_provider()
-    configured_provider = current_app.config.get("AI_PROVIDER", "openai").lower()
-    if provider.name == "mock" and configured_provider != "mock":
-        fallback_reason = ai_provider_fallback_reason(current_app.config)
-        LAST_OPENAI_ERROR = fallback_reason or "provider_unavailable"
-        answer = local_general_chat_answer(LAST_OPENAI_ERROR)
-        return with_general_tracking_notice(answer), ai_diagnostics(
-            LAST_OPENAI_ERROR,
-            fallback_used=True,
-            error=provider_fallback_error_message(LAST_OPENAI_ERROR),
-            metadata=local_metadata("local", "general_chat"),
-        )
-
-    try:
-        if context:
-            answer = provider.answer_question(message, context, workflow="general_chat")
-        else:
-            answer = provider.answer_general_question(message)
-    except AIServiceError as exc:
-        LAST_OPENAI_ERROR = redacted_openai_error(exc)
-        logger.exception(
-            "ai_call_failed workflow=general_chat provider=%s",
-            provider.name,
-        )
-        fallback = local_general_chat_answer(LAST_OPENAI_ERROR)
-        return with_general_tracking_notice(fallback), ai_diagnostics(
-            "openai_error",
-            fallback_used=True,
-            error=LAST_OPENAI_ERROR,
-            provider=provider.name,
-            metadata=getattr(provider, "last_call_metadata", {}),
-        )
-
-    LAST_OPENAI_ERROR = None
-    metadata = getattr(provider, "last_call_metadata", {})
-    status = "local_answer" if provider.name == "mock" else "openai_used"
-    return with_general_tracking_notice(answer), ai_diagnostics(
-        status,
-        provider=provider.name,
-        metadata=metadata,
-    )
-
-
-def fallback_general_answer(context_data, blocked_scopes=None):
-    """Return a local read-only answer from allowed context counts."""
-    blocked_scopes = blocked_scopes or []
-    counts = {
-        "Fehler": len(context_data.get("errors", [])),
-        "Mitarbeiter": len(context_data.get("employees", [])),
-        "Maschinen": len(context_data.get("machines", [])),
-        "Lagerpositionen": len(context_data.get("inventory", [])),
-        "Dokumente": len(context_data.get("documents", [])),
-        "Schichtplaene": len(context_data.get("shiftplans", [])),
-    }
-    visible = [f"{label}: {count}" for label, count in counts.items() if count]
-    lines = [
-        "## Ergebnis",
-        "- **Status:** Freigegebene Daten geprueft",
-    ]
-    if visible:
-        lines.append(f"- **Sichtbarer Kontext:** {', '.join(visible[:4])}")
-    else:
-        lines.append("- **Sichtbarer Kontext:** Keine passenden Daten gefunden")
-    if blocked_scopes:
-        labels = [DASHBOARD_SCOPE_LABELS[scope] for scope in blocked_scopes]
-        blocked_labels = ", ".join(labels)
-        lines.append(f"- **Eingeschraenkt:** Keine Berechtigung fuer {blocked_labels}")
-        lines.append("- **Naechster Schritt:** Berechtigung beim Admin anfragen")
-    else:
-        lines.append("- **Naechster Schritt:** Frage bei Bedarf konkreter stellen")
-    return "\n".join(lines)
-
-
-__all__ = [
-    "ANSWER_CATEGORY_GENERAL",
-    "ANSWER_CATEGORY_RAG",
-    "ANSWER_CATEGORY_STRUCTURED",
-    "MODEL_KNOWLEDGE_LABEL",
-    "answer_mode_for_message",
-    "retrieval_has_evidence",
-    "should_generate_without_evidence",
-    "empty_retrieval_diagnostics",
-    "grounded_empty_retrieval_answer",
-    "chat_quality_warnings",
-    "finalize_chat_result_quality",
-    "ai_diagnostics",
-    "attach_audit_metadata",
-    "redacted_status_error",
-    "ai_status",
-    "redacted_openai_error",
-    "openai_assistant_answer",
-    "general_tracking_notice",
-    "with_general_tracking_notice",
-    "local_general_chat_answer",
-    "openai_general_answer",
-    "fallback_general_answer",
-]

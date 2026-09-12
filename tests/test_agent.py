@@ -294,7 +294,6 @@ def test_agent_answers_with_tools_offline(app, make_user, make_task):
     admin = make_user(username="agent_loop_admin", role=Role.MASTER_ADMIN, department_name=None)
     make_task("Dichtung an Presse 3 pruefen", admin["username"])
 
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     with app.app_context():
         result = run_agent(
             "Welche offenen Tasks gibt es?", _user(admin["id"]), session_id="agent-s1"
@@ -377,7 +376,6 @@ def test_agent_stops_at_iteration_limit(app, make_user):
                 metadata={"input_tokens": 10, "output_tokens": 5, "total_tokens": 15},
             )
 
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     provider = LoopingProvider()
     with app.app_context():
         app.config["AI_AGENT_MAX_ITERATIONS"] = 2
@@ -405,7 +403,6 @@ def test_agent_reports_provider_failure_with_fallback(app, make_user):
             """Simulate a rate limit."""
             raise AIServiceError("rate limited", error_code="rate_limit")
 
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     with app.app_context():
         result = run_agent(
             "Welche Tasks sind offen?", _user(admin["id"]), provider=FailingProvider()
@@ -533,7 +530,7 @@ def test_agent_falls_back_to_chat_message_history_without_checkpointer(app, make
     with app.app_context():
         app.config["AI_AGENT_CHECKPOINTER"] = "none"
         app.extensions.pop("agent_checkpointer", None)
-        from app.ai.services import save_chat_message
+        from app.services.ai_history_service import save_chat_message
 
         save_chat_message(
             _user(admin["id"]),
@@ -555,47 +552,10 @@ def test_agent_falls_back_to_chat_message_history_without_checkpointer(app, make
     assert captured["messages"][1]["content"] == "Wie tausche ich den Filter?"
 
 
-def test_structured_fast_path_answers_without_model_call(app, make_user, make_task):
-    """Verify deterministic rule handlers answer structured questions before the loop."""
-    user = make_user(username="agent_fast_path_user", role=Role.PRODUKTION)
-    make_task("Riemen pruefen", user["username"])
-
-    class ExplodingProvider:
-        """Provider double that must not be called."""
-
-        name = "exploding"
-        supports_tool_calls = True
-
-        def chat_with_tools(self, messages, tools, workflow="agent"):
-            """Fail loudly if the fast path did not match."""
-            raise AssertionError("fast path should have answered")
-
-    with app.app_context():
-        result = run_agent(
-            "Wie viele Tasks sind offen?", _user(user["id"]), provider=ExplodingProvider()
-        )
-
-    assert result["diagnostics"]["agent_fast_path"] == "structured_rules"
-    assert result["rag"]["agent"]["engine"] == "fast_path"
-    assert result["type"] != "agent"
-    assert "1" in result["answer"]
-    assert result["diagnostics"]["audit_event_id"]
-
-
-def test_chat_mode_defaults_to_agent():
-    """Verify the shipped configuration routes chat through the agent."""
-    import os
-
-    from app.config import Config
-
-    assert Config.AI_CHAT_MODE == (os.getenv("AI_CHAT_MODE") or "agent").strip().lower()
-
-
 def test_agent_fallback_runner_matches_langgraph(app, make_user, make_task, monkeypatch):
     """Verify the deterministic runner produces the same node sequence without LangGraph."""
     admin = make_user(username="agent_fallback_admin", role=Role.MASTER_ADMIN, department_name=None)
     make_task("Riemen spannen", admin["username"])
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     monkeypatch.setattr(agent_graph, "_compiled_graph", lambda *args, **kwargs: None)
     monkeypatch.setattr(agent_graph, "_workflow_engine_name", lambda: "fallback")
 
@@ -729,7 +689,6 @@ def test_agent_route_persists_chat_and_lists_tools(app, client, make_user, make_
     """Verify the agent endpoint stores history and the tools endpoint is permission-aware."""
     user = make_user(username="agent_route_user", role=Role.PRODUKTION)
     make_task("Sensor reinigen", user["username"])
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     headers = auth_headers(user["username"])
 
     response = client.post(
@@ -752,14 +711,12 @@ def test_agent_route_persists_chat_and_lists_tools(app, client, make_user, make_
     assert "search_employees" not in {tool["name"] for tool in tools["tools"]}
 
 
-def test_chat_endpoint_routes_through_agent_when_configured(
+def test_chat_endpoint_answers_through_agent_with_answer_only_mode(
     app, client, make_user, make_task, auth_headers
 ):
-    """Verify AI_CHAT_MODE=agent switches the existing chat endpoint to the agent."""
+    """Verify the chat endpoint runs the agent and honours answer-only redaction."""
     user = make_user(username="agent_mode_user", role=Role.PRODUKTION)
     make_task("Kette schmieren", user["username"])
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
-    app.config["AI_CHAT_MODE"] = "agent"
 
     response = client.post(
         "/api/v1/ai/chat",

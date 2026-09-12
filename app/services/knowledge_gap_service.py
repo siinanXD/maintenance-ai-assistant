@@ -16,7 +16,10 @@ from app.services.text_normalization_service import tokenize_text
 
 logger = logging.getLogger(__name__)
 
-TRACKED_RESPONSE_TYPES = {"assistant", "general_chat", "error_help"}
+TRACKED_RESPONSE_TYPES = {"agent"}
+# Only retrieval-backed answers can reveal missing knowledge; general model
+# answers and structured data lists never create gap entries.
+TRACKED_ANSWER_CATEGORIES = {"rag"}
 GAP_STATUSES = {"api_key_missing", "openai_error", "fallback_used"}
 DEFAULT_DEDUP_HOURS = 24
 DEFAULT_LOW_CONFIDENCE_SCORE = 35
@@ -57,6 +60,9 @@ def should_track_gap(result):
     sources = result.get("sources") or []
     if diagnostics.get("status") in GAP_STATUSES or diagnostics.get("fallback_used"):
         return True
+    answer_category = result.get("answer_category") or diagnostics.get("answer_category")
+    if answer_category not in TRACKED_ANSWER_CATEGORIES:
+        return False
     if not sources:
         return True
 

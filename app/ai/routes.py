@@ -1,17 +1,18 @@
 """AI API routes for chat, briefings, and assistants."""
 
-from flask import Blueprint, current_app, request
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 
 from app.agent.actions import confirm_pending_action
 from app.agent.service import agent_capabilities, run_agent
-from app.ai.services import ai_status, answer_chat, daily_briefing, save_chat_message
+from app.ai.briefings import daily_briefing
+from app.ai.status import ai_status
 from app.extensions import db
 from app.models import Role
 from app.responses import error_response, service_error_response, success_response
 from app.security import current_user, has_dashboard_permission, roles_required
 from app.services.ai_feedback_service import record_ai_feedback
-from app.services.ai_history_service import paginated_chat_history
+from app.services.ai_history_service import paginated_chat_history, save_chat_message
 from app.services.ai_rate_limit_service import check_ai_quota
 from app.services.ai_response_visibility_service import (
     redact_ai_chat_response,
@@ -32,11 +33,6 @@ from app.services.operations_tracking_service import record_event
 from app.services.order_planning_service import plan_order
 
 ai_bp = Blueprint("ai", __name__)
-
-
-def chat_mode_is_agent():
-    """Return whether the chat endpoint should route through the tool agent."""
-    return str(current_app.config.get("AI_CHAT_MODE", "legacy") or "").strip().lower() == "agent"
 
 
 def _persist_and_respond(user, message, result, data, event_type):
@@ -71,32 +67,8 @@ def _persist_and_respond(user, message, result, data, event_type):
     return success_response(visible_result, message="AI response generated")
 
 
-@ai_bp.post("/chat")
-@jwt_required()
-def chat():
-    """Handle authenticated chat requests for the maintenance assistant."""
-    data = request.get_json(silent=True) or {}
-    message = data.get("message", "").strip()
-
-    if not message:
-        return error_response("message is required", 400)
-
-    user = current_user()
-    rejected = check_ai_quota(user)
-    if rejected is not None:
-        return rejected
-    session_id = normalize_session_id(data.get("session_id"))
-    if chat_mode_is_agent():
-        result = run_agent(message, user, session_id=session_id)
-        return _persist_and_respond(user, message, result, data, "ai.agent")
-    result = answer_chat(message, user, session_id=session_id)
-    return _persist_and_respond(user, message, result, data, "ai.chat")
-
-
-@ai_bp.post("/agent")
-@jwt_required()
-def agent_chat():
-    """Answer through the tool-using agent regardless of the configured chat mode."""
+def _run_agent_and_respond(event_type="ai.agent"):
+    """Run the tool agent for the current chat request and return the response."""
     data = request.get_json(silent=True) or {}
     message = str(data.get("message") or "").strip()
     if not message:
@@ -107,7 +79,21 @@ def agent_chat():
         return rejected
     session_id = normalize_session_id(data.get("session_id"))
     result = run_agent(message, user, session_id=session_id)
-    return _persist_and_respond(user, message, result, data, "ai.agent")
+    return _persist_and_respond(user, message, result, data, event_type)
+
+
+@ai_bp.post("/chat")
+@jwt_required()
+def chat():
+    """Handle authenticated chat requests through the tool-using agent."""
+    return _run_agent_and_respond()
+
+
+@ai_bp.post("/agent")
+@jwt_required()
+def agent_chat():
+    """Answer through the tool-using agent (alias of the chat endpoint)."""
+    return _run_agent_and_respond()
 
 
 @ai_bp.post("/agent/confirm")

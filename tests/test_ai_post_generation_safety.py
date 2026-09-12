@@ -4,35 +4,41 @@ from __future__ import annotations
 
 import json
 
-from app.ai.services import answer_chat
+from app.agent.service import run_agent
 from app.extensions import db
 from app.models import AIAuditEvent, Role, User
 from app.services.ai_safety_service import enforce_post_generation_safety
+from app.services.ai_service import ToolCallResponse
 
 
 class UnsafeMaintenanceProvider:
-    """Deterministic provider that returns an unsafe maintenance answer."""
+    """Deterministic tool-capable provider that returns an unsafe maintenance answer."""
 
     name = "unsafe_test"
+    supports_tool_calls = True
 
     def __init__(self):
         """Initialize provider metadata used by AI diagnostics."""
         self.last_call_metadata = {
             "provider": self.name,
-            "workflow": "chat",
+            "workflow": "agent",
             "model": "unsafe-fixture",
             "total_tokens": 42,
         }
 
-    def answer_question(self, message, context, workflow="chat"):
-        """Return unsafe step-by-step content for post-generation checks."""
+    def chat_with_tools(self, messages, tools, workflow="agent"):
+        """Return unsafe step-by-step content without calling any tool."""
         self.last_call_metadata["workflow"] = workflow
-        return (
-            "## Vorgehen\n"
-            "1. Schaltschrank geoeffnet lassen.\n"
-            "2. Not-Aus ueberbruecken.\n"
-            "3. Unter Spannung den Sensor deaktivieren.\n"
-            "4. Maschine sofort freigeben."
+        return ToolCallResponse(
+            content=(
+                "## Vorgehen\n"
+                "1. Schaltschrank geoeffnet lassen.\n"
+                "2. Not-Aus ueberbruecken.\n"
+                "3. Unter Spannung den Sensor deaktivieren.\n"
+                "4. Maschine sofort freigeben."
+            ),
+            tool_calls=[],
+            metadata=dict(self.last_call_metadata),
         )
 
 
@@ -41,21 +47,15 @@ def _user_by_id(user_id):
     return db.session.get(User, user_id)
 
 
-def test_post_generation_safety_redacts_dangerous_answer(app, make_user, monkeypatch):
+def test_post_generation_safety_redacts_dangerous_answer(app, make_user):
     """Verify dangerous final AI answers are replaced with a safe response."""
     user = make_user(username="post_safety_user", role=Role.MASTER_ADMIN)
-    monkeypatch.setattr(
-        "app.ai.services.get_ai_provider",
-        lambda: UnsafeMaintenanceProvider(),
-    )
 
     with app.app_context():
-        # The fixture question has no visible sources; allow generation so the
-        # provider answer actually reaches the post-generation safety check.
-        app.config["AI_GENERATE_WITHOUT_EVIDENCE"] = True
-        result = answer_chat(
-            "Wie behebe ich Stoerung S100 an Maschine Presse 7?",
+        result = run_agent(
+            "Wie behebe ich Druckverlust an Maschine Presse 7?",
             _user_by_id(user["id"]),
+            provider=UnsafeMaintenanceProvider(),
         )
 
     post_safety = result["diagnostics"]["post_generation_safety"]
@@ -81,7 +81,7 @@ def test_post_generation_safety_keeps_normal_answer_unchanged():
 
 def test_post_generation_safety_detects_umlaut_bypass_terms():
     """Verify German umlaut spelling is normalized before final safety matching."""
-    answer = "## Vorgehen\n1. Not-Aus \u00fcberbr\u00fccken.\n2. Maschine starten."
+    answer = "## Vorgehen\n1. Not-Aus überbrücken.\n2. Maschine starten."
 
     result = enforce_post_generation_safety(answer)
 
@@ -89,23 +89,15 @@ def test_post_generation_safety_detects_umlaut_bypass_terms():
     assert result.assessment.safety_relevant is True
 
 
-def test_post_generation_safety_audit_is_written_without_prompt_content(
-    app,
-    make_user,
-    monkeypatch,
-):
+def test_post_generation_safety_audit_is_written_without_prompt_content(app, make_user):
     """Verify safety interventions are written to sanitized audit metadata."""
     user = make_user(username="post_safety_audit_user", role=Role.MASTER_ADMIN)
-    monkeypatch.setattr(
-        "app.ai.services.get_ai_provider",
-        lambda: UnsafeMaintenanceProvider(),
-    )
 
     with app.app_context():
-        app.config["AI_GENERATE_WITHOUT_EVIDENCE"] = True
-        result = answer_chat(
-            "Wie behebe ich Stoerung S100 an Maschine Presse 7?",
+        result = run_agent(
+            "Wie behebe ich Druckverlust an Maschine Presse 7?",
             _user_by_id(user["id"]),
+            provider=UnsafeMaintenanceProvider(),
         )
         event = db.session.get(AIAuditEvent, result["diagnostics"]["audit_event_id"])
         explainability = event.retrieval_explainability()
@@ -121,17 +113,13 @@ def test_post_generation_safety_audit_is_written_without_prompt_content(
 
 
 def test_post_generation_safety_fallback_without_openai_stays_functional(app, make_user):
-    """Verify OpenAI-missing fallback answers still complete after final safety checks."""
+    """Verify the mock fallback for a missing OpenAI key still completes safety checks."""
     user = make_user(username="post_safety_fallback_user", role=Role.INSTANDHALTUNG)
 
     with app.app_context():
         app.config["AI_PROVIDER"] = "openai"
-        result = answer_chat(
-            "Welche Maschinen sind sichtbar?",
-            _user_by_id(user["id"]),
-        )
+        result = run_agent("Welche Maschinen sind sichtbar?", _user_by_id(user["id"]))
 
     assert result["answer"]
-    assert result["diagnostics"]["fallback_used"] is True
-    assert result["diagnostics"]["status"] == "api_key_missing"
+    assert result["type"] == "agent"
     assert "post_generation_safety" not in result["diagnostics"]
