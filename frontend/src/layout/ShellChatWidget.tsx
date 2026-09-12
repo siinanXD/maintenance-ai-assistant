@@ -32,10 +32,17 @@ type ShellChatDiagnostics = {
   readonly status?: string;
 };
 
+type ShellChatPendingAction = {
+  readonly label?: string;
+  readonly token: string;
+  readonly tool?: string;
+};
+
 type ShellChatMessage = {
   readonly id: string;
   readonly isLoading?: boolean;
   readonly meta?: ShellChatAnswerMeta;
+  readonly pendingAction?: ShellChatPendingAction;
   readonly role: ChatMessageRole;
   readonly text: string;
 };
@@ -47,6 +54,7 @@ type ShellChatResponse = {
   readonly data?: ShellChatResponse;
   readonly diagnostics?: ShellChatDiagnostics;
   readonly evidence_visible?: boolean;
+  readonly pending_action?: ShellChatPendingAction;
   readonly retrieval_used?: boolean;
   readonly source_label?: string;
   readonly sources?: readonly ShellChatSource[];
@@ -172,11 +180,23 @@ function metaFromPayload(payload: ShellChatResponse): ShellChatAnswerMeta {
 }
 
 /**
+ * Return the pending agent action carried by a chat response, if any.
+ */
+function pendingActionFromPayload(payload: ShellChatResponse): ShellChatPendingAction | undefined {
+  const data = responseData(payload);
+  const pending = data.pending_action;
+  if (!pending || typeof pending.token !== "string" || !pending.token) return undefined;
+  return { label: pending.label, token: pending.token, tool: pending.tool };
+}
+
+/**
  * Return a human-readable answer type label.
  */
 function answerTypeLabel(typeValue: unknown): string {
   const key = String(typeValue || "").trim();
   const labels: Record<string, string> = {
+    agent: "Agent",
+    agent_action: "Agent-Aktion",
     daily_briefing: "Daily Briefing",
     document_outdated: "Dokumente",
     document_recent: "Dokumente",
@@ -377,7 +397,13 @@ function cleanAnswerLine(line: string): string {
 /**
  * Render one React-owned chat message bubble.
  */
-function ShellChatMessageBubble({ message }: { readonly message: ShellChatMessage }): ReactNode {
+function ShellChatMessageBubble({
+  message,
+  onConfirm
+}: {
+  readonly message: ShellChatMessage;
+  readonly onConfirm?: (message: ShellChatMessage) => void;
+}): ReactNode {
   const className = [
     "chat-message",
     message.role === "assistant" ? "is-assistant" : "is-user",
@@ -409,6 +435,14 @@ function ShellChatMessageBubble({ message }: { readonly message: ShellChatMessag
           {message.meta.sourceItems.map((sourceLabel) => (
             <span key={sourceLabel}>{sourceLabel}</span>
           ))}
+        </div>
+      ) : null}
+      {message.pendingAction && onConfirm ? (
+        <div className="chat-pending-action" data-chat-pending-action>
+          <span>Aktion wartet auf Bestätigung: {message.pendingAction.label || message.pendingAction.tool}</span>
+          <button className="btn btn-sm btn-primary" type="button" onClick={() => onConfirm(message)}>
+            Aktion bestätigen
+          </button>
         </div>
       ) : null}
     </article>
@@ -497,8 +531,11 @@ export function ShellChatWidget(): ReactNode {
       });
       const answer = answerFromPayload(payload);
       const meta = metaFromPayload(payload);
+      const pendingAction = pendingActionFromPayload(payload);
       setMessages((currentMessages) => currentMessages.map((item) => (
-        item.id === loadingId ? { id: loadingId, meta, role: "assistant", text: answer } : item
+        item.id === loadingId
+          ? { id: loadingId, meta, pendingAction, role: "assistant", text: answer }
+          : item
       )));
     } catch (error) {
       const fallbackMessage = error instanceof Error
@@ -510,6 +547,43 @@ export function ShellChatWidget(): ReactNode {
     } finally {
       setIsSending(false);
       window.setTimeout(() => inputRef.current?.focus(), 0);
+    }
+  }
+
+  /**
+   * Confirm a pending agent write action and show the outcome in the chat.
+   */
+  async function confirmAction(message: ShellChatMessage): Promise<void> {
+    const pending = message.pendingAction;
+    if (!pending || isSending) return;
+    setIsSending(true);
+    setMessages((currentMessages) => currentMessages.map((item) => (
+      item.id === message.id ? { ...item, pendingAction: undefined } : item
+    )));
+    try {
+      const payload = await apiRequest<ShellChatResponse>("/api/v1/ai/agent/confirm", {
+        body: { session_id: chatSessionId(), token: pending.token },
+        method: "POST"
+      });
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          id: chatMessageId("assistant-action"),
+          meta: metaFromPayload(payload),
+          role: "assistant",
+          text: answerFromPayload(payload)
+        }
+      ]);
+    } catch (error) {
+      const fallbackMessage = error instanceof Error
+        ? error.message
+        : "Die Aktion konnte nicht ausgeführt werden.";
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        { id: chatMessageId("assistant-action-error"), role: "assistant", text: fallbackMessage }
+      ]);
+    } finally {
+      setIsSending(false);
     }
   }
 
@@ -547,7 +621,7 @@ export function ShellChatWidget(): ReactNode {
         </div>
         <div className="chat-panel-body" data-chat-messages role="log" aria-live="polite" aria-relevant="additions text">
           {messages.map((message) => (
-            <ShellChatMessageBubble key={message.id} message={message} />
+            <ShellChatMessageBubble key={message.id} message={message} onConfirm={confirmAction} />
           ))}
         </div>
         <details className="help-disclosure chat-guidance">
@@ -578,7 +652,7 @@ export function ShellChatWidget(): ReactNode {
             ref={inputRef}
             value={inputValue}
           />
-          <span className="sr-only" id="chat-input-help-react">Der Assistant arbeitet read-only und nutzt nur freigegebene Daten.</span>
+          <span className="sr-only" id="chat-input-help-react">Der Assistant nutzt nur freigegebene Daten; schreibende Aktionen brauchen deine Bestätigung.</span>
           <button className="btn btn-primary" type="submit" disabled={isSending}>
             {isSending ? "Analysiere..." : "Senden"}
           </button>

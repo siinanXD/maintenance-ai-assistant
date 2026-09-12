@@ -2676,6 +2676,135 @@ ADDITIONAL_PATHS = {
             },
         }
     },
+    "/api/v1/ai/agent": {
+        "post": {
+            "tags": ["AI"],
+            "summary": "Ask the tool-using maintenance agent",
+            "description": (
+                "Runs the LangGraph agent loop: deterministic safety guard, provider "
+                "tool selection, permission-gated tool execution, validation. Write "
+                "tools return a signed pending_action that must be confirmed."
+            ),
+            "security": [{"bearerAuth": []}],
+            "requestBody": {
+                "required": True,
+                "content": {
+                    "application/json": {
+                        "example": {
+                            "message": "Welche offenen Tasks gibt es an Presse 3?",
+                            "session_id": "chat-widget",
+                            "response_mode": "answer_only",
+                        }
+                    }
+                },
+            },
+            "responses": {
+                "200": {
+                    "description": (
+                        "Agent answer with tool trace, sources, confidence and optional "
+                        "pending_action for confirmable write tools"
+                    ),
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": "#/components/schemas/AIChatResponse"},
+                            "example": {
+                                "type": "agent",
+                                "answer": "## Ergebnis\n- Dichtung an Presse 3 pruefen (open)",
+                                "tool_trace": [
+                                    {
+                                        "tool": "search_tasks",
+                                        "status": "ok",
+                                        "summary": "1 Treffer in tasks",
+                                        "source_count": 1,
+                                        "duration_ms": 12,
+                                    }
+                                ],
+                                "pending_action": None,
+                                "diagnostics": {
+                                    "status": "openai_used",
+                                    "workflow": "agent",
+                                    "agent_iterations": 2,
+                                    "agent_tool_calls": ["search_tasks"],
+                                },
+                            },
+                        }
+                    },
+                },
+                "400": {"$ref": "#/components/responses/ValidationError"},
+                "401": {"$ref": "#/components/responses/Unauthorized"},
+                "429": {"description": "Per-user rate limit or daily token budget exceeded"},
+            },
+        }
+    },
+    "/api/v1/ai/agent/confirm": {
+        "post": {
+            "tags": ["AI"],
+            "summary": "Confirm a pending agent write action",
+            "description": (
+                "Executes one signed pending action (for example create_task) once. "
+                "Tokens are bound to the requesting user and expire after "
+                "AI_AGENT_ACTION_TTL_SECONDS."
+            ),
+            "security": [{"bearerAuth": []}],
+            "requestBody": {
+                "required": True,
+                "content": {
+                    "application/json": {
+                        "example": {"token": "<signed-token>", "session_id": "chat-widget"}
+                    }
+                },
+            },
+            "responses": {
+                "200": {
+                    "description": "Action executed",
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "type": "agent_action",
+                                "tool": "create_task",
+                                "answer": "## Aktion ausgefuehrt\n- **Aktion:** Task anlegen",
+                                "data": {"task": {"id": 42, "title": "Filter tauschen"}},
+                            }
+                        }
+                    },
+                },
+                "400": {"description": "Invalid or expired action token"},
+                "401": {"$ref": "#/components/responses/Unauthorized"},
+                "403": {"description": "Action belongs to another user or lacks permission"},
+            },
+        }
+    },
+    "/api/v1/ai/agent/tools": {
+        "get": {
+            "tags": ["AI"],
+            "summary": "List agent tools available to the current user",
+            "security": [{"bearerAuth": []}],
+            "responses": {
+                "200": {
+                    "description": "Permission-filtered tool catalog",
+                    "content": {
+                        "application/json": {
+                            "example": {
+                                "tool_count": 9,
+                                "max_iterations": 4,
+                                "confirmation_required_tools": ["create_task"],
+                                "tools": [
+                                    {
+                                        "name": "search_tasks",
+                                        "label": "Search Tasks",
+                                        "requires_confirmation": False,
+                                        "write": False,
+                                        "scopes": ["tasks"],
+                                    }
+                                ],
+                            }
+                        }
+                    },
+                },
+                "401": {"$ref": "#/components/responses/Unauthorized"},
+            },
+        }
+    },
     "/api/v1/ai/chat/history": {
         "get": {
             "tags": ["AI"],

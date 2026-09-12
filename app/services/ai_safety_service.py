@@ -345,6 +345,33 @@ def apply_post_generation_safety_to_result(result, safety_result):
     return result
 
 
+def reapply_post_generation_penalty(result):
+    """Re-apply a stored post-generation confidence penalty after recomputation.
+
+    The workflow validation node already redacts unsafe answers and lowers the
+    confidence. When a later step recalculates confidence from scratch, the
+    redacted answer no longer triggers findings, so the stored penalty would be
+    lost. This keeps the diagnostics and the final confidence consistent.
+    """
+    if not isinstance(result, dict):
+        return result
+    diagnostics = result.get("diagnostics") or {}
+    stored = diagnostics.get("post_generation_safety")
+    if not isinstance(stored, dict):
+        return result
+    penalty = _bounded_int(stored.get("confidence_penalty"))
+    if not penalty:
+        return result
+    confidence = result.get("confidence") or diagnostics.get("confidence")
+    if not isinstance(confidence, dict):
+        return result
+    reasons = confidence.get("reasons") or []
+    if any("Post-generation Safety" in str(reason) for reason in reasons):
+        return result
+    _apply_confidence_penalty(result, penalty)
+    return result
+
+
 def _source_safety_signal(sources):
     """Return whether source metadata suggests safety relevance."""
     for source in sources or []:

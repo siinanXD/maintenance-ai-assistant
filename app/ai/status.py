@@ -1,6 +1,7 @@
 """AI orchestration services for permission-aware workflows."""
 # ruff: noqa: F401, F821
 
+import inspect
 import logging
 
 from flask import current_app
@@ -16,6 +17,7 @@ from app.services.ai_safety_service import (
     apply_safety_warning,
     assess_ai_safety,
     enforce_post_generation_safety,
+    reapply_post_generation_penalty,
 )
 from app.services.ai_service import (
     AIServiceError,
@@ -172,10 +174,48 @@ def retrieval_has_evidence(retrieval):
 
 
 def should_generate_without_evidence():
-    """Return whether a configured provider should still receive unsourced prompts."""
+    """Return whether a configured provider should still receive unsourced prompts.
+
+    The policy is explicit: ``AI_GENERATE_WITHOUT_EVIDENCE`` must be enabled and
+    a non-mock provider must be configured. Otherwise empty retrieval stays a
+    local, grounded no-answer and no LLM call is made.
+    """
+    if not _config_flag("AI_GENERATE_WITHOUT_EVIDENCE", False):
+        return False
     provider = get_ai_provider()
     configured_provider = current_app.config.get("AI_PROVIDER", "openai").lower()
     return provider.name != "mock" or configured_provider != "mock"
+
+
+def _config_flag(key, default=False):
+    """Return a boolean config flag that tolerates string values."""
+    value = current_app.config.get(key, default)
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+def empty_retrieval_diagnostics():
+    """Return diagnostics for a grounded no-answer that skipped generation.
+
+    Provider misconfiguration stays visible (for example ``api_key_missing``)
+    so admins can distinguish a deliberate evidence gate from a broken setup.
+    """
+    configured_provider = str(current_app.config.get("AI_PROVIDER", "openai") or "").lower()
+    reason = ""
+    if configured_provider != "mock":
+        reason = ai_provider_fallback_reason(current_app.config)
+    if reason:
+        diagnostics = ai_diagnostics(
+            reason,
+            fallback_used=True,
+            error=provider_fallback_error_message(reason),
+            metadata=local_metadata("local", "chat"),
+        )
+    else:
+        diagnostics = ai_diagnostics("local_answer", fallback_used=True)
+    diagnostics["generation_skipped"] = "no_evidence"
+    return diagnostics
 
 
 def grounded_empty_retrieval_answer(message, retrieval=None, user=None):
@@ -398,6 +438,7 @@ def attach_audit_metadata(
     result["answer"] = apply_safety_payload_warning(result.get("answer"), safety)
     post_safety = enforce_post_generation_safety(result.get("answer"), safety)
     result = apply_post_generation_safety_to_result(result, post_safety)
+    result = reapply_post_generation_penalty(result)
     diagnostics = result.setdefault("diagnostics", ai_diagnostics("local_answer"))
     diagnostics["source_count"] = len(sources)
     diagnostics["scopes"] = sorted(requested_scopes or [])
@@ -489,7 +530,23 @@ def redacted_openai_error(error):
     return name if name.endswith("Error") else "OpenAIError"
 
 
-def openai_assistant_answer(message, context):
+def _call_answer_question(provider, message, context, extra_rules=None):
+    """Call ``answer_question`` and pass extra rules only when the provider accepts them."""
+    if not extra_rules:
+        return provider.answer_question(message, context)
+    try:
+        parameters = inspect.signature(provider.answer_question).parameters
+    except (TypeError, ValueError):
+        return provider.answer_question(message, context)
+    accepts_rules = "extra_rules" in parameters or any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
+    )
+    if accepts_rules:
+        return provider.answer_question(message, context, extra_rules=extra_rules)
+    return provider.answer_question(message, context)
+
+
+def openai_assistant_answer(message, context, extra_rules=None):
     """Generate an AI answer using OpenAI and permission-aware context."""
     global LAST_OPENAI_ERROR
     provider = get_ai_provider()
@@ -507,7 +564,7 @@ def openai_assistant_answer(message, context):
         )
 
     try:
-        answer = provider.answer_question(message, context)
+        answer = _call_answer_question(provider, message, context, extra_rules)
     except AIServiceError as exc:
         LAST_OPENAI_ERROR = redacted_openai_error(exc)
         logger.exception("ai_call_failed workflow=chat provider=%s", provider.name)
@@ -686,6 +743,7 @@ __all__ = [
     "answer_mode_for_message",
     "retrieval_has_evidence",
     "should_generate_without_evidence",
+    "empty_retrieval_diagnostics",
     "grounded_empty_retrieval_answer",
     "chat_quality_warnings",
     "finalize_chat_result_quality",

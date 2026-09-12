@@ -49,6 +49,8 @@ class RagWorkflowState(TypedDict, total=False):
     retrieval: dict[str, Any]
     rag: dict[str, Any]
     answer: str
+    diagnostics: Any
+    answer_generator: Any
     result: dict[str, Any]
     trace: list[dict[str, Any]]
     workflow_engine: str
@@ -87,6 +89,7 @@ def run_langgraph_rag_workflow(
     requested_scopes=None,
     provider=None,
     conversation_context=None,
+    answer_generator=None,
 ):
     """Generate an answer through LangGraph when available, with fallback runner."""
     state = _initial_state(
@@ -96,6 +99,7 @@ def run_langgraph_rag_workflow(
         provider=provider,
         conversation_context=conversation_context,
         workflow_engine=_workflow_engine_name(),
+        answer_generator=answer_generator,
     )
     graph = _compiled_langgraph()
     if graph is not None:
@@ -189,8 +193,33 @@ def context_assembly_node(state):
 
 
 def answer_generation_node(state):
-    """Generate the assistant answer from assembled RAG context."""
+    """Generate the assistant answer from assembled RAG context.
+
+    When the state carries an ``answer_generator`` callable, it owns provider
+    selection, evidence gating and diagnostics. Otherwise the configured
+    provider is called directly.
+    """
     retrieval = state["retrieval"]
+    generator = state.get("answer_generator")
+    if generator is not None:
+        answer, diagnostics = generator(
+            state["message"],
+            retrieval,
+            prompt_rules_for_retrieval(retrieval),
+        )
+        return {
+            "answer": answer,
+            "diagnostics": diagnostics,
+            "trace": _append_trace(
+                state,
+                "answer_generation",
+                {
+                    "generator": "delegated",
+                    "status": str((diagnostics or {}).get("status") or ""),
+                    "answered": answer is not None,
+                },
+            ),
+        }
     provider = state.get("provider") or get_ai_provider()
     with langfuse_trace_context(
         "chat",
@@ -214,17 +243,29 @@ def answer_generation_node(state):
 def validation_node(state):
     """Attach confidence and post-generation safety validation to the answer."""
     retrieval = state["retrieval"]
-    provider = state.get("provider") or get_ai_provider()
-    result = attach_confidence_to_result(
-        state["message"],
-        {
-            "answer": state.get("answer"),
-            "sources": retrieval["sources"],
-            "data": retrieval["data"],
-            "rag": retrieval["rag"],
-            "provider": getattr(provider, "name", "unknown"),
-        },
-    )
+    provider = state.get("provider")
+    provider_name = getattr(provider, "name", "") if provider is not None else ""
+    if not provider_name and state.get("answer_generator") is None:
+        provider_name = getattr(get_ai_provider(), "name", "unknown")
+    result = {
+        "answer": state.get("answer"),
+        "sources": retrieval["sources"],
+        "data": retrieval["data"],
+        "rag": retrieval["rag"],
+        "provider": provider_name or "unknown",
+        "requested_scopes": retrieval.get("requested_scopes") or [],
+        "allowed_scopes": retrieval.get("allowed_scopes") or [],
+    }
+    diagnostics = state.get("diagnostics")
+    if isinstance(diagnostics, dict):
+        result["diagnostics"] = diagnostics
+    if state.get("answer") is None:
+        # Provider failure: leave fallback wording to the caller, keep diagnostics.
+        return {
+            "result": result,
+            "trace": _append_trace(state, "validation", {"skipped": "no_answer"}),
+        }
+    result = attach_confidence_to_result(state["message"], result)
     post_safety = enforce_post_generation_safety(
         result.get("answer"),
         retrieval["rag"].get("safety"),
@@ -232,7 +273,14 @@ def validation_node(state):
     result = apply_post_generation_safety_to_result(result, post_safety)
     return {
         "result": result,
-        "trace": _append_trace(state, "validation"),
+        "trace": _append_trace(
+            state,
+            "validation",
+            {
+                "confidence_level": (result.get("confidence") or {}).get("level", ""),
+                "post_generation_safety": post_safety.action,
+            },
+        ),
     }
 
 
@@ -280,6 +328,7 @@ def _initial_state(
     provider,
     conversation_context,
     workflow_engine,
+    answer_generator=None,
 ):
     """Return the initial workflow state."""
     return {
@@ -288,6 +337,7 @@ def _initial_state(
         "requested_scopes": requested_scopes,
         "provider": provider,
         "conversation_context": conversation_context,
+        "answer_generator": answer_generator,
         "trace": [],
         "workflow_engine": workflow_engine,
     }

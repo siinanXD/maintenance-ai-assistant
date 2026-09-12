@@ -17,6 +17,7 @@ from app.ai.status import (
     ANSWER_CATEGORY_RAG,
     MODEL_KNOWLEDGE_LABEL,
     ai_diagnostics,
+    empty_retrieval_diagnostics,
     fallback_general_answer,
     grounded_empty_retrieval_answer,
     openai_assistant_answer,
@@ -27,7 +28,7 @@ from app.ai.status import (
 from app.security import has_dashboard_permission
 from app.services.error_service import search_errors
 from app.services.langfuse_service import langfuse_trace_context
-from app.services.rag_service import build_rag_context
+from app.services.rag_service import answer_with_rag as run_rag_answer_workflow
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +71,46 @@ def try_general_hybrid_answer(
     )
 
 
+def grounded_answer_generator(user, conversation_context):
+    """Return the chat answer generator used by the LangGraph answer node.
+
+    The generator keeps the product rules in one place: generate with the
+    configured provider only when retrieval produced evidence (or the explicit
+    ``AI_GENERATE_WITHOUT_EVIDENCE`` policy allows it), otherwise return a
+    grounded local no-answer without calling the provider.
+    """
+
+    def generate(message, retrieval, extra_rules):
+        """Return ``(answer, diagnostics)`` for one retrieval payload.
+
+        Applied short-term conversation context counts as evidence: the prior
+        answer in the session was already grounded, so follow-up questions may
+        be answered from it.
+        """
+        context_applied = bool(getattr(conversation_context, "applied", False))
+        if (
+            retrieval_has_evidence(retrieval)
+            or context_applied
+            or should_generate_without_evidence()
+        ):
+            with langfuse_trace_context(
+                "chat",
+                user=user,
+                session_id=conversation_context.session_id,
+                metadata={"source_count": len(retrieval.get("sources") or [])},
+                tags=["chat", "rag", *sorted(retrieval.get("requested_scopes") or [])],
+            ):
+                return openai_assistant_answer(
+                    message,
+                    retrieval["context"],
+                    extra_rules=extra_rules,
+                )
+        answer = grounded_empty_retrieval_answer(message, retrieval=retrieval, user=user)
+        return answer, empty_retrieval_diagnostics()
+
+    return generate
+
+
 def answer_with_rag(
     message: str,
     user,
@@ -79,26 +120,24 @@ def answer_with_rag(
     *,
     build_action_preview,
 ) -> dict[str, Any]:
-    """Answer with retrieval-augmented context and optional action previews."""
+    """Answer with retrieval-augmented context and optional action previews.
+
+    The full LangGraph workflow runs here: retrieval, context assembly, answer
+    generation, validation (confidence and post-generation safety) and trace
+    logging. Route-level audit metadata is attached afterwards.
+    """
     blocked_scopes = blocked_requested_scopes(user, requested_scopes)
-    retrieval = build_rag_context(
+    workflow_result = run_rag_answer_workflow(
         message,
         user,
-        requested_scopes,
+        requested_scopes=requested_scopes,
         conversation_context=conversation_context,
+        answer_generator=grounded_answer_generator(user, conversation_context),
     )
-    if retrieval_has_evidence(retrieval) or should_generate_without_evidence():
-        with langfuse_trace_context(
-            "chat",
-            user=user,
-            session_id=conversation_context.session_id,
-            metadata={"source_count": len(retrieval.get("sources") or [])},
-            tags=["chat", "rag", *sorted(retrieval.get("requested_scopes") or [])],
-        ):
-            answer, diagnostics = openai_assistant_answer(message, retrieval["context"])
-    else:
-        answer = grounded_empty_retrieval_answer(message, retrieval=retrieval, user=user)
-        diagnostics = ai_diagnostics("local_answer", fallback_used=True)
+    answer = workflow_result.get("answer")
+    diagnostics = workflow_result.get("diagnostics") or {}
+    retrieval_data = workflow_result.get("data") or {}
+    sources = workflow_result.get("sources") or []
 
     if not answer:
         logger.warning("ai_fallback workflow=chat type=assistant")
@@ -111,32 +150,34 @@ def answer_with_rag(
             entries = search_errors(extract_error_query(retrieval_message), user)
             answer = fallback_error_answer(entries)
         else:
-            answer = fallback_general_answer(retrieval["data"], blocked_scopes)
+            answer = fallback_general_answer(retrieval_data, blocked_scopes)
         diagnostics = diagnostics or ai_diagnostics("fallback_used", fallback_used=True)
 
     retrieval_message = conversation_context.retrieval_query(message)
     response_type = "error_help" if looks_like_error_question(retrieval_message) else "assistant"
     response_data = (
-        retrieval["data"].get("errors", []) if response_type == "error_help" else retrieval["data"]
+        retrieval_data.get("errors", []) if response_type == "error_help" else retrieval_data
     )
-    action_preview = build_action_preview(message, user, retrieval["sources"])
+    action_preview = build_action_preview(message, user, sources)
     result: dict[str, Any] = {
         "type": response_type,
         "answer": answer,
         "diagnostics": diagnostics,
         "data": response_data,
-        "sources": retrieval["sources"],
-        "rag": retrieval.get("rag", {}),
+        "sources": sources,
+        "rag": workflow_result.get("rag", {}),
         "answer_category": ANSWER_CATEGORY_RAG,
-        "retrieval_used": retrieval_has_evidence(retrieval),
+        "retrieval_used": bool(sources),
     }
+    if isinstance(workflow_result.get("confidence"), dict):
+        result["confidence"] = workflow_result["confidence"]
     if action_preview:
         result["action_preview"] = action_preview
     return finalize_chat_answer(
         user,
         result,
-        retrieval["requested_scopes"],
-        retrieval["allowed_scopes"],
+        workflow_result.get("requested_scopes") or [],
+        workflow_result.get("allowed_scopes") or [],
         message=message,
         conversation_context=conversation_context,
     )

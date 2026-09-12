@@ -39,6 +39,7 @@ LOW_CONFIDENCE_NOTICE = (
     "nicht eindeutig passenden Quellen. Bitte fachlich pruefen.\n\n"
 )
 LOW_CONFIDENCE_RESPONSE_TYPES = {"assistant", "error_help", "general_chat"}
+SAFETY_NOTICE_HEADING = "## Sicherheitshinweis"
 LOCAL_ANSWER_EXCLUDED_CONFIDENCE_TYPES = frozenset(
     {
         "permission_denied",
@@ -173,6 +174,9 @@ def should_mark_low_confidence(result, confidence):
         confidence.level == "low"
         and response_type in LOW_CONFIDENCE_RESPONSE_TYPES
         and not answer.startswith(LOW_CONFIDENCE_NOTICE.strip())
+        # A leading safety notice (e.g. a redacted answer) already carries the
+        # stronger warning; do not push it below a confidence marker.
+        and not answer.startswith(SAFETY_NOTICE_HEADING)
     )
 
 
