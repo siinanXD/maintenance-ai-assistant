@@ -56,6 +56,52 @@ except ImportError:  # pragma: no cover - optional dependency
 logger = logging.getLogger(__name__)
 
 AGENT_PIPELINE_STEPS = ["guard", "agent", "tools", "validate", "respond"]
+ANSWER_CATEGORY_STRUCTURED = "structured_data"
+ANSWER_CATEGORY_RAG = "rag"
+ANSWER_CATEGORY_GENERAL = "general_ai_knowledge"
+ANSWER_CATEGORY_AGENT = "agent"
+MODEL_KNOWLEDGE_LABEL = "Modellwissen"
+STRUCTURED_TOOL_NAMES = frozenset(
+    {
+        "list_tasks",
+        "list_incidents",
+        "count_records",
+        "list_employees",
+        "list_employee_documents",
+        "list_vacations",
+        "list_documents",
+        "list_shift_entries",
+        "list_inventory",
+        "machine_incident_report",
+        "get_machine_overview",
+        "daily_briefing",
+    }
+)
+RAG_TOOL_NAMES = frozenset(
+    {
+        "search_knowledge",
+        "search_tasks",
+        "search_errors",
+        "search_machines",
+        "search_inventory",
+        "search_documents",
+        "search_shift_handovers",
+        "search_employees",
+        "error_assistant",
+    }
+)
+RAG_META_KEYS = (
+    "query_understanding",
+    "query_classification",
+    "conflicts",
+    "context_builder",
+    "knowledge_links",
+    "incident_timeline",
+    "retrieval_duration_ms",
+    "retrieval_debug",
+    "explainability",
+    "langgraph",
+)
 DEFAULT_MAX_ITERATIONS = 4
 DEFAULT_HISTORY_MESSAGES = 4
 DEFAULT_HISTORY_MAX_CHARS = 1400
@@ -86,6 +132,9 @@ class AgentState(TypedDict, total=False):
     safety: dict
     blocked: bool
     tool_scopes: list
+    structured_context: dict
+    turn_structured_context: dict
+    rag_meta: dict
     turn_count: int
     result: dict
     trace: list
@@ -100,12 +149,13 @@ def run_agent_workflow(
     provider=None,
     thread_id=None,
     checkpointer=None,
+    structured_hint=None,
 ):
     """Run the agent workflow and return the result payload.
 
     ``checkpointer`` enables persistent thread state; ``thread_id`` scopes it
     to one user session. Without a checkpointer the optional ``history`` list
-    seeds the conversation.
+    and ``structured_hint`` (last structured context) seed the conversation.
     """
     text = str(message or "").strip()
     if not text:
@@ -128,10 +178,14 @@ def run_agent_workflow(
         "safety": {},
         "blocked": False,
         "tool_scopes": [],
+        "turn_structured_context": {},
+        "rag_meta": {},
         "result": {},
         "trace": [],
         "workflow_engine": _workflow_engine_name(),
     }
+    if structured_hint:
+        turn_state["structured_context"] = dict(structured_hint)
     token = _PROVIDER_OVERRIDE.set(provider)
     try:
         graph = _compiled_graph(checkpointer)
@@ -168,7 +222,11 @@ def guard_node(state):
     safety = assess_ai_safety(state["message"])
     tools = available_tools(user)
     scopes = allowed_ai_scopes(user)
-    system_prompt = build_agent_system_prompt(scopes, safety.prompt_rules)
+    system_prompt = build_agent_system_prompt(
+        scopes,
+        safety.prompt_rules,
+        structured_context=state.get("structured_context") or {},
+    )
     previous = compact_history(state.get("messages") or [])
     if not previous:
         previous = [
@@ -231,6 +289,7 @@ def agent_node(state):
             )
     except AIServiceError as exc:
         logger.warning("agent_provider_failed provider=%s error=%s", provider.name, exc.error_code)
+        _record_provider_error(exc.error_code)
         return {
             "iterations": iterations,
             "pending_tool_calls": [],
@@ -284,6 +343,9 @@ def tools_node(state):
     data = dict(state.get("data") or {})
     scopes = list(state.get("tool_scopes") or [])
     pending_action = state.get("pending_action")
+    structured_context = dict(state.get("structured_context") or {})
+    turn_structured_context = dict(state.get("turn_structured_context") or {})
+    rag_meta = dict(state.get("rag_meta") or {})
     pending_calls = state.get("pending_tool_calls") or []
     for call in pending_calls:
         name = call["name"]
@@ -323,6 +385,11 @@ def tools_node(state):
             scopes.extend(scope for scope in spec.scopes if scope not in scopes)
         if result.status == "confirmation_required":
             pending_action = (result.content or {}).get("pending_action") or pending_action
+        if result.structured_context:
+            structured_context = dict(result.structured_context)
+            turn_structured_context = dict(result.structured_context)
+        if result.rag:
+            rag_meta.update(_safe_rag_meta(result.rag))
     return {
         "messages": messages,
         "pending_tool_calls": [],
@@ -331,6 +398,9 @@ def tools_node(state):
         "data": data,
         "tool_scopes": scopes,
         "pending_action": pending_action,
+        "structured_context": structured_context,
+        "turn_structured_context": turn_structured_context,
+        "rag_meta": rag_meta,
         "trace": _append_trace(state, "tools", {"executed": len(pending_calls)}),
     }
 
@@ -345,23 +415,33 @@ def validate_node(state):
         diagnostics.setdefault("fallback_used", True)
     if not diagnostics:
         diagnostics = _local_diagnostics("local_answer")
+    sources = list(state.get("sources") or [])
+    answer_category = _answer_category(tool_trace, sources, state)
+    if tool_trace and all(entry.get("status") == "permission_denied" for entry in tool_trace):
+        diagnostics["status"] = "permission_denied"
+    rag = {
+        "enabled": True,
+        "pipeline": list(AGENT_PIPELINE_STEPS),
+        "safety": state.get("safety") or {},
+        "source_count": len(sources),
+    }
+    rag.update(state.get("rag_meta") or {})
     result = {
         "type": "agent",
         "answer": answer,
-        "sources": list(state.get("sources") or []),
+        "sources": sources,
         "data": {"tools": state.get("data") or {}},
         "diagnostics": diagnostics,
         "tool_trace": tool_trace,
         "tool_scopes": list(state.get("tool_scopes") or []),
-        "answer_category": "agent",
-        "retrieval_used": bool(state.get("sources")),
-        "rag": {
-            "enabled": True,
-            "pipeline": list(AGENT_PIPELINE_STEPS),
-            "safety": state.get("safety") or {},
-            "source_count": len(state.get("sources") or []),
-        },
+        "answer_category": answer_category,
+        "retrieval_used": answer_category == ANSWER_CATEGORY_RAG and bool(sources),
+        "rag": rag,
     }
+    if answer_category == ANSWER_CATEGORY_GENERAL:
+        result["source_label"] = MODEL_KNOWLEDGE_LABEL
+    if state.get("turn_structured_context"):
+        result["structured_context"] = dict(state["turn_structured_context"])
     if state.get("pending_action"):
         result["pending_action"] = state["pending_action"]
     result = attach_confidence_to_result(state["message"], result)
@@ -634,6 +714,36 @@ def _iteration_limit_answer(tool_trace):
     for entry in tool_trace[:6]:
         lines.append(f"- {entry['tool']}: {entry.get('summary') or entry.get('status')}")
     return "\n".join(lines)
+
+
+def _answer_category(tool_trace, sources, state):
+    """Return the product-facing answer category for an agent turn."""
+    if not tool_trace:
+        if state.get("blocked") or not state.get("answer"):
+            return ANSWER_CATEGORY_AGENT
+        return ANSWER_CATEGORY_GENERAL
+    successful = [entry for entry in tool_trace if entry.get("status") == "ok"]
+    names = {entry["tool"] for entry in successful}
+    if names and names <= STRUCTURED_TOOL_NAMES:
+        return ANSWER_CATEGORY_STRUCTURED
+    if names & RAG_TOOL_NAMES:
+        return ANSWER_CATEGORY_RAG
+    return ANSWER_CATEGORY_AGENT
+
+
+def _safe_rag_meta(rag):
+    """Return only the retrieval diagnostics keys kept from a tool RAG payload."""
+    return {key: rag[key] for key in RAG_META_KEYS if key in rag}
+
+
+def _record_provider_error(error_code):
+    """Expose the last provider error to the admin status endpoint."""
+    try:
+        from app.ai import status as ai_status_module
+
+        ai_status_module.LAST_OPENAI_ERROR = error_code
+    except Exception:  # pragma: no cover - status module is optional at runtime
+        logger.debug("agent_provider_error_not_recorded", exc_info=True)
 
 
 def _merge_sources(existing, additions):

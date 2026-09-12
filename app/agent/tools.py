@@ -66,6 +66,9 @@ class ToolResult:
     summary: str = ""
     status: str = "ok"
     error: str = ""
+    # Not sent to the model: follow-up memory and retrieval diagnostics.
+    structured_context: dict[str, Any] = field(default_factory=dict)
+    rag: dict[str, Any] = field(default_factory=dict)
 
     def to_model_payload(self):
         """Return the JSON payload handed back to the model."""
@@ -89,6 +92,7 @@ class ToolSpec:
     requires_confirmation: bool = False
     write: bool = False
     label: str = ""
+    extra_permissions: tuple[tuple[str, str], ...] = ()
 
     def provider_schema(self):
         """Return the OpenAI-compatible function definition."""
@@ -129,16 +133,18 @@ def tool_spec(name):
 
 
 def user_can_use_tool(user, spec):
-    """Return whether the user passes the tool's permission gate."""
-    if spec.permission is None:
-        return True
-    dashboard, action = spec.permission
-    if dashboard == "employees" and not can_read_employee_context(user):
-        return False
-    try:
-        return has_dashboard_permission(user, dashboard, action)
-    except ValueError:
-        return False
+    """Return whether the user passes every permission gate of the tool."""
+    required = [spec.permission] if spec.permission else []
+    required.extend(spec.extra_permissions or ())
+    for dashboard, action in required:
+        if dashboard == "employees" and not can_read_employee_context(user):
+            return False
+        try:
+            if not has_dashboard_permission(user, dashboard, action):
+                return False
+        except ValueError:
+            return False
+    return True
 
 
 def available_tools(user):
@@ -157,11 +163,17 @@ def execute_tool(name, arguments, user, *, confirmed=False):
     if spec is None:
         return ToolResult(status="error", error=f"unknown_tool:{name}", summary="Unbekanntes Tool")
     if not user_can_use_tool(user, spec):
+        from app.services.ai_prompting import permission_denied_answer
+
+        scope = spec.permission[0] if spec.permission else (spec.scopes[0] if spec.scopes else "")
         return ToolResult(
             status="permission_denied",
             error="permission_denied",
             summary=f"Keine Berechtigung fuer {spec.label or spec.name}",
-            content={"required_permission": list(spec.permission or [])},
+            content={
+                "required_permission": list(spec.permission or []),
+                "answer_markdown": permission_denied_answer(spec.label or spec.name, scope),
+            },
         )
     try:
         safe_arguments = normalize_arguments(spec, arguments)
@@ -362,16 +374,41 @@ for _tool_name, (_scope, _description) in SCOPE_SEARCH_TOOLS.items():
 
 
 def _search_knowledge(user, arguments):
-    """Search indexed knowledge chunks (manuals, reports, training entries)."""
-    from app.services.retrieval_service import knowledge_context_for_chat
+    """Search maintenance knowledge through the full hybrid retrieval pipeline.
 
-    context, sources = knowledge_context_for_chat(arguments["query"], user)
-    context_text = str(context or "")[:MAX_CONTEXT_CHARS]
+    Uses the LangGraph retrieval nodes (structured SQL + vector + keyword
+    fallback, safety, conflicts, explainability). When nothing is found, the
+    grounded no-answer text is included so the model can answer honestly.
+    """
+    from app.services.empty_retrieval_response_service import build_empty_retrieval_answer
+    from app.services.langgraph_rag_workflow import prompt_rules_for_retrieval
+    from app.services.rag_service import build_rag_context
+
+    query = arguments["query"]
+    retrieval = build_rag_context(query, user)
+    rag = retrieval.get("rag") or {}
+    sources = list(retrieval.get("sources") or [])
     cards = compact_sources(sources)
+    context_text = str(retrieval.get("context") or "")[:MAX_CONTEXT_CHARS]
+    understanding = retrieval.get("query_understanding") or {}
+    content = {
+        "context": context_text,
+        "sources": cards,
+        "source_count": len(sources),
+        "empty_retrieval": not sources,
+        "query_type": str(understanding.get("query_type") or ""),
+        "has_conflicts": bool((retrieval.get("conflicts") or {}).get("has_conflicts")),
+        "prompt_rules": prompt_rules_for_retrieval(retrieval),
+    }
+    if not sources:
+        content["answer_markdown"] = build_empty_retrieval_answer(
+            query, retrieval=retrieval, user=user
+        )
     return ToolResult(
-        content={"context": context_text, "sources": cards, "source_count": len(cards)},
+        content=content,
         sources=cards,
-        summary=f"{len(cards)} Wissensquellen gefunden",
+        summary=f"{len(sources)} Wissensquellen gefunden",
+        rag=rag,
     )
 
 
@@ -824,3 +861,7 @@ register_tool(
         write=True,
     )
 )
+
+
+# Structured list/count/report tools are registered by importing the module.
+from app.agent import structured_tools  # noqa: E402,F401

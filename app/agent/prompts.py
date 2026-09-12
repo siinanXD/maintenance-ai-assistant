@@ -23,12 +23,21 @@ AGENT_SYSTEM_PROMPT = (
     "hinzuziehen.\n"
     "7. Antworte kurz, technisch klar und auf Deutsch. Format: '## Ergebnis' mit "
     "Bulletpoints, danach '- **Quelle:** ...' und '- **Unsicherheit:** niedrig/mittel/hoch'.\n"
-    "8. Rufe hoechstens die Werkzeuge auf, die fuer die Frage noetig sind."
+    "8. Rufe hoechstens die Werkzeuge auf, die fuer die Frage noetig sind.\n"
+    "Werkzeugwahl: Fuer gefilterte Listen und Zaehlungen (offene Tasks, Stoerungen je "
+    "Maschine, Mitarbeiter je Abteilung, Urlaub, Lager unter Mindestbestand, Dokument-"
+    "Metadaten, Schichtplan) nutze list_* bzw. count_records mit expliziten Argumenten. "
+    "Fuer Wie-/Warum-/Nachschlagefragen zu Handbuechern, Anleitungen und Wartungswissen "
+    "nutze search_knowledge. Fuer Fehlercodes und Stoerungsbeschreibungen nutze "
+    "error_assistant. Allgemeine Fragen ohne App-Bezug beantwortest du ohne Werkzeug und "
+    "kennzeichnest sie als Modellwissen. Liefert ein Werkzeug answer_markdown, uebernimm "
+    "dessen Fakten und Struktur. Folgefragen wie 'welche davon' beziehen sich auf den "
+    "zuletzt genutzten Datenbereich: rufe dasselbe Werkzeug mit den vererbten Filtern auf."
 )
 
 
-def build_agent_system_prompt(allowed_scopes, safety_rules=()):
-    """Return the resolved system prompt with scope and safety context."""
+def build_agent_system_prompt(allowed_scopes, safety_rules=(), structured_context=None):
+    """Return the resolved system prompt with scope, safety and follow-up context."""
     prompt = _resolve_prompt("agent", AGENT_SYSTEM_PROMPT)
     scope_text = ", ".join(sorted(allowed_scopes)) or "keine"
     lines = [prompt, f"Freigegebene Bereiche fuer diesen Nutzer: {scope_text}."]
@@ -36,7 +45,24 @@ def build_agent_system_prompt(allowed_scopes, safety_rules=()):
         rule_text = str(rule or "").strip()
         if rule_text:
             lines.append(f"Sicherheitsregel: {rule_text}")
+    hint = _structured_context_hint(structured_context)
+    if hint:
+        lines.append(hint)
     return "\n".join(lines)
+
+
+def _structured_context_hint(structured_context):
+    """Return a one-line hint about the last structured data scope of this session."""
+    context = structured_context if isinstance(structured_context, dict) else {}
+    entity_type = str(context.get("entity_type") or "").strip()
+    if not entity_type:
+        return ""
+    parts = [f"entity_type={entity_type}"]
+    for key in ("department", "status", "time_range", "machine", "query", "shift", "employee_name"):
+        value = str(context.get(key) or "").strip()
+        if value:
+            parts.append(f"{key}={value[:60]}")
+    return "[structured_context] Letzter Datenbereich dieser Sitzung: " + ", ".join(parts) + "."
 
 
 def _resolve_prompt(workflow, fallback):
