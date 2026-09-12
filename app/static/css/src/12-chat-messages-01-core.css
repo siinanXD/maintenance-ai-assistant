@@ -172,6 +172,20 @@
     line-height: 1.1;
   }
 
+  .chat-pending-action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.6rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid rgba(245, 158, 11, 0.55);
+    border-radius: 0.6rem;
+    background: rgba(245, 158, 11, 0.1);
+    font-size: 0.8rem;
+  }
+
   .chat-answer-meta span:first-child {
     border-color: #bfdbfe;
     background: #eff6ff;

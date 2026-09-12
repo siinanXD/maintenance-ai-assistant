@@ -46,6 +46,14 @@ def redact_ai_chat_response(result, user, answer_only=False):
     redacted.pop("rag", None)
     redacted.pop("action_preview", None)
     redacted.pop("confidence", None)
+    # Tool traces stay limited to names and status; pending actions belong to the
+    # requesting user and are required to confirm agent write actions.
+    if "tool_trace" in redacted:
+        redacted["tool_trace"] = [
+            {"tool": entry.get("tool"), "status": entry.get("status")}
+            for entry in redacted.get("tool_trace") or []
+            if isinstance(entry, dict)
+        ]
     return redacted
 
 

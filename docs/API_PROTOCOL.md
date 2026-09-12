@@ -857,6 +857,25 @@ Moegliche Diagnosewerte:
 
 `diagnostics` enthaelt zusaetzlich `provider` und `model`, aber niemals den API-Key. Die Chat-Bubble zeigt diese Werte als kleine Statuszeile pro Antwort.
 
+Rate-Limit: `POST /api/v1/ai/chat`, `POST /api/v1/ai/error-assistant` und
+`POST /api/v1/ai/order-plan` sind pro Nutzer auf
+`AI_CHAT_RATE_LIMIT_PER_MINUTE` Anfragen begrenzt. Bei Ueberschreitung:
+
+```http
+429 Too Many Requests
+Retry-After: 42
+X-RateLimit-Limit: 30
+X-RateLimit-Remaining: 0
+```
+
+```json
+{
+  "success": false,
+  "error": "ai_request_rate_limit_exceeded",
+  "message": "AI request rate limit exceeded"
+}
+```
+
 OpenAI-Fehler werden in `diagnostics.error` getrennt ausgewiesen:
 
 | Fehler | Bedeutung |
@@ -871,6 +890,58 @@ OpenAI-Fehler werden in `diagnostics.error` getrennt ausgewiesen:
 Normale allgemeine Fragen werden als `type: general_chat` gespeichert und
 enthalten sichtbar den Hinweis, dass Chat-Historie und AI-Nutzungsmetadaten
 protokolliert werden.
+
+### Agent
+
+```http
+POST /api/v1/ai/agent
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+```json
+{ "message": "Welche offenen Tasks gibt es an Presse 3?", "session_id": "chat-widget" }
+```
+
+Response `200` (Auszug):
+
+```json
+{
+  "type": "agent",
+  "answer": "## Ergebnis
+- Dichtung an Presse 3 pruefen (open)",
+  "tool_trace": [{ "tool": "search_tasks", "status": "ok", "summary": "1 Treffer in tasks" }],
+  "pending_action": null,
+  "diagnostics": { "status": "openai_used", "workflow": "agent", "agent_tool_calls": ["search_tasks"] }
+}
+```
+
+Schreibende Tools liefern statt einer Ausfuehrung eine `pending_action`
+(`token`, `tool`, `label`, `arguments`, `expires_in_seconds`). Die Aktion wird
+mit dem Token bestaetigt:
+
+```http
+POST /api/v1/ai/agent/confirm
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+```json
+{ "token": "<signed-token>", "session_id": "chat-widget" }
+```
+
+Antworten: `200` mit `type: agent_action`, `400` bei ungueltigem oder
+abgelaufenem Token, `403` wenn das Token einem anderen Nutzer gehoert oder die
+Schreibberechtigung fehlt.
+
+```http
+GET /api/v1/ai/agent/tools
+Authorization: Bearer <access_token>
+```
+
+liefert den nach Berechtigung gefilterten Tool-Katalog. Mit
+`AI_CHAT_MODE=agent` laeuft auch `POST /api/v1/ai/chat` ueber den Agenten.
+Details: `docs/AI_AGENT.md`.
 
 ### Chat-Historie
 

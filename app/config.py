@@ -142,6 +142,18 @@ class Config:
         0,
     )
     AI_ENABLE_STREAMING = env_bool("AI_ENABLE_STREAMING", default=True)
+    # When false, RAG chat answers without any visible source stay local and
+    # grounded instead of sending an unsourced prompt to the configured provider.
+    AI_GENERATE_WITHOUT_EVIDENCE = env_bool("AI_GENERATE_WITHOUT_EVIDENCE", default=False)
+    # Per-user request limit for AI chat and assistant endpoints; 0 disables.
+    AI_CHAT_RATE_LIMIT_PER_MINUTE = env_int("AI_CHAT_RATE_LIMIT_PER_MINUTE", 30)
+    # Per-user daily token budget across AI workflows; 0 disables the cap.
+    AI_DAILY_TOKEN_BUDGET_PER_USER = env_int("AI_DAILY_TOKEN_BUDGET_PER_USER", 0)
+    # Chat routing: "legacy" keeps the rule-based router, "agent" sends
+    # POST /api/v1/ai/chat through the tool-using agent.
+    AI_CHAT_MODE = os.getenv("AI_CHAT_MODE", "legacy").strip().lower() or "legacy"
+    AI_AGENT_MAX_ITERATIONS = env_int("AI_AGENT_MAX_ITERATIONS", 4)
+    AI_AGENT_ACTION_TTL_SECONDS = env_int("AI_AGENT_ACTION_TTL_SECONDS", 600)
     LANGFUSE_ENABLED = env_bool("LANGFUSE_ENABLED", default=False)
     LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY", "")
     LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY", "")

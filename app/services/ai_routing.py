@@ -21,6 +21,7 @@ WORKFLOW_PROFILES = {
     "document_text": {"tier": "balanced", "temperature": 0.2, "max_tokens": 600},
     "document_review": {"tier": "balanced", "temperature": 0.1, "max_tokens": 900},
     "chat": {"tier": "balanced", "temperature": 0.2, "max_tokens": 750},
+    "agent": {"tier": "balanced", "temperature": 0.1, "max_tokens": 900},
     "general_chat": {"tier": "balanced", "temperature": 0.2, "max_tokens": 260},
     "machine_assistant": {"tier": "balanced", "temperature": 0.2, "max_tokens": 750},
     "machine_summary": {"tier": "balanced", "temperature": 0.1, "max_tokens": 600},

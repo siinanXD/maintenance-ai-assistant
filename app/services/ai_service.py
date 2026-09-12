@@ -4,6 +4,7 @@ import json
 import logging
 import re
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from datetime import date
 
 from flask import current_app
@@ -133,10 +134,40 @@ def log_ai_call_failure(provider_name, model, mode, error_code, exc):
     )
 
 
+@dataclass(frozen=True)
+class ToolCall:
+    """One tool invocation requested by the model."""
+
+    id: str
+    name: str
+    arguments: dict = field(default_factory=dict)
+
+
+@dataclass
+class ToolCallResponse:
+    """Provider answer for a tool-enabled chat turn."""
+
+    content: str | None = None
+    tool_calls: list = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
+
+
 class BaseAIProvider(ABC):
     """Define the provider contract for AI-assisted workflows."""
 
     name = "base"
+    supports_tool_calls = False
+
+    def chat_with_tools(self, messages, tools, workflow="agent"):
+        """Return a ``ToolCallResponse`` for provider-format messages and tool schemas.
+
+        Providers without tool calling raise ``AIServiceError`` so the agent
+        workflow can fall back visibly instead of pretending to reason.
+        """
+        raise AIServiceError(
+            "AI provider does not support tool calling",
+            error_code="unsupported_capability",
+        )
 
     @abstractmethod
     def suggest_task(self, text, user_context=None):
@@ -188,6 +219,22 @@ class MockAIProvider(BaseAIProvider):
     """Provide deterministic local AI-like results without external services."""
 
     name = "mock"
+    supports_tool_calls = True
+
+    def chat_with_tools(self, messages, tools, workflow="agent"):
+        """Select tools with deterministic keyword rules and summarize tool results."""
+        from app.agent.mock_policy import select_mock_tool_call
+
+        self.last_call_metadata = local_metadata(self.name, workflow)
+        content, calls = select_mock_tool_call(messages, tools)
+        return ToolCallResponse(
+            content=content,
+            tool_calls=[
+                ToolCall(id=call["id"], name=call["name"], arguments=dict(call["arguments"]))
+                for call in calls
+            ],
+            metadata=dict(self.last_call_metadata),
+        )
 
     def suggest_task(self, text, user_context=None):
         """Return a deterministic task suggestion from free text."""
@@ -283,6 +330,7 @@ class OpenAIProvider(BaseAIProvider):
     """Use OpenAI for AI-assisted workflows."""
 
     name = "openai"
+    supports_tool_calls = True
 
     def __init__(self, api_key, model, provider_name="openai"):
         """Initialize the OpenAI provider."""
@@ -501,6 +549,48 @@ class OpenAIProvider(BaseAIProvider):
         )
         return self._json_completion(prompt, "document_review")
 
+    def chat_with_tools(self, messages, tools, workflow="agent"):
+        """Run one tool-enabled chat turn and return content and tool calls."""
+        profile = workflow_profile(workflow, self.legacy_model)
+        self.model = profile.model
+        logger.info(
+            "ai_call provider=%s model=%s tier=%s mode=tools message_count=%s tool_count=%s",
+            self.name,
+            profile.model,
+            profile.tier,
+            len(messages),
+            len(tools or []),
+        )
+        try:
+            completion, latency_ms, trace_metadata = self._chat_completion(
+                profile,
+                workflow,
+                messages,
+                tools=tools,
+            )
+            self.last_call_metadata = completion_metadata(
+                self.name,
+                profile,
+                completion,
+                latency_ms,
+            )
+            self.last_call_metadata.update(trace_metadata)
+            choice_message = completion.choices[0].message
+            return ToolCallResponse(
+                content=getattr(choice_message, "content", None),
+                tool_calls=_parse_tool_calls(getattr(choice_message, "tool_calls", None)),
+                metadata=dict(self.last_call_metadata),
+            )
+        except (OpenAIError, TypeError, AttributeError, IndexError) as exc:
+            error_code = (
+                openai_error_code(exc) if isinstance(exc, OpenAIError) else "invalid_response"
+            )
+            log_ai_call_failure(self.name, self.model, "tools", error_code, exc)
+            raise AIServiceError(
+                "AI provider failed to return a tool-enabled response",
+                error_code=error_code,
+            ) from exc
+
     def _json_completion(self, prompt, workflow):
         """Call OpenAI and parse a JSON object response."""
         profile = workflow_profile(workflow, self.legacy_model)
@@ -589,7 +679,7 @@ class OpenAIProvider(BaseAIProvider):
                 error_code=error_code,
             ) from exc
 
-    def _chat_completion(self, profile, workflow, messages, response_format=None):
+    def _chat_completion(self, profile, workflow, messages, response_format=None, tools=None):
         """Call Chat Completions with optional Langfuse tracing metadata."""
         call_kwargs = {
             "model": profile.model,
@@ -599,6 +689,9 @@ class OpenAIProvider(BaseAIProvider):
         }
         if response_format:
             call_kwargs["response_format"] = response_format
+        if tools:
+            call_kwargs["tools"] = list(tools)
+            call_kwargs["tool_choice"] = "auto"
         call_kwargs.update(openai_langfuse_kwargs(workflow, profile))
 
         started_at = call_timer()
@@ -621,6 +714,42 @@ class OpenAIProvider(BaseAIProvider):
             elapsed_ms(started_at),
             normalize_observation_metadata(observation),
         )
+
+
+def _parse_tool_calls(raw_calls):
+    """Return normalized ``ToolCall`` objects from a provider message."""
+    calls = []
+    for index, raw in enumerate(raw_calls or []):
+        function = _get_value(raw, "function", None)
+        name = str(_get_value(function, "name", "") or "").strip()
+        if not name:
+            continue
+        raw_arguments = _get_value(function, "arguments", "{}")
+        if isinstance(raw_arguments, dict):
+            arguments = raw_arguments
+        else:
+            try:
+                arguments = json.loads(raw_arguments or "{}")
+            except (TypeError, ValueError):
+                arguments = {}
+        call_id = str(_get_value(raw, "id", "") or f"call-{index + 1}")
+        calls.append(
+            ToolCall(
+                id=call_id,
+                name=name,
+                arguments=arguments if isinstance(arguments, dict) else {},
+            )
+        )
+    return calls
+
+
+def _get_value(source, key, default=None):
+    """Return an attribute or mapping value from a provider object."""
+    if source is None:
+        return default
+    if isinstance(source, dict):
+        return source.get(key, default)
+    return getattr(source, key, default)
 
 
 def get_ai_provider():

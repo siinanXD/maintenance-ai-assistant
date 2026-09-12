@@ -1,6 +1,6 @@
 """Tests for shift model service foundations."""
 
-from datetime import date
+from datetime import date, timedelta
 
 from app.extensions import db
 from app.models import (
@@ -443,11 +443,14 @@ def test_shiftplan_generate_updates_employee_rotation_state(
         )
         db.session.commit()
 
+    # one_shift has no weekend operation, so anchor the plan on the next Monday
+    # to keep the test deterministic regardless of the weekday it runs on.
+    start_date = date.today() + timedelta(days=(7 - date.today().weekday()) % 7)
     response = client.post(
         "/api/v1/shiftplans/generate",
         json={
             "department": "Produktion",
-            "start_date": date.today().isoformat(),
+            "start_date": start_date.isoformat(),
             "days": 2,
             "shift_model_key": "one_shift",
             "machine_ids": [machine_id],

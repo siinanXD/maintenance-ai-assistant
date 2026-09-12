@@ -25,6 +25,9 @@ API key, and keeps sensitive employee or admin data behind permissions.
 - **AI-readiness without lock-in:** OpenAI and OpenAI-compatible provider
   integration, deterministic local fallback, RAG indexing, source visibility
   policies and retrieval diagnostics.
+- **Tool-using agent with human-in-the-loop:** LangGraph agent loop over
+  permission-gated tools, signed confirmations for write actions, per-user
+  rate limits and token budgets, offline-evaluable tool selection.
 - **Operational workflows:** tasks, errors, machines, documents, inventory,
   shift planning, handover, vacations, notifications and backups.
 - **Quality baseline:** pytest coverage gate in CI, Ruff, compile checks,
@@ -255,6 +258,12 @@ AI_BASE_URL=                # set for OpenAI-compatible local APIs, e.g. http://
 OPENAI_MODEL=gpt-4o-mini
 AI_TASK_PRIORITIZATION_TIMEOUT_SECONDS=6
 AI_TASK_PRIORITIZATION_MAX_RETRIES=0
+AI_GENERATE_WITHOUT_EVIDENCE=false  # true sends unsourced chat prompts to the provider
+AI_CHAT_RATE_LIMIT_PER_MINUTE=30    # per-user limit for AI chat/assistant calls, 0 disables
+AI_DAILY_TOKEN_BUDGET_PER_USER=0    # optional per-user daily token cap, 0 disables
+AI_CHAT_MODE=legacy                 # agent routes /ai/chat through the tool-using agent
+AI_AGENT_MAX_ITERATIONS=4
+AI_AGENT_ACTION_TTL_SECONDS=600
 LANGFUSE_ENABLED=false      # set true to trace OpenAI calls in Langfuse
 LANGFUSE_PUBLIC_KEY=
 LANGFUSE_SECRET_KEY=
@@ -511,7 +520,9 @@ Current implementation:
 - Nach Änderung von Embedding Provider, Embedding Modell oder Vector Store müssen Knowledge-Dokumente vollständig neu indexiert werden.
 - RAG scoring weights (`RAG_SCORE_*`), recency, aging and feedback windows are configuration-only tuning knobs; keep `RAG_SCORE_DEBUG=false` outside diagnostics because score details are admin-facing explainability, not user answer text.
 - `retrieval_service.py` combines permission-aware structured retrieval with RAG knowledge chunks.
-- `rag_service.py` exposes the stable RAG facade; `langgraph_rag_workflow.py` contains the modular LangGraph orchestration with a deterministic fallback runner. See `docs/LANGGRAPH_RAG_WORKFLOW.md`.
+- `rag_service.py` exposes the stable RAG facade; `langgraph_rag_workflow.py` contains the modular LangGraph orchestration with a deterministic fallback runner. The chat route runs the complete node sequence including answer generation and validation. See `docs/LANGGRAPH_RAG_WORKFLOW.md`.
+- Empty retrieval never reaches the provider unless `AI_GENERATE_WITHOUT_EVIDENCE=true`; the default answer is a grounded local no-answer with `diagnostics.generation_skipped=no_evidence`.
+- AI chat, error assistant and order planning are rate limited per user via `AI_CHAT_RATE_LIMIT_PER_MINUTE` and answer `429` with `Retry-After` when exceeded.
 - `retrieval_service.py` remains the single retrieval orchestration layer. Structured SQL retrieval, vector retrieval and keyword fallback stay separated as components; see `docs/AI_RAG_ARCHITECTURE.md`.
 - See `docs/MONGODB_ATLAS_VECTOR_SEARCH.md` for Atlas Vector Search setup, index configuration and fallback behavior.
 - `ai_traceability_service.py` stores metadata-only answer traces connected to chat messages and AI audit events. See `docs/AI_ANSWER_TRACEABILITY.md`.
@@ -546,6 +557,19 @@ Provider behavior:
 - See `docs/EMBEDDING_PROVIDER_CONFIGURATION.md` for provider selection, dimensions, fallback and reindex rules.
 - `AI_PROVIDER=mock` keeps all standard tests and local fallback workflows offline.
 - Unsupported providers such as `gemini` currently fall back visibly to `mock` until a dedicated adapter is implemented.
+
+### Maintenance Agent
+
+`POST /api/v1/ai/agent` runs a tool-using agent on top of the same services:
+a LangGraph loop with a deterministic safety guard, provider tool selection
+(OpenAI function calling or the offline mock policy), permission-gated tool
+execution and validation. Read tools cover tasks, errors, machines, inventory,
+documents, handovers, employees, knowledge search, machine profiles, the error
+assistant, task drafts, prioritization, order planning and the daily briefing.
+Write tools (`create_task`, `request_knowledge_reindex`) only return a signed
+`pending_action` that the user confirms through `POST /api/v1/ai/agent/confirm`.
+Set `AI_CHAT_MODE=agent` to route the chat widget through the agent. See
+[`docs/AI_AGENT.md`](docs/AI_AGENT.md) and `flask --app run:app agent eval-tools`.
 
 ### Automated Knowledge Lifecycle
 
@@ -623,6 +647,7 @@ See [`docs/API_PROTOCOL.md`](docs/API_PROTOCOL.md) for the full endpoint referen
 | --- | --- |
 | Features and scope | [`docs/FEATURES.md`](docs/FEATURES.md) |
 | RAG architecture | [`docs/AI_RAG_ARCHITECTURE.md`](docs/AI_RAG_ARCHITECTURE.md) |
+| Tool-using agent | [`docs/AI_AGENT.md`](docs/AI_AGENT.md) |
 | Production deploy | [`docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md`](docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md) |
 | API reference | [`docs/API_PROTOCOL.md`](docs/API_PROTOCOL.md) |
 | Demo questions | [`docs/AI_DEMO_QUESTIONS.md`](docs/AI_DEMO_QUESTIONS.md) |

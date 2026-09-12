@@ -27,9 +27,23 @@ Die Knoten liegen in `app/services/langgraph_rag_workflow.py`:
 - `structured_data_retrieval_node`: ruft die konsolidierte Retrieval-Pipeline auf.
 - `vector_retrieval_node`: protokolliert Knowledge-/Vector-Diagnostik aus dem Retrieval-Ergebnis.
 - `context_assembly_node`: baut das bestehende `rag`-Diagnosepayload.
-- `answer_generation_node`: erzeugt die Antwort mit dem aktiven AI-Provider.
+- `answer_generation_node`: erzeugt die Antwort. Der Chat-Handler übergibt einen
+  `answer_generator`, der Evidence-Gate, Provider-Fallback und Diagnostik
+  kapselt; ohne Generator wird der aktive Provider direkt aufgerufen.
 - `validation_node`: wendet Confidence- und Safety-Prüfungen an.
 - `trace_logging_node`: ergänzt prompt-sichere Workflow-Diagnostik.
+
+Der Chat-Endpunkt `POST /api/v1/ai/chat` führt die komplette Sequenz aus.
+`rag.langgraph.completed_nodes` in der Antwort zeigt, welche Knoten gelaufen
+sind.
+
+## Evidence-Gate
+
+Ohne sichtbare Quelle wird der Provider nicht aufgerufen, solange
+`AI_GENERATE_WITHOUT_EVIDENCE=false` ist (Default). Die Antwort ist dann eine
+lokale, geerdete No-Answer mit `diagnostics.generation_skipped = "no_evidence"`.
+Provider-Fehlkonfigurationen wie `api_key_missing` bleiben in `diagnostics.status`
+sichtbar.
 
 ## Kompatibilität
 

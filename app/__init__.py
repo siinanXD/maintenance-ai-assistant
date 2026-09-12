@@ -9,6 +9,7 @@ from werkzeug.exceptions import HTTPException
 from app.admin.atlas_commands import register_atlas_commands
 from app.admin.commands import register_admin_commands
 from app.admin.routes import admin_bp
+from app.agent.commands import register_agent_commands
 from app.ai.routes import ai_bp
 from app.auth.routes import auth_bp
 from app.config import Config, validate_runtime_config
@@ -120,6 +121,7 @@ def create_app(config_class=Config):
     configure_api_documentation(app)
     register_admin_commands(app)
     register_atlas_commands(app)
+    register_agent_commands(app)
     register_notification_commands(app)
     register_error_handlers(app)
 

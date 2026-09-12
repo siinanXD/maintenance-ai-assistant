@@ -50,6 +50,9 @@ def test_post_generation_safety_redacts_dangerous_answer(app, make_user, monkeyp
     )
 
     with app.app_context():
+        # The fixture question has no visible sources; allow generation so the
+        # provider answer actually reaches the post-generation safety check.
+        app.config["AI_GENERATE_WITHOUT_EVIDENCE"] = True
         result = answer_chat(
             "Wie behebe ich Stoerung S100 an Maschine Presse 7?",
             _user_by_id(user["id"]),
@@ -99,6 +102,7 @@ def test_post_generation_safety_audit_is_written_without_prompt_content(
     )
 
     with app.app_context():
+        app.config["AI_GENERATE_WITHOUT_EVIDENCE"] = True
         result = answer_chat(
             "Wie behebe ich Stoerung S100 an Maschine Presse 7?",
             _user_by_id(user["id"]),

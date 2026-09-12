@@ -40,9 +40,15 @@ def interactive_data_attributes():
 
 
 def frontend_source_text():
-    """Return combined template and static JavaScript source text."""
+    """Return combined template, static JavaScript and React source text.
+
+    React islands are scanned from ``frontend/src`` so the check does not depend
+    on a built ``app/static/react`` bundle being present.
+    """
     source_paths = list((REPO_ROOT / "app" / "templates").rglob("*.html"))
     source_paths.extend((REPO_ROOT / "app" / "static").rglob("*.js"))
+    source_paths.extend((REPO_ROOT / "frontend" / "src").rglob("*.ts"))
+    source_paths.extend((REPO_ROOT / "frontend" / "src").rglob("*.tsx"))
     return "\n".join(path.read_text(encoding="utf-8") for path in source_paths)
 
 

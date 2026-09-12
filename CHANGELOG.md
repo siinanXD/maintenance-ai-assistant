@@ -8,11 +8,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Tool-using maintenance agent (`POST /api/v1/ai/agent`, `AI_CHAT_MODE=agent`):
+  LangGraph loop with safety guard, permission-gated tool registry over the
+  existing services, provider tool calling (OpenAI function calling, offline mock
+  policy), signed human-in-the-loop confirmations for write tools
+  (`POST /api/v1/ai/agent/confirm`), tool catalog endpoint, chat-widget confirm
+  button, Langfuse trace context per tool call, golden tool-selection evals
+  (`flask agent eval-tools`) and a per-user daily token budget
+- Per-user rate limiting for AI chat, error assistant and order planning
+  (`AI_CHAT_RATE_LIMIT_PER_MINUTE`, `429` with `Retry-After`)
+- Explicit evidence policy `AI_GENERATE_WITHOUT_EVIDENCE` (default `false`):
+  unsourced chat questions stay local and grounded instead of calling the provider
 - Edit and delete UI for employees, errors, and machines (PUT/DELETE routes were
   already in place; this wires up the missing frontend for all three entities)
 - `.ruff_cache/` added to `.gitignore`
 
 ### Fixed
+- The chat route now runs the complete LangGraph RAG workflow including the
+  answer generation and validation nodes; query-type prompt rules reach the provider
+- Template hook stability test no longer requires a built React bundle
+- Shift rotation test is deterministic on weekends
 - Docstrings added to all public model classes and `to_dict` methods in `models.py`
 
 ---

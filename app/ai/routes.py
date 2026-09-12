@@ -1,8 +1,10 @@
 """AI API routes for chat, briefings, and assistants."""
 
-from flask import Blueprint, request
+from flask import Blueprint, current_app, request
 from flask_jwt_extended import jwt_required
 
+from app.agent.actions import confirm_pending_action
+from app.agent.service import agent_capabilities, run_agent
 from app.ai.services import ai_status, answer_chat, daily_briefing, save_chat_message
 from app.extensions import db
 from app.models import Role
@@ -10,6 +12,7 @@ from app.responses import error_response, service_error_response, success_respon
 from app.security import current_user, has_dashboard_permission, roles_required
 from app.services.ai_feedback_service import record_ai_feedback
 from app.services.ai_history_service import paginated_chat_history
+from app.services.ai_rate_limit_service import check_ai_quota
 from app.services.ai_response_visibility_service import (
     redact_ai_chat_response,
     redact_chat_history_result,
@@ -31,6 +34,43 @@ from app.services.order_planning_service import plan_order
 ai_bp = Blueprint("ai", __name__)
 
 
+def chat_mode_is_agent():
+    """Return whether the chat endpoint should route through the tool agent."""
+    return str(current_app.config.get("AI_CHAT_MODE", "legacy") or "").strip().lower() == "agent"
+
+
+def _persist_and_respond(user, message, result, data, event_type):
+    """Store one chat exchange, its trace and audit event, then return the response."""
+    session_id = normalize_session_id(data.get("session_id"))
+    chat_message = save_chat_message(user, message, result, session_id=session_id)
+    if chat_message:
+        result["chat_message_id"] = chat_message.id
+        create_answer_trace(chat_message, result)
+    maybe_track_knowledge_gap(message, user, result)
+    diagnostics = result.get("diagnostics") or {}
+    record_event(
+        event_type,
+        "ai",
+        entity_type="chat_message",
+        user=user,
+        department=user.department,
+        source="ai",
+        metadata={
+            "response_type": result.get("type"),
+            "source_count": len(result.get("sources") or []),
+            "audit_event_id": diagnostics.get("audit_event_id"),
+            "tool_calls": diagnostics.get("agent_tool_calls"),
+        },
+        commit=True,
+    )
+    visible_result = redact_ai_chat_response(
+        result,
+        user,
+        answer_only=wants_answer_only_response(data),
+    )
+    return success_response(visible_result, message="AI response generated")
+
+
 @ai_bp.post("/chat")
 @jwt_required()
 def chat():
@@ -42,35 +82,63 @@ def chat():
         return error_response("message is required", 400)
 
     user = current_user()
+    rejected = check_ai_quota(user)
+    if rejected is not None:
+        return rejected
     session_id = normalize_session_id(data.get("session_id"))
+    if chat_mode_is_agent():
+        result = run_agent(message, user, session_id=session_id)
+        return _persist_and_respond(user, message, result, data, "ai.agent")
     result = answer_chat(message, user, session_id=session_id)
-    chat_message = save_chat_message(user, message, result, session_id=session_id)
+    return _persist_and_respond(user, message, result, data, "ai.chat")
+
+
+@ai_bp.post("/agent")
+@jwt_required()
+def agent_chat():
+    """Answer through the tool-using agent regardless of the configured chat mode."""
+    data = request.get_json(silent=True) or {}
+    message = str(data.get("message") or "").strip()
+    if not message:
+        return error_response("message is required", 400)
+    user = current_user()
+    rejected = check_ai_quota(user)
+    if rejected is not None:
+        return rejected
+    session_id = normalize_session_id(data.get("session_id"))
+    result = run_agent(message, user, session_id=session_id)
+    return _persist_and_respond(user, message, result, data, "ai.agent")
+
+
+@ai_bp.post("/agent/confirm")
+@jwt_required()
+def agent_confirm():
+    """Execute a pending agent action after explicit user confirmation."""
+    data = request.get_json(silent=True) or {}
+    token = str(data.get("token") or "").strip()
+    if not token:
+        return error_response("token is required", 400)
+    user = current_user()
+    result, error, status_code = confirm_pending_action(token, user)
+    if error:
+        return service_error_response(error, status_code)
+    session_id = normalize_session_id(data.get("session_id"))
+    chat_message = save_chat_message(
+        user,
+        f"Bestaetigung: {result.get('tool')}",
+        result,
+        session_id=session_id,
+    )
     if chat_message:
         result["chat_message_id"] = chat_message.id
-        create_answer_trace(chat_message, result)
-    maybe_track_knowledge_gap(message, user, result)
-    diagnostics = result.get("diagnostics") or {}
-    record_event(
-        "ai.chat",
-        "ai",
-        entity_type="chat_message",
-        user=user,
-        department=user.department,
-        source="ai",
-        metadata={
-            "response_type": result.get("response_type"),
-            "source_count": len(result.get("sources") or []),
-            "audit_event_id": diagnostics.get("audit_event_id"),
-        },
-        commit=True,
-    )
+    return success_response(result, message="Agent action executed")
 
-    visible_result = redact_ai_chat_response(
-        result,
-        user,
-        answer_only=wants_answer_only_response(data),
-    )
-    return success_response(visible_result, message="AI response generated")
+
+@ai_bp.get("/agent/tools")
+@jwt_required()
+def agent_tools():
+    """Return the agent tools the current user may use."""
+    return success_response(agent_capabilities(current_user()), message="Agent tools loaded")
 
 
 @ai_bp.get("/answers/<answer_id>/trace")
@@ -147,6 +215,9 @@ def incident_timeline_view():
 def order_plan():
     """Return a RAG-supported production order planning preview."""
     user = current_user()
+    rejected = check_ai_quota(user)
+    if rejected is not None:
+        return rejected
     result, error, status_code = plan_order(request.get_json(silent=True) or {}, user)
     if error:
         return service_error_response(error, status_code)
@@ -187,6 +258,9 @@ def error_assistant():
     user = current_user()
     if not has_dashboard_permission(user, "errors", "view"):
         return error_response("Keine Berechtigung fuer den Fehlerkatalog", 403)
+    rejected = check_ai_quota(user)
+    if rejected is not None:
+        return rejected
 
     data = request.get_json(silent=True) or {}
     result, error, status_code = run_error_assistant(data, user)
