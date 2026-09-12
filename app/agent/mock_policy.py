@@ -40,11 +40,14 @@ MACHINE_REFERENCE_PATTERN = re.compile(
 QUANTITY_PATTERN = re.compile(r"\b(\d{1,7})\s*(?:stueck|stück|stk)\b", re.IGNORECASE)
 IDENTIFIER_PATTERN = re.compile(r"#\s?\d+")
 ISO_DATE_PATTERN = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
-STRUCTURED_HINT_PATTERN = re.compile(r"\[structured_context\][^\n]*")
+STRUCTURED_HINT_PATTERN = re.compile(
+    r"\[structured_context\] Letzter Datenbereich dieser Sitzung:[^\n]*"
+)
 CREATE_TASK_TERMS = ("task anlegen", "aufgabe anlegen", "task erstellen", "aufgabe erstellen")
 DRAFT_TERMS = ("entwurf", "vorschlag", "vorschlagen")
 GENERAL_TERMS = ("hallo", "guten tag", "danke", "wer bist du", "was kannst du", "hilfe")
 COUNT_TERMS = ("wie viele", "wieviele", "anzahl", "wie viel", "zaehl")
+VALUE_TERMS = ("gesamtwert", "lagerwert", "bestandswert", "wert des", "wie viel wert", "kosten")
 LIST_TERMS = (
     "welche",
     "zeige",
@@ -129,7 +132,7 @@ def _choose_tool_calls(text, available, registry_names=None, structured_hint=Non
         return []
     if IDENTIFIER_PATTERN.search(text) and "search_knowledge" in available:
         return [("search_knowledge", {"query": text[:500]})]
-    if is_structured_follow_up(text) and structured_hint:
+    if structured_hint and (is_structured_follow_up(text) or _is_bare_follow_up(lowered)):
         follow_up = _follow_up_call(text, lowered, signals, structured_hint, registry)
         if follow_up:
             return [follow_up]
@@ -226,6 +229,8 @@ def _structured_calls(text, lowered, signals, registry, available):
     if "schicht" in lowered:
         return _registry_call(registry, "list_shift_entries", _shift_arguments(text, lowered))
     if _mentions(lowered, ("lager", "bestand", "material", "ersatzteil", "artikel")):
+        if _mentions(lowered, VALUE_TERMS):
+            return _registry_call(registry, "list_inventory", {"filter": "all", "count_only": True})
         arguments = _inventory_arguments(text, lowered, count_only)
         if arguments or _mentions(lowered, ("welche", "zeige", "liste", "alle ")):
             return _registry_call(
@@ -353,6 +358,8 @@ def _follow_up_call(text, lowered, signals, hint, registry):
             arguments["shift"] = _shift_alias(merged["shift"])
         return tool_name, arguments
     if tool_name == "list_inventory":
+        if _mentions(lowered, VALUE_TERMS):
+            return tool_name, {"filter": "all", "count_only": True}
         arguments = _inventory_arguments(text, lowered, signals["count"])
         return tool_name, {"filter": "all", "count_only": signals["count"], **arguments}
     if tool_name == "machine_incident_report":
@@ -517,6 +524,29 @@ def _machine_reference(text):
 def _mentions(lowered, terms):
     """Return whether normalized text contains any of the terms."""
     return any(term in lowered for term in terms)
+
+
+def _is_bare_follow_up(lowered):
+    """Return whether a short question names no data scope of its own."""
+    if len(lowered) > 60:
+        return False
+    scope_words = (
+        "task",
+        "aufgabe",
+        "stoerung",
+        "fehler",
+        "maschine",
+        "lager",
+        "material",
+        "mitarbeiter",
+        "urlaub",
+        "schicht",
+        "dokument",
+        "bericht",
+        "ersatzteil",
+        "bestand",
+    )
+    return not any(word in lowered for word in scope_words)
 
 
 def _is_general_chat(lowered):

@@ -27,12 +27,16 @@ AGENT_SYSTEM_PROMPT = (
     "Werkzeugwahl: Fuer gefilterte Listen und Zaehlungen (offene Tasks, Stoerungen je "
     "Maschine, Mitarbeiter je Abteilung, Urlaub, Lager unter Mindestbestand, Dokument-"
     "Metadaten, Schichtplan) nutze list_* bzw. count_records mit expliziten Argumenten. "
+    "Lagerwert, Gesamtwert oder Gesamtmenge des Lagers liefert list_inventory mit "
+    "count_only=true. "
     "Fuer Wie-/Warum-/Nachschlagefragen zu Handbuechern, Anleitungen und Wartungswissen "
     "nutze search_knowledge. Fuer Fehlercodes und Stoerungsbeschreibungen nutze "
     "error_assistant. Allgemeine Fragen ohne App-Bezug beantwortest du ohne Werkzeug und "
     "kennzeichnest sie als Modellwissen. Liefert ein Werkzeug answer_markdown, uebernimm "
-    "dessen Fakten und Struktur. Folgefragen wie 'welche davon' beziehen sich auf den "
-    "zuletzt genutzten Datenbereich: rufe dasselbe Werkzeug mit den vererbten Filtern auf."
+    "dessen Fakten und Struktur. Folgefragen wie 'welche davon' oder kurze Fragen ohne "
+    "eigenen Datenbereich ('was ist der Gesamtwert?') beziehen sich auf den zuletzt "
+    "genutzten Datenbereich ([structured_context]): rufe das passende Werkzeug dieses "
+    "Bereichs mit den vererbten Filtern auf, statt ohne Werkzeug zu antworten."
 )
 
 

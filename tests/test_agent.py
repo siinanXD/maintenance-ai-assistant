@@ -211,6 +211,9 @@ def test_mock_policy_extracts_structured_arguments(app, make_user):
             [{"role": "user", "content": "Wie viele offenen Tasks hat die Produktion?"}], tools
         )
         _, absent = select_mock_tool_call([{"role": "user", "content": "Wer fehlt morgen?"}], [])
+        _, value = select_mock_tool_call(
+            [{"role": "user", "content": "Was ist der Gesamtwert im Lager?"}], []
+        )
 
     assert [(call["name"], call["arguments"]["scope"]) for call in counts] == [
         ("count_records", "tasks"),
@@ -224,6 +227,11 @@ def test_mock_policy_extracts_structured_arguments(app, make_user):
     }
     assert absent[0]["name"] == "list_employees"
     assert absent[0]["arguments"]["availability"] == "absent_tomorrow"
+    assert value[0] == {
+        "id": "mock-call-1",
+        "name": "list_inventory",
+        "arguments": {"filter": "all", "count_only": True},
+    }
 
 
 def test_mock_policy_refines_follow_up_from_structured_hint(app, make_user):
@@ -231,6 +239,9 @@ def test_mock_policy_refines_follow_up_from_structured_hint(app, make_user):
     make_user(username="mock_policy_follow_up", role=Role.PRODUKTION)
     system_prompt = build_agent_system_prompt(
         ["tasks"], structured_context={"entity_type": "tasks", "status": "open"}
+    )
+    inventory_prompt = build_agent_system_prompt(
+        ["inventory"], structured_context={"entity_type": "inventory", "query": "inventory_count"}
     )
     messages = [
         {"role": "system", "content": system_prompt},
@@ -241,7 +252,16 @@ def test_mock_policy_refines_follow_up_from_structured_hint(app, make_user):
 
     with app.app_context():
         _, calls = select_mock_tool_call(messages, [tool_spec("list_tasks").provider_schema()])
+        _, value_calls = select_mock_tool_call(
+            [
+                {"role": "system", "content": inventory_prompt},
+                {"role": "user", "content": "was ist der gesamtwert?"},
+            ],
+            [tool_spec("list_inventory").provider_schema()],
+        )
 
+    assert value_calls[0]["name"] == "list_inventory"
+    assert value_calls[0]["arguments"] == {"filter": "all", "count_only": True}
     assert calls[0]["name"] == "list_tasks"
     assert calls[0]["arguments"] == {
         "department": "Produktion",
