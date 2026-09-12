@@ -261,9 +261,12 @@ AI_TASK_PRIORITIZATION_MAX_RETRIES=0
 AI_GENERATE_WITHOUT_EVIDENCE=false  # true sends unsourced chat prompts to the provider
 AI_CHAT_RATE_LIMIT_PER_MINUTE=30    # per-user limit for AI chat/assistant calls, 0 disables
 AI_DAILY_TOKEN_BUDGET_PER_USER=0    # optional per-user daily token cap, 0 disables
-AI_CHAT_MODE=legacy                 # agent routes /ai/chat through the tool-using agent
+AI_CHAT_MODE=agent                  # default; legacy keeps the rule-based chat router only
 AI_AGENT_MAX_ITERATIONS=4
 AI_AGENT_ACTION_TTL_SECONDS=600
+AI_AGENT_STRUCTURED_FAST_PATH=true  # rule handlers answer structured questions without tokens
+AI_AGENT_CHECKPOINTER=auto          # session memory: auto, none, memory, sqlite, postgres
+AI_AGENT_CHECKPOINT_PATH=data/agent_checkpoints.sqlite
 LANGFUSE_ENABLED=false      # set true to trace OpenAI calls in Langfuse
 LANGFUSE_PUBLIC_KEY=
 LANGFUSE_SECRET_KEY=
@@ -568,7 +571,11 @@ documents, handovers, employees, knowledge search, machine profiles, the error
 assistant, task drafts, prioritization, order planning and the daily briefing.
 Write tools (`create_task`, `request_knowledge_reindex`) only return a signed
 `pending_action` that the user confirms through `POST /api/v1/ai/agent/confirm`.
-Set `AI_CHAT_MODE=agent` to route the chat widget through the agent. See
+The agent is the default chat mode: structured questions (counts, lists,
+status, permission denials) are answered by the deterministic rule handlers as
+a fast path without a model call, everything else runs through the tool loop.
+Session memory is persisted by a LangGraph checkpointer (PostgreSQL, SQLite or
+in-process). Set `AI_CHAT_MODE=legacy` to keep the old router only. See
 [`docs/AI_AGENT.md`](docs/AI_AGENT.md) and `flask --app run:app agent eval-tools`.
 
 ### Automated Knowledge Lifecycle

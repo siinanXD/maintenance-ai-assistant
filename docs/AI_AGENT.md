@@ -23,7 +23,8 @@ Module:
 | --- | --- |
 | `app/agent/tools.py` | Tool-Registry, JSON-Schemas, Permission-Gates, Ergebnis-Kompaktierung |
 | `app/agent/graph.py` | LangGraph-State-Machine mit deterministischem Fallback-Runner |
-| `app/agent/service.py` | `run_agent(...)`, Session-Historie aus `ChatMessage`, Audit-Finalisierung |
+| `app/agent/service.py` | `run_agent(...)`, strukturierter Fast-Path, Checkpoint-Thread pro Session, Audit-Finalisierung |
+| `app/agent/checkpoints.py` | LangGraph-Checkpointer (postgres, sqlite, memory) fuer Session-Gedaechtnis |
 | `app/agent/actions.py` | signierte Pending Actions (itsdangerous) und Bestaetigung |
 | `app/agent/mock_policy.py` | deterministische Tool-Auswahl fuer `AI_PROVIDER=mock` und Tests |
 | `app/agent/prompts.py` | System-Prompt (per Prompt-Admin unter `workflow_key=agent` ueberschreibbar) |
@@ -34,6 +35,41 @@ Provider: `BaseAIProvider.chat_with_tools(messages, tools, workflow)` liefert
 OpenAI-kompatible Endpunkte nutzen Function Calling; der Mock-Provider nutzt
 die Keyword-Policy. Nachrichten folgen dem OpenAI-Format
 (`system`/`user`/`assistant` mit `tool_calls`/`tool`).
+
+## Strukturierter Fast-Path
+
+`run_agent(...)` prueft vor dem Modell-Loop die deterministischen Regel-Handler
+(`try_domain_structured_answers`, `try_local_structured_routes`). Treffen sie,
+kommt die Antwort ohne Token-Verbrauch und reproduzierbar zurueck:
+
+- Zaehl-, Listen- und Statusfragen zu Tasks, Stoerungen, Lager, Dokumenten,
+  Schichten, Urlaub, Mitarbeitern, Daily Briefing, Auftragsplanung
+- Berechtigungsverweigerungen fuer explizit angefragte Bereiche
+
+Die Antwort traegt `diagnostics.agent_fast_path = "structured_rules"` und
+`rag.agent.engine = "fast_path"`. Mit `AI_AGENT_STRUCTURED_FAST_PATH=false`
+laeuft jede Frage durch den Loop. Die Regeln sind damit kein eigener Router
+mehr, sondern ein Vorab-Schritt des Agenten; sie koennen Fragetyp fuer Fragetyp
+in Tools ueberfuehrt werden.
+
+## Session-Gedaechtnis (Checkpointer)
+
+Der Graph-Zustand ist JSON-serialisierbar (Nutzer als ID, Tools werden pro
+Knoten aus den Berechtigungen abgeleitet) und wird pro Thread
+`user:<id>:<session_id>` von einem LangGraph-Checkpointer gespeichert:
+
+| `AI_AGENT_CHECKPOINTER` | Backend |
+| --- | --- |
+| `auto` (Default) | `postgres`, wenn `DATABASE_URL` PostgreSQL ist, sonst `sqlite`, sonst `memory` |
+| `postgres` | `PostgresSaver` auf der App-Datenbank (Tabellen werden per `setup()` angelegt) |
+| `sqlite` | `SqliteSaver` unter `AI_AGENT_CHECKPOINT_PATH` (Default `data/agent_checkpoints.sqlite`) |
+| `memory` | `MemorySaver`, nur innerhalb eines Prozesses (Tests) |
+| `none` | kein Checkpointer; Historie aus `ChatMessage`-Zeilen |
+
+Zu Beginn jedes Turns kompaktiert `guard` die gespeicherten Nachrichten auf
+reine User/Assistant-Turns (Tool-Payloads werden verworfen) und begrenzt sie auf
+`AI_SESSION_CONTEXT_MESSAGES` Runden und `AI_SESSION_CONTEXT_MAX_CHARS` Zeichen.
+`diagnostics.memory_backend` zeigt das aktive Backend.
 
 ## Werkzeuge
 
@@ -92,7 +128,10 @@ Ein Token ist nur fuer den anfragenden Nutzer gueltig und laeuft nach
 ## Konfiguration
 
 ```env
-AI_CHAT_MODE=legacy            # agent: /ai/chat laeuft ueber den Agenten
+AI_CHAT_MODE=agent             # Default; legacy = nur der alte Regel-Router
+AI_AGENT_STRUCTURED_FAST_PATH=true
+AI_AGENT_CHECKPOINTER=auto
+AI_AGENT_CHECKPOINT_PATH=data/agent_checkpoints.sqlite
 AI_AGENT_MAX_ITERATIONS=4
 AI_AGENT_ACTION_TTL_SECONDS=600
 AI_CHAT_RATE_LIMIT_PER_MINUTE=30
@@ -115,8 +154,8 @@ Mit `AI_PROVIDER=mock` muss die Genauigkeit 1.0 sein (Test in
 ## Ausbaustufen
 
 - Weitere Tools nur ueber `register_tool(...)` mit Permission-Gate ergaenzen.
-- LangGraph-Checkpointer (Postgres) kann die `ChatMessage`-basierte Historie
-  ersetzen, wenn Multi-Turn-Zustand ueber Tool-Runden hinweg noetig wird.
+- Regel-Handler des Fast-Path schrittweise durch Tools ersetzen und danach
+  `AI_AGENT_STRUCTURED_FAST_PATH=false` als Default setzen.
 - Multi-Agent (Supervisor + Worker) erst fuer langlaufende Workflows wie
   "Bericht recherchieren, entwerfen, pruefen"; die Tool-Registry bleibt die
   gemeinsame Basis.

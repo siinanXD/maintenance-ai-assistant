@@ -149,11 +149,17 @@ class Config:
     AI_CHAT_RATE_LIMIT_PER_MINUTE = env_int("AI_CHAT_RATE_LIMIT_PER_MINUTE", 30)
     # Per-user daily token budget across AI workflows; 0 disables the cap.
     AI_DAILY_TOKEN_BUDGET_PER_USER = env_int("AI_DAILY_TOKEN_BUDGET_PER_USER", 0)
-    # Chat routing: "legacy" keeps the rule-based router, "agent" sends
-    # POST /api/v1/ai/chat through the tool-using agent.
-    AI_CHAT_MODE = os.getenv("AI_CHAT_MODE", "legacy").strip().lower() or "legacy"
+    # Chat routing: "agent" (default) sends POST /api/v1/ai/chat through the
+    # tool-using agent; "legacy" keeps the rule-based router only.
+    AI_CHAT_MODE = os.getenv("AI_CHAT_MODE", "agent").strip().lower() or "agent"
     AI_AGENT_MAX_ITERATIONS = env_int("AI_AGENT_MAX_ITERATIONS", 4)
     AI_AGENT_ACTION_TTL_SECONDS = env_int("AI_AGENT_ACTION_TTL_SECONDS", 600)
+    # Deterministic structured rules answer counts/lists/status questions before
+    # the model loop runs (no tokens, reproducible).
+    AI_AGENT_STRUCTURED_FAST_PATH = env_bool("AI_AGENT_STRUCTURED_FAST_PATH", default=True)
+    # LangGraph checkpointer for agent session memory: auto, none, memory, sqlite, postgres.
+    AI_AGENT_CHECKPOINTER = os.getenv("AI_AGENT_CHECKPOINTER", "auto").strip().lower() or "auto"
+    AI_AGENT_CHECKPOINT_PATH = os.getenv("AI_AGENT_CHECKPOINT_PATH", "")
     LANGFUSE_ENABLED = env_bool("LANGFUSE_ENABLED", default=False)
     LANGFUSE_PUBLIC_KEY = os.getenv("LANGFUSE_PUBLIC_KEY", "")
     LANGFUSE_SECRET_KEY = os.getenv("LANGFUSE_SECRET_KEY", "")

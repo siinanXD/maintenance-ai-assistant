@@ -5,11 +5,16 @@ Nodes::
     guard -> agent -> tools -> agent -> ... -> validate -> respond
 
 - ``guard`` runs deterministic safety and permission checks and builds the
-  initial provider messages.
+  provider messages, continuing a checkpointed thread when one exists.
 - ``agent`` asks the provider for an answer or tool calls.
 - ``tools`` executes tool calls through the permission-gated registry.
 - ``validate`` applies confidence scoring and post-generation safety.
 - ``respond`` writes prompt-safe workflow diagnostics.
+
+State stays JSON-serializable so a LangGraph checkpointer can persist it per
+thread (user + session). The user is referenced by id, tools are derived from
+the user's permissions, and the provider is resolved per call (an override
+context variable exists for tests).
 
 When ``langgraph`` is unavailable the same node functions run in a
 deterministic loop, mirroring the RAG workflow module.
@@ -19,13 +24,17 @@ from __future__ import annotations
 
 import json
 import logging
+from contextvars import ContextVar
 from time import perf_counter
 from typing import Any, TypedDict
+from uuid import uuid4
 
 from flask import current_app, has_app_context
 
 from app.agent.prompts import build_agent_system_prompt
 from app.agent.tools import available_tools, execute_tool, provider_tool_schemas, tool_spec
+from app.extensions import db
+from app.models import User
 from app.services.ai_confidence_service import attach_confidence_to_result
 from app.services.ai_retrieval import allowed_ai_scopes
 from app.services.ai_routing import local_metadata
@@ -48,19 +57,21 @@ logger = logging.getLogger(__name__)
 
 AGENT_PIPELINE_STEPS = ["guard", "agent", "tools", "validate", "respond"]
 DEFAULT_MAX_ITERATIONS = 4
+DEFAULT_HISTORY_MESSAGES = 4
+DEFAULT_HISTORY_MAX_CHARS = 1400
 MAX_TOOL_CALLS_PER_ROUND = 4
 USAGE_KEYS = ("input_tokens", "output_tokens", "cached_tokens", "total_tokens")
+COMPILED_GRAPH_KEY = "agent_compiled_graph"
+_PROVIDER_OVERRIDE: ContextVar[Any] = ContextVar("maintenance_agent_provider", default=None)
 
 
 class AgentState(TypedDict, total=False):
-    """Mutable state passed between agent workflow nodes."""
+    """JSON-serializable state passed between agent workflow nodes."""
 
     message: str
-    user: Any
+    user_id: int
     session_id: str
     history: list
-    provider: Any
-    tools: list
     messages: list
     pending_tool_calls: list
     tool_trace: list
@@ -75,20 +86,35 @@ class AgentState(TypedDict, total=False):
     safety: dict
     blocked: bool
     tool_scopes: list
+    turn_count: int
     result: dict
     trace: list
     workflow_engine: str
 
 
-def run_agent_workflow(message, user, session_id="", history=None, provider=None):
-    """Run the agent workflow and return the result payload."""
-    state: AgentState = {
-        "message": str(message or "").strip(),
-        "user": user,
+def run_agent_workflow(
+    message,
+    user,
+    session_id="",
+    history=None,
+    provider=None,
+    thread_id=None,
+    checkpointer=None,
+):
+    """Run the agent workflow and return the result payload.
+
+    ``checkpointer`` enables persistent thread state; ``thread_id`` scopes it
+    to one user session. Without a checkpointer the optional ``history`` list
+    seeds the conversation.
+    """
+    text = str(message or "").strip()
+    if not text:
+        raise ValueError("Agent workflow requires a non-empty message.")
+    turn_state: AgentState = {
+        "message": text,
+        "user_id": int(user.id),
         "session_id": session_id or "",
         "history": list(history or []),
-        "provider": provider,
-        "messages": [],
         "pending_tool_calls": [],
         "tool_trace": [],
         "sources": [],
@@ -99,28 +125,31 @@ def run_agent_workflow(message, user, session_id="", history=None, provider=None
         "answer": None,
         "diagnostics": {},
         "usage": {},
+        "safety": {},
+        "blocked": False,
         "tool_scopes": [],
+        "result": {},
         "trace": [],
         "workflow_engine": _workflow_engine_name(),
     }
-    if not state["message"]:
-        raise ValueError("Agent workflow requires a non-empty message.")
-    graph = _compiled_graph()
-    if graph is not None:
-        return graph.invoke(state)["result"]
-    return _run_fallback_workflow(state)["result"]
+    token = _PROVIDER_OVERRIDE.set(provider)
+    try:
+        graph = _compiled_graph(checkpointer)
+        if graph is None:
+            state = dict(turn_state)
+            state["messages"] = []
+            return _run_fallback_workflow(state)["result"]
+        config = {}
+        if checkpointer is not None:
+            config = {"configurable": {"thread_id": thread_id or f"{user.id}:{uuid4().hex}"}}
+        return graph.invoke(turn_state, config=config)["result"]
+    finally:
+        _PROVIDER_OVERRIDE.reset(token)
 
 
 def max_iterations():
     """Return the configured agent iteration cap."""
-    if not has_app_context():
-        return DEFAULT_MAX_ITERATIONS
-    try:
-        return max(
-            1, int(current_app.config.get("AI_AGENT_MAX_ITERATIONS", DEFAULT_MAX_ITERATIONS))
-        )
-    except (TypeError, ValueError):
-        return DEFAULT_MAX_ITERATIONS
+    return max(1, _config_int("AI_AGENT_MAX_ITERATIONS", DEFAULT_MAX_ITERATIONS))
 
 
 # ---------------------------------------------------------------------------
@@ -129,25 +158,33 @@ def max_iterations():
 
 
 def guard_node(state):
-    """Run deterministic safety checks and build the initial provider messages."""
-    user = state["user"]
+    """Run deterministic safety checks and build the provider messages.
+
+    A checkpointed thread already carries ``messages`` from earlier turns; they
+    are compacted to plain user/assistant turns so tool payloads from previous
+    rounds do not accumulate.
+    """
+    user = _state_user(state)
     safety = assess_ai_safety(state["message"])
     tools = available_tools(user)
     scopes = allowed_ai_scopes(user)
     system_prompt = build_agent_system_prompt(scopes, safety.prompt_rules)
-    messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(
-        {"role": item["role"], "content": item["content"]}
-        for item in state.get("history") or []
-        if item.get("role") in {"user", "assistant"} and item.get("content")
-    )
+    previous = compact_history(state.get("messages") or [])
+    if not previous:
+        previous = [
+            {"role": item["role"], "content": item["content"]}
+            for item in state.get("history") or []
+            if item.get("role") in {"user", "assistant"} and item.get("content")
+        ]
+    previous = previous[-2 * _config_int("AI_SESSION_CONTEXT_MESSAGES", DEFAULT_HISTORY_MESSAGES) :]
+    messages = [{"role": "system", "content": system_prompt}, *previous]
     messages.append({"role": "user", "content": state["message"]})
     blocked = bool(safety.blocked_actions)
     update = {
-        "tools": tools,
         "messages": messages,
         "safety": safety.to_dict(),
         "blocked": blocked,
+        "turn_count": int(state.get("turn_count") or 0) + 1,
         "trace": _append_trace(
             state,
             "guard",
@@ -155,6 +192,7 @@ def guard_node(state):
                 "tool_count": len(tools),
                 "safety_risk_level": safety.risk_level,
                 "blocked": blocked,
+                "history_messages": len(previous),
             },
         ),
     }
@@ -172,15 +210,16 @@ def guard_node(state):
 
 def agent_node(state):
     """Ask the provider for an answer or tool calls."""
-    provider = state.get("provider") or get_ai_provider()
-    tools = state.get("tools") or []
+    user = _state_user(state)
+    provider = _current_provider()
+    tools = available_tools(user)
     messages = list(state.get("messages") or [])
     iterations = int(state.get("iterations") or 0) + 1
     started = perf_counter()
     try:
         with langfuse_trace_context(
             "agent",
-            user=state["user"],
+            user=user,
             session_id=state.get("session_id") or "",
             metadata={"iteration": iterations, "tool_count": len(tools)},
             tags=["agent", "tools"],
@@ -202,7 +241,11 @@ def agent_node(state):
             ),
         }
     usage = _merge_usage(state.get("usage") or {}, response.metadata, perf_counter() - started)
-    tool_calls = [call for call in response.tool_calls if tool_spec(call.name)]
+    tool_calls = [
+        {"id": call.id, "name": call.name, "arguments": dict(call.arguments or {})}
+        for call in response.tool_calls
+        if tool_spec(call.name)
+    ]
     if tool_calls and iterations < int(state.get("max_iterations") or DEFAULT_MAX_ITERATIONS):
         messages.append(_assistant_tool_message(response.content, tool_calls))
         return {
@@ -210,23 +253,23 @@ def agent_node(state):
             "messages": messages,
             "pending_tool_calls": tool_calls[:MAX_TOOL_CALLS_PER_ROUND],
             "usage": usage,
-            "provider": provider,
             "trace": _append_trace(
                 state,
                 "agent",
-                {"iteration": iterations, "tool_calls": [call.name for call in tool_calls]},
+                {"iteration": iterations, "tool_calls": [call["name"] for call in tool_calls]},
             ),
         }
     answer = response.content
     if not answer and tool_calls:
         answer = _iteration_limit_answer(state.get("tool_trace") or [])
+    if answer:
+        messages.append({"role": "assistant", "content": answer})
     return {
         "iterations": iterations,
         "messages": messages,
         "pending_tool_calls": [],
         "answer": answer,
         "usage": usage,
-        "provider": provider,
         "diagnostics": _provider_diagnostics(provider, usage),
         "trace": _append_trace(state, "agent", {"iteration": iterations, "final": True}),
     }
@@ -234,46 +277,48 @@ def agent_node(state):
 
 def tools_node(state):
     """Execute pending tool calls and feed results back into the messages."""
-    user = state["user"]
+    user = _state_user(state)
     messages = list(state.get("messages") or [])
     tool_trace = list(state.get("tool_trace") or [])
     sources = list(state.get("sources") or [])
     data = dict(state.get("data") or {})
     scopes = list(state.get("tool_scopes") or [])
     pending_action = state.get("pending_action")
-    for call in state.get("pending_tool_calls") or []:
+    pending_calls = state.get("pending_tool_calls") or []
+    for call in pending_calls:
+        name = call["name"]
         started = perf_counter()
         with langfuse_trace_context(
             "agent_tool",
             user=user,
             session_id=state.get("session_id") or "",
-            metadata={"tool": call.name},
-            tags=["agent", "tool", call.name],
+            metadata={"tool": name},
+            tags=["agent", "tool", name],
         ):
-            result = execute_tool(call.name, call.arguments, user)
+            result = execute_tool(name, call.get("arguments") or {}, user)
         duration_ms = int((perf_counter() - started) * 1000)
         payload = result.to_model_payload()
         messages.append(
             {
                 "role": "tool",
-                "tool_call_id": call.id,
-                "name": call.name,
+                "tool_call_id": call["id"],
+                "name": name,
                 "content": json.dumps(payload, ensure_ascii=True, default=str),
             }
         )
         tool_trace.append(
             {
-                "tool": call.name,
+                "tool": name,
                 "status": result.status,
                 "summary": str(result.summary or "")[:200],
-                "arguments": _safe_arguments(call.arguments),
+                "arguments": _safe_arguments(call.get("arguments")),
                 "source_count": len(result.sources),
                 "duration_ms": duration_ms,
             }
         )
         sources = _merge_sources(sources, result.sources)
-        data[call.name] = result.content
-        spec = tool_spec(call.name)
+        data[name] = result.content
+        spec = tool_spec(name)
         if spec is not None:
             scopes.extend(scope for scope in spec.scopes if scope not in scopes)
         if result.status == "confirmation_required":
@@ -286,9 +331,7 @@ def tools_node(state):
         "data": data,
         "tool_scopes": scopes,
         "pending_action": pending_action,
-        "trace": _append_trace(
-            state, "tools", {"executed": len(state.get("pending_tool_calls") or [])}
-        ),
+        "trace": _append_trace(state, "tools", {"executed": len(pending_calls)}),
     }
 
 
@@ -347,6 +390,7 @@ def respond_node(state):
         "nodes": list(AGENT_PIPELINE_STEPS),
         "completed_nodes": [entry["node"] for entry in trace],
         "iterations": int(state.get("iterations") or 0),
+        "turn_count": int(state.get("turn_count") or 0),
         "tool_calls": [entry["tool"] for entry in state.get("tool_trace") or []],
         "max_iterations": int(state.get("max_iterations") or DEFAULT_MAX_ITERATIONS),
     }
@@ -387,10 +431,14 @@ def _run_fallback_workflow(state):
     return state
 
 
-def _compiled_graph():
+def _compiled_graph(checkpointer=None):
     """Return the compiled LangGraph workflow or ``None`` for the fallback runner."""
     if StateGraph is None or END is None:
         return None
+    cache = current_app.extensions if has_app_context() else None
+    cache_key = (COMPILED_GRAPH_KEY, id(checkpointer))
+    if cache is not None and cache_key in cache:
+        return cache[cache_key]
     try:
         graph = StateGraph(AgentState)
         graph.add_node("guard", guard_node)
@@ -408,12 +456,15 @@ def _compiled_graph():
         graph.add_edge("tools", "agent")
         graph.add_edge("validate", "respond")
         graph.add_edge("respond", END)
-        return graph.compile()
+        compiled = graph.compile(checkpointer=checkpointer)
     except Exception:  # pragma: no cover - defensive
         logger.warning(
             "agent_langgraph_compile_failed fallback=deterministic_runner", exc_info=True
         )
         return None
+    if cache is not None:
+        cache[cache_key] = compiled
+    return compiled
 
 
 def _workflow_engine_name():
@@ -426,6 +477,58 @@ def _workflow_engine_name():
 # ---------------------------------------------------------------------------
 
 
+def compact_history(messages):
+    """Return plain user/assistant turns from a provider message list.
+
+    Tool payloads and assistant tool-call envelopes are dropped so the next
+    turn starts from a bounded conversational memory.
+    """
+    compact = []
+    for message in messages or []:
+        role = message.get("role")
+        content = message.get("content")
+        if role == "user" and content:
+            compact.append({"role": "user", "content": str(content)})
+        elif role == "assistant" and content and not message.get("tool_calls"):
+            compact.append({"role": "assistant", "content": str(content)})
+    max_chars = _config_int("AI_SESSION_CONTEXT_MAX_CHARS", DEFAULT_HISTORY_MAX_CHARS)
+    return [
+        {
+            "role": item["role"],
+            "content": (
+                item["content"]
+                if len(item["content"]) <= max_chars
+                else item["content"][:max_chars] + "..."
+            ),
+        }
+        for item in compact
+    ]
+
+
+def _state_user(state):
+    """Return the user for the state's user id."""
+    user = db.session.get(User, int(state["user_id"]))
+    if user is None:
+        raise ValueError("Agent workflow user no longer exists.")
+    return user
+
+
+def _current_provider():
+    """Return the provider override for this run or the configured provider."""
+    override = _PROVIDER_OVERRIDE.get()
+    return override if override is not None else get_ai_provider()
+
+
+def _config_int(key, default):
+    """Return an integer config value with a safe fallback."""
+    if not has_app_context():
+        return default
+    try:
+        return int(current_app.config.get(key, default))
+    except (TypeError, ValueError):
+        return default
+
+
 def _assistant_tool_message(content, tool_calls):
     """Return the provider-format assistant message carrying tool calls."""
     return {
@@ -433,11 +536,11 @@ def _assistant_tool_message(content, tool_calls):
         "content": content or None,
         "tool_calls": [
             {
-                "id": call.id,
+                "id": call["id"],
                 "type": "function",
                 "function": {
-                    "name": call.name,
-                    "arguments": json.dumps(call.arguments or {}, ensure_ascii=True),
+                    "name": call["name"],
+                    "arguments": json.dumps(call.get("arguments") or {}, ensure_ascii=True),
                 },
             }
             for call in tool_calls

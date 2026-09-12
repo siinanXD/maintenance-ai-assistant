@@ -742,6 +742,10 @@ def _api_docs_test_app(
         AUTO_CREATE_DATABASE = True
         AI_PROVIDER = "mock"
         EMBEDDING_PROVIDER = "hashing"
+        # The legacy suites exercise the rule-based router directly; agent tests
+        # opt in with AI_CHAT_MODE="agent". Checkpoints stay in-process.
+        AI_CHAT_MODE = "legacy"
+        AI_AGENT_CHECKPOINTER = "memory"
         OPENAI_API_KEY = ""
         OPENAI_MODEL = "test-model"
         MAIL_DRY_RUN = True
