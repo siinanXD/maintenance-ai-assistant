@@ -2,6 +2,8 @@
 
 from datetime import date, timedelta
 
+from app.agent.mock_policy import _choose_tool_calls
+from app.agent.tools import TOOL_REGISTRY, available_tools, execute_tool
 from app.domain_models.common import utc_now
 from app.extensions import db
 from app.models import (
@@ -35,14 +37,8 @@ MIN_RECALL_AT_K = 0.95
 MIN_MRR = 0.5
 
 
-def test_ai_chat_golden_retrieval_questions(
-    app,
-    client,
-    make_user,
-    auth_headers,
-    set_dashboard_permission,
-):
-    """Verify fixed AI questions retrieve reproducible, relevant sources."""
+def _golden_user(app, make_user, set_dashboard_permission):
+    """Create the department-scoped golden test user with retrieval permissions."""
     user = make_user(
         username="golden_ai_retrieval_user",
         role=Role.PRODUKTION,
@@ -65,23 +61,56 @@ def test_ai_chat_golden_retrieval_questions(
     )
     app.config["RAG_ENABLED"] = True
     app.config["RAG_VECTOR_STORE"] = "local"
+    return user
+
+
+def _agent_retrieval(question, user):
+    """Execute the tools the offline policy selects for a question and merge their sources.
+
+    Structured questions are answered by ``list_*``/``count_records`` tools, knowledge
+    questions by ``search_knowledge``; hybrid questions get both, mirroring the
+    evidence the agent can ground an answer in.
+    """
+    available = {spec.name for spec in available_tools(user)}
+    calls = _choose_tool_calls(question, available, set(TOOL_REGISTRY), None)
+    if not any(name == "search_knowledge" for name, _ in calls):
+        calls.append(("search_knowledge", {"query": question}))
+    sources = []
+    seen = set()
+    failed_tools = []
+    for name, arguments in calls:
+        result = execute_tool(name, arguments, user)
+        if result.status != "ok":
+            failed_tools.append(f"{name}:{result.status}")
+            continue
+        for source in result.sources or []:
+            key = (str(source.get("type") or ""), str(source.get("id") or ""))
+            if key in seen:
+                continue
+            seen.add(key)
+            sources.append(source)
+    return {"sources": sources, "failed_tools": failed_tools}
+
+
+def test_agent_tools_golden_retrieval_questions(
+    app,
+    make_user,
+    set_dashboard_permission,
+):
+    """Verify fixed knowledge questions retrieve reproducible, relevant sources."""
+    user = _golden_user(app, make_user, set_dashboard_permission)
 
     with app.app_context():
         db_user = db.session.get(User, user["id"])
         source_ids = _seed_golden_sources(db_user)
         cases = build_golden_questions(source_ids)
+        results = {case.question: _agent_retrieval(case.question, db_user) for case in cases}
 
     failures = []
     evaluations = []
     for case in cases:
-        response = client.post(
-            "/api/v1/ai/chat",
-            headers=auth_headers(user["username"]),
-            json={"message": case.question},
-        )
-        payload = response.get_json()
-        sources = payload.get("sources") or []
-        diagnostics = payload.get("diagnostics") or {}
+        result = results[case.question]
+        sources = result["sources"]
         source_keys = _source_keys(sources)
         missing_sources = set(case.expected_sources) - source_keys
         missing_types = set(case.expected_source_types) - _source_types(sources)
@@ -91,9 +120,9 @@ def test_ai_chat_golden_retrieval_questions(
         evaluation = _evaluate_golden_question(case, sources)
         evaluations.append(evaluation)
 
-        if response.status_code != 200:
-            failures.append(f"{case.question}: HTTP {response.status_code}")
-        if diagnostics.get("empty_retrieval") is True:
+        if result["failed_tools"]:
+            failures.append(f"{case.question}: tool failures {result['failed_tools']}")
+        if not sources:
             failures.append(f"{case.question}: empty retrieval")
         if len(sources) < case.min_source_count:
             failures.append(
@@ -127,6 +156,41 @@ def test_ai_chat_golden_retrieval_questions(
         failures.append(f"recall_at_k={metrics['recall_at_k']}")
     if metrics["mrr"] < MIN_MRR:
         failures.append(f"mrr={metrics['mrr']}")
+
+    assert not failures, "\n".join(failures)
+
+
+def test_ai_chat_endpoint_answers_golden_questions_with_sources(
+    app,
+    client,
+    make_user,
+    auth_headers,
+    set_dashboard_permission,
+):
+    """Verify the agent chat endpoint grounds every golden question in visible sources."""
+    user = _golden_user(app, make_user, set_dashboard_permission)
+
+    with app.app_context():
+        db_user = db.session.get(User, user["id"])
+        cases = build_golden_questions(_seed_golden_sources(db_user))
+
+    failures = []
+    for case in cases:
+        response = client.post(
+            "/api/v1/ai/chat",
+            headers=auth_headers(user["username"]),
+            json={"message": case.question},
+        )
+        payload = response.get_json() or {}
+        diagnostics = payload.get("diagnostics") or {}
+        if response.status_code != 200:
+            failures.append(f"{case.question}: HTTP {response.status_code}")
+            continue
+        if diagnostics.get("empty_retrieval") is True or not payload.get("sources"):
+            failures.append(
+                f"{case.question}: no sources via "
+                f"{[entry.get('tool') for entry in payload.get('tool_trace') or []]}"
+            )
 
     assert not failures, "\n".join(failures)
 

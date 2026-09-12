@@ -161,8 +161,8 @@ function metaFromPayload(payload: ShellChatResponse): ShellChatAnswerMeta {
     data.answer_category || diagnostics.answer_category || ""
   ).trim();
   const answerType = answerTypeLabel(data.type);
-  const structured = isStructuredAnswer(data.type, answerCategory);
-  const appDataBadge = structured || answerCategory === "structured_data";
+  const structured = isStructuredAnswer(answerCategory);
+  const appDataBadge = structured;
   const sourceLabel = sourceLabelFromPayload(data, sourceItems, answerType);
   const zeroResult = isZeroResult(data.answer || "", data, sourceCount);
 
@@ -197,37 +197,16 @@ function answerTypeLabel(typeValue: unknown): string {
   const labels: Record<string, string> = {
     agent: "Agent",
     agent_action: "Agent-Aktion",
-    daily_briefing: "Daily Briefing",
-    document_outdated: "Dokumente",
-    document_recent: "Dokumente",
-    document_this_week: "Dokumente",
-    error_help: "Fehlerhilfe",
-    general_chat: "AI-Antwort",
-    structured_scope: "App-Daten",
-    tasks_status: "Task-Status",
-    tasks_today: "Heutige Tasks"
+    daily_briefing: "Daily Briefing"
   };
-  return labels[key] || (key ? "App-Daten" : "Antwort");
+  return labels[key] || "Antwort";
 }
 
 /**
- * Return whether a response type represents structured app data.
+ * Return whether an answer was produced from structured app data.
  */
-function isStructuredAnswer(typeValue: unknown, answerCategory = ""): boolean {
-  if (answerCategory === "structured_data") return true;
-  const key = String(typeValue || "");
-  return (
-    key === "daily_briefing"
-    || key === "structured_scope"
-    || key.startsWith("document_")
-    || key.startsWith("employee_")
-    || key.startsWith("inventory_")
-    || key.startsWith("machine_")
-    || key.startsWith("shiftplan_")
-    || key.startsWith("tasks_")
-    || key.startsWith("vacation_")
-    || key.endsWith("_count")
-  );
+function isStructuredAnswer(answerCategory = ""): boolean {
+  return answerCategory === "structured_data";
 }
 
 /**

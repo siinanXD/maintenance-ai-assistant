@@ -27,22 +27,25 @@ Die Knoten liegen in `app/services/langgraph_rag_workflow.py`:
 - `structured_data_retrieval_node`: ruft die konsolidierte Retrieval-Pipeline auf.
 - `vector_retrieval_node`: protokolliert Knowledge-/Vector-Diagnostik aus dem Retrieval-Ergebnis.
 - `context_assembly_node`: baut das bestehende `rag`-Diagnosepayload.
-- `answer_generation_node`: erzeugt die Antwort. Der Chat-Handler übergibt einen
-  `answer_generator`, der Evidence-Gate, Provider-Fallback und Diagnostik
-  kapselt; ohne Generator wird der aktive Provider direkt aufgerufen.
+- `answer_generation_node`: erzeugt die Antwort, wenn der Workflow komplett
+  über `answer_with_rag(...)` läuft. Der Chat-Agent nutzt nur den
+  Retrieval-Teil (`build_rag_context(...)` im Tool `search_knowledge`) und
+  erzeugt die Antwort im Agent-Loop.
 - `validation_node`: wendet Confidence- und Safety-Prüfungen an.
 - `trace_logging_node`: ergänzt prompt-sichere Workflow-Diagnostik.
 
-Der Chat-Endpunkt `POST /api/v1/ai/chat` führt die komplette Sequenz aus.
-`rag.langgraph.completed_nodes` in der Antwort zeigt, welche Knoten gelaufen
-sind.
+Im Chat läuft die Retrieval-Sequenz, sobald der Agent `search_knowledge`
+aufruft. `rag.langgraph.completed_nodes` in der Antwort zeigt, welche
+Retrieval-Knoten gelaufen sind; `rag.agent.completed_nodes` zeigt den
+Agent-Loop.
 
 ## Evidence-Gate
 
-Ohne sichtbare Quelle wird der Provider nicht aufgerufen, solange
-`AI_GENERATE_WITHOUT_EVIDENCE=false` ist (Default). Die Antwort ist dann eine
-lokale, geerdete No-Answer mit `diagnostics.generation_skipped = "no_evidence"`.
-Provider-Fehlkonfigurationen wie `api_key_missing` bleiben in `diagnostics.status`
+Ohne sichtbare Quelle liefert `search_knowledge` eine lokale, geerdete
+No-Answer (`## Keine belastbare Quelle gefunden`, `empty_retrieval: true`), die
+der Agent unverändert wiedergibt; die Antwort trägt
+`diagnostics.empty_retrieval = true` und erzeugt einen Knowledge-Gap-Eintrag.
+Provider-Fehler bleiben in `diagnostics.status` und `/api/v1/ai/status`
 sichtbar.
 
 ## Kompatibilität

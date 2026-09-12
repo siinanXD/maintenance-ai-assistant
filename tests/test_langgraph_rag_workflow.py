@@ -187,8 +187,8 @@ def test_answer_with_rag_handles_empty_retrieval_without_sources(monkeypatch):
     assert result["confidence"]["score"] >= 0
 
 
-def test_chat_route_runs_full_langgraph_workflow(app, client, make_user, auth_headers):
-    """Verify the live chat path executes generation and validation nodes."""
+def test_chat_route_runs_hybrid_retrieval_through_agent(app, client, make_user, auth_headers):
+    """Verify knowledge questions reach the LangGraph retrieval pipeline via the agent."""
     from app.models import Role
 
     user = make_user(
@@ -200,63 +200,21 @@ def test_chat_route_runs_full_langgraph_workflow(app, client, make_user, auth_he
     response = client.post(
         "/api/v1/ai/chat",
         headers=auth_headers(user["username"]),
-        json={"message": "Wie behebe ich Stoerung LG404 an Maschine Graph?"},
+        json={"message": "Wie behebe ich laut Wartungswissen einen Hydraulikdruckverlust?"},
     )
 
     payload = response.get_json()
-    langgraph = payload["rag"]["langgraph"]
     assert response.status_code == 200
-    assert langgraph["completed_nodes"] == payload["rag"]["pipeline"]
-    assert "answer_generation" in langgraph["completed_nodes"]
-    assert "validation" in langgraph["completed_nodes"]
-    assert payload["diagnostics"]["generation_skipped"] == "no_evidence"
+    assert payload["type"] == "agent"
+    assert [entry["tool"] for entry in payload["tool_trace"]] == ["search_knowledge"]
+    langgraph = payload["rag"]["langgraph"]
+    assert "structured_data_retrieval" in langgraph["completed_nodes"]
+    assert "vector_retrieval" in langgraph["completed_nodes"]
+    assert payload["rag"]["agent"]["completed_nodes"][:3] == ["guard", "agent", "tools"]
+    assert payload["diagnostics"]["query_understanding"]["query_type"]
+    assert payload["diagnostics"]["empty_retrieval"] is True
+    assert payload["answer_category"] == "rag"
     assert "Keine belastbare Quelle gefunden" in payload["answer"]
-
-
-def test_chat_without_evidence_skips_provider_by_default(app, make_user, monkeypatch):
-    """Verify unsourced questions stay local unless the explicit policy allows generation."""
-    from app.ai.services import answer_chat
-    from app.extensions import db
-    from app.models import Role, User
-
-    calls = []
-
-    class RecordingChatProvider:
-        """Provider double that records generation calls."""
-
-        name = "openai"
-        last_call_metadata = {"provider": "openai", "workflow": "chat", "model": "test"}
-
-        def answer_question(self, question, context, workflow="chat", extra_rules=None):
-            """Record the call and return a fixed answer."""
-            calls.append({"question": question, "extra_rules": extra_rules})
-            return "## Antwort\n- **Status:** generiert"
-
-        def answer_general_question(self, question):
-            """Return a fixed general answer."""
-            return "## Allgemein"
-
-    monkeypatch.setattr("app.ai.services.get_ai_provider", lambda: RecordingChatProvider())
-    user = make_user(
-        username="langgraph_evidence_gate_user",
-        role=Role.MASTER_ADMIN,
-        department_name=None,
-    )
-    message = "Wie behebe ich Stoerung ZZ777 an Maschine Nirgendwo?"
-
-    with app.app_context():
-        app.config["AI_PROVIDER"] = "openai"
-        app.config["OPENAI_API_KEY"] = "test-key"
-        app.config["AI_GENERATE_WITHOUT_EVIDENCE"] = False
-        gated = answer_chat(message, db.session.get(User, user["id"]))
-        app.config["AI_GENERATE_WITHOUT_EVIDENCE"] = True
-        generated = answer_chat(message, db.session.get(User, user["id"]))
-
-    assert gated["diagnostics"]["generation_skipped"] == "no_evidence"
-    assert "Keine belastbare Quelle gefunden" in gated["answer"]
-    assert len(calls) == 1
-    assert "Ursache" in (calls[0]["extra_rules"] or "")
-    assert generated["diagnostics"]["status"] == "openai_used"
 
 
 def test_validation_node_attaches_confidence_and_safety(monkeypatch):

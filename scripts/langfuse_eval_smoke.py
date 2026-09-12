@@ -36,7 +36,8 @@ def main():
     _bootstrap_environment()
 
     from app import create_app
-    from app.ai.chat_answers import answer_chat, save_chat_message
+    from app.agent.service import run_agent
+    from app.services.ai_history_service import save_chat_message
     from app.services.ai_traceability_service import create_answer_trace
     from app.services.langfuse_eval_score_service import submit_automatic_eval_scores
     from app.services.langfuse_service import langfuse_eval_enabled, langfuse_status
@@ -60,7 +61,7 @@ def main():
             return 1
 
         message = "Welche offenen Wartungsaufgaben gibt es heute?"
-        result = answer_chat(message, user, session_id="langfuse-eval-smoke")
+        result = run_agent(message, user, session_id="langfuse-eval-smoke")
         chat_message = save_chat_message(user, message, result, session_id="langfuse-eval-smoke")
         if chat_message is None:
             print("FAIL: Could not persist chat message.")

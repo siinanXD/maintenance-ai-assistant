@@ -14,7 +14,8 @@ from app.agent.tools import available_tools, provider_tool_schemas
 from app.services.ai_service import AIServiceError, get_ai_provider
 
 GOLDEN_TOOL_CASES = (
-    {"message": "Welche offenen Tasks gibt es heute?", "expected_tool": "search_tasks"},
+    {"message": "Welche offenen Tasks gibt es heute?", "expected_tool": "list_tasks"},
+    {"message": "Wie viele Tasks sind ueberfaellig?", "expected_tool": "list_tasks"},
     {
         "message": "Was bedeutet Fehler INS-E-103 an Hydraulikpresse 03?",
         "expected_tool": "error_assistant",
@@ -23,13 +24,36 @@ GOLDEN_TOOL_CASES = (
         "message": "Presse 3 verliert Hydraulikdruck, Stoerung seit heute",
         "expected_tool": "error_assistant",
     },
+    {"message": "Wie viele kritische Stoerungen gibt es?", "expected_tool": "list_incidents"},
+    {
+        "message": "Welche Maschine hat die meisten Stoerungen?",
+        "expected_tool": "list_incidents",
+    },
+    {
+        "message": "Welche Maschine hat die meiste Ausfallzeit?",
+        "expected_tool": "machine_incident_report",
+    },
+    {
+        "message": "Welche Stoerungen gibt es an Presse 3?",
+        "expected_tool": "machine_incident_report",
+    },
+    {"message": "Wie viele Maschinen gibt es?", "expected_tool": "count_records"},
     {
         "message": "Welche Materialien sind unter Mindestbestand?",
+        "expected_tool": "list_inventory",
+    },
+    {"message": "Welche Materialien sind kritisch?", "expected_tool": "list_inventory"},
+    {
+        "message": "Gibt es Ersatzteile fuer die Hydraulikpumpe im Lager?",
         "expected_tool": "search_inventory",
     },
     {
         "message": "Was steht im Handbuch zur Hydraulikpresse bei Druckverlust?",
         "expected_tool": "search_documents",
+    },
+    {
+        "message": "Welche Dokumente wurden diese Woche erstellt?",
+        "expected_tool": "list_documents",
     },
     {
         "message": "Wie ist der Status von Maschine Spritzgussanlage 04?",
@@ -54,13 +78,26 @@ GOLDEN_TOOL_CASES = (
         "expected_tool": "search_shift_handovers",
     },
     {
+        "message": "Wer ist morgen in der Fruehschicht eingeplant?",
+        "expected_tool": "list_shift_entries",
+    },
+    {
         "message": "Welche Mitarbeiter haben die Qualifikation Hydraulik?",
         "expected_tool": "search_employees",
     },
+    {"message": "Wie viele Mitarbeiter hat die Produktion?", "expected_tool": "list_employees"},
+    {"message": "Wer fehlt morgen?", "expected_tool": "list_employees"},
+    {
+        "message": "Welche Mitarbeiter haben Dokumente hinterlegt?",
+        "expected_tool": "list_employee_documents",
+    },
+    {"message": "Welche Urlaubsantraege sind offen?", "expected_tool": "list_vacations"},
+    {"message": "Wer hat naechste Woche Urlaub?", "expected_tool": "list_vacations"},
     {
         "message": "Wie tausche ich den Filter laut Wartungswissen?",
         "expected_tool": "search_knowledge",
     },
+    {"message": "Zeige Task #12", "expected_tool": "search_knowledge"},
 )
 
 

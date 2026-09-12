@@ -1,5 +1,4 @@
-"""AI orchestration services for permission-aware workflows."""
-# ruff: noqa: F401, F821
+"""Daily maintenance briefing sections and chat formatting."""
 
 import logging
 from datetime import date, timedelta
@@ -19,101 +18,8 @@ from app.services.incident_timeline_service import daily_briefing_timeline_secti
 from app.services.recurring_issue_service import analyze_recurring_issues
 from app.services.retrieval_service import knowledge_context_for_chat
 from app.services.task_service import visible_tasks_query
-from app.services.text_normalization_service import normalize_text
 
-LAST_OPENAI_ERROR = None
-OPENAI_PROVIDER = "OpenAI"
 logger = logging.getLogger(__name__)
-
-DASHBOARD_SCOPE_LABELS = {
-    "tasks": "Tasks",
-    "errors": "Fehlerkatalog",
-    "employees": "Mitarbeiter",
-    "machines": "Maschinen",
-    "inventory": "Lager",
-    "documents": "Dokumente",
-    "shiftplans": "Schichtplanung",
-    "admin_users": "Admin Users",
-}
-
-SCOPE_KEYWORDS = {
-    "tasks": ["task", "tasks", "aufgabe", "aufgaben", "todo"],
-    "errors": [
-        "fehler",
-        "stoerung",
-        "störung",
-        "error",
-        "fehlercode",
-        "ursache",
-    ],
-    "employees": [
-        "mitarbeiter",
-        "personal",
-        "personaldaten",
-        "gehalt",
-        "gehaltsklasse",
-        "adresse",
-        "geburtsdatum",
-        "qualifikation",
-    ],
-    "machines": ["maschine", "maschinen", "anlage", "anlagen", "machine"],
-    "inventory": ["lager", "bestand", "material", "ersatzteil", "inventory"],
-    "documents": ["dokument", "dokumente", "bericht", "berichte", "report"],
-    "shiftplans": ["schichtplan", "schichtplanung", "dienstplan", "schicht"],
-    "admin_users": ["user", "users", "nutzer", "benutzer", "accounts"],
-}
-
-COUNT_WORDS = [
-    "wie viele",
-    "wie vile",
-    "wieviele",
-    "wievile",
-    "anzahl",
-    "count",
-    "many",
-]
-
-GENERAL_KNOWLEDGE_PREFIXES = (
-    "was ist",
-    "was bedeutet",
-    "wie funktioniert",
-    "warum",
-    "wer ist",
-    "erklaere",
-    "erkläre",
-    "what is",
-    "how does",
-    "why",
-)
-
-APP_DATA_INTENT_PHRASES = (
-    "bei uns",
-    "im system",
-    "in der app",
-    "in unserer datenbank",
-    "meine",
-    "mein",
-    "unsere",
-    "unser",
-    "sichtbar",
-    "vorhanden",
-    "angelegt",
-    "offen",
-    "heute",
-    "morgen",
-    "anstehend",
-    "zeige",
-    "liste",
-    "auflisten",
-    "anzeigen",
-    "gibt es",
-    "erstellen",
-    "anlegen",
-    "loeschen",
-    "löschen",
-    "aendern",
-    "ändern",
-)
 
 
 def daily_briefing(user):
@@ -151,58 +57,6 @@ def daily_briefing(user):
             ),
         },
     }
-
-
-def answer_daily_briefing_chat_question(message, user):
-    """Return a structured chat answer for daily briefing style questions."""
-    if not looks_like_daily_briefing_question(message):
-        return None
-
-    briefing = daily_briefing(user)
-    sections = list(briefing.get("sections") or [])
-    item_count = sum(int(section.get("count") or 0) for section in sections)
-    return {
-        "type": "daily_briefing",
-        "answer": _format_daily_briefing_answer(briefing, sections, item_count),
-        "data": {
-            "entity_type": "daily_briefing",
-            "date": briefing.get("date"),
-            "count": item_count,
-            "summary": briefing.get("summary"),
-            "sections": sections,
-        },
-        "sources": _daily_briefing_source_cards(sections, user),
-        "scope": "daily_briefing",
-        "structured_context": {"entity_type": "daily_briefing"},
-    }
-
-
-def looks_like_daily_briefing_question(message):
-    """Return whether a chat message asks for today's briefing or decisions."""
-    text = normalize_text(message)
-    if not any(term in text for term in ("heute", "heutige", "tagesbriefing", "daily briefing")):
-        return False
-    if _mentions_specific_app_scope(text):
-        return False
-    return any(
-        phrase in text
-        for phrase in (
-            "was steht heute an",
-            "steht heute an",
-            "was ist heute wichtig",
-            "heute wichtig",
-            "was hat heute prioritaet",
-            "heute prioritaet",
-            "worauf heute achten",
-            "heutiger ueberblick",
-            "tagesueberblick",
-            "heutige entscheidungen",
-            "entscheidungen stehen heute an",
-            "welche entscheidungen",
-            "tagesbriefing",
-            "daily briefing",
-        )
-    )
 
 
 def task_briefing_section(user):
@@ -341,7 +195,7 @@ def document_briefing_section(user):
     }
 
 
-def _format_daily_briefing_answer(briefing, sections, item_count):
+def format_daily_briefing_answer(briefing, sections, item_count):
     """Return a compact German chat answer for an existing daily briefing payload."""
     lines = [
         "## Heutige Entscheidungen",
@@ -366,7 +220,7 @@ def _format_daily_briefing_answer(briefing, sections, item_count):
     return "\n".join(lines)
 
 
-def _daily_briefing_source_cards(sections, user):
+def daily_briefing_source_cards(sections, user):
     """Return prompt-safe source cards for daily briefing sections."""
     sources = []
     for section in sections:
@@ -418,16 +272,6 @@ def _knowledge_section_source_cards(section):
     return cards
 
 
-def _mentions_specific_app_scope(text):
-    """Return whether a message should stay with a more specific structured route."""
-    scoped_keywords = set()
-    for scope, keywords in SCOPE_KEYWORDS.items():
-        if scope == "admin_users":
-            continue
-        scoped_keywords.update(keywords)
-    return any(keyword in text for keyword in scoped_keywords)
-
-
 def rag_briefing_section(user):
     """Return visible RAG knowledge sources relevant for today's briefing."""
     department = user.department.name if user.department else ""
@@ -458,16 +302,3 @@ def rag_briefing_section(user):
         "items": items,
         "rag_source_count": len(sources),
     }
-
-
-__all__ = [
-    "answer_daily_briefing_chat_question",
-    "daily_briefing",
-    "looks_like_daily_briefing_question",
-    "task_briefing_section",
-    "inventory_briefing_section",
-    "error_briefing_section",
-    "recurring_issue_briefing_section",
-    "document_briefing_section",
-    "rag_briefing_section",
-]

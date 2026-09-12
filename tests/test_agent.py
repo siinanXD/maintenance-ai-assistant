@@ -9,6 +9,7 @@ import pytest
 from app.agent import graph as agent_graph
 from app.agent.actions import create_pending_action, load_pending_action
 from app.agent.mock_policy import select_mock_tool_call
+from app.agent.prompts import build_agent_system_prompt
 from app.agent.service import run_agent
 from app.agent.tools import (
     TOOL_REGISTRY,
@@ -153,7 +154,8 @@ def test_mock_policy_picks_tool_then_composes_answer():
 
     content, calls = select_mock_tool_call(messages, tools)
     assert content is None
-    assert calls[0]["name"] == "search_tasks"
+    assert calls[0]["name"] == "list_tasks"
+    assert calls[0]["arguments"] == {"count_only": False, "status": "open"}
 
     messages.append(
         {
@@ -196,6 +198,92 @@ def test_mock_policy_prefers_error_assistant_for_error_codes():
     assert calls[0]["name"] == "error_assistant"
 
 
+def test_mock_policy_extracts_structured_arguments(app, make_user):
+    """Verify structured questions map to parameterized tools with explicit arguments."""
+    make_user(username="mock_policy_prod", role=Role.PRODUKTION)
+    tools = [tool_spec(name).provider_schema() for name in ("list_tasks", "count_records")]
+
+    with app.app_context():
+        _, counts = select_mock_tool_call(
+            [{"role": "user", "content": "Wie viele Tasks und Stoerungen gibt es?"}], tools
+        )
+        _, department = select_mock_tool_call(
+            [{"role": "user", "content": "Wie viele offenen Tasks hat die Produktion?"}], tools
+        )
+        _, absent = select_mock_tool_call([{"role": "user", "content": "Wer fehlt morgen?"}], [])
+
+    assert [(call["name"], call["arguments"]["scope"]) for call in counts] == [
+        ("count_records", "tasks"),
+        ("count_records", "errors"),
+    ]
+    assert department[0]["name"] == "list_tasks"
+    assert department[0]["arguments"] == {
+        "count_only": True,
+        "status": "open",
+        "department": "Produktion",
+    }
+    assert absent[0]["name"] == "list_employees"
+    assert absent[0]["arguments"]["availability"] == "absent_tomorrow"
+
+
+def test_mock_policy_refines_follow_up_from_structured_hint(app, make_user):
+    """Verify "welche davon" inherits the last structured scope from the system prompt."""
+    make_user(username="mock_policy_follow_up", role=Role.PRODUKTION)
+    system_prompt = build_agent_system_prompt(
+        ["tasks"], structured_context={"entity_type": "tasks", "status": "open"}
+    )
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "Welche offenen Tasks gibt es?"},
+        {"role": "assistant", "content": "## Tasks"},
+        {"role": "user", "content": "Welche davon sind in der Produktion?"},
+    ]
+
+    with app.app_context():
+        _, calls = select_mock_tool_call(messages, [tool_spec("list_tasks").provider_schema()])
+
+    assert calls[0]["name"] == "list_tasks"
+    assert calls[0]["arguments"] == {
+        "department": "Produktion",
+        "status": "open",
+        "count_only": False,
+    }
+
+
+def test_mock_policy_returns_prepared_answer_verbatim_and_handles_small_talk():
+    """Verify answer_markdown payloads are echoed unchanged and greetings need no tool."""
+    tools = [tool_spec("list_tasks").provider_schema()]
+    messages = [
+        {"role": "user", "content": "Wie viele Tasks gibt es?"},
+        {
+            "role": "assistant",
+            "content": None,
+            "tool_calls": [
+                {
+                    "id": "c1",
+                    "type": "function",
+                    "function": {"name": "count_records", "arguments": "{}"},
+                }
+            ],
+        },
+        {
+            "role": "tool",
+            "tool_call_id": "c1",
+            "content": json.dumps(
+                {"status": "ok", "summary": "2 Tasks", "answer_markdown": "## Tasks (2)"}
+            ),
+        },
+    ]
+
+    answer, calls = select_mock_tool_call(messages, tools)
+    greeting, greeting_calls = select_mock_tool_call([{"role": "user", "content": "Hallo!"}], tools)
+
+    assert calls == []
+    assert answer == "## Tasks (2)"
+    assert greeting_calls == []
+    assert greeting.startswith("## Wartungsassistent")
+
+
 # ---------------------------------------------------------------------------
 # Workflow
 # ---------------------------------------------------------------------------
@@ -206,16 +294,17 @@ def test_agent_answers_with_tools_offline(app, make_user, make_task):
     admin = make_user(username="agent_loop_admin", role=Role.MASTER_ADMIN, department_name=None)
     make_task("Dichtung an Presse 3 pruefen", admin["username"])
 
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     with app.app_context():
         result = run_agent(
             "Welche offenen Tasks gibt es?", _user(admin["id"]), session_id="agent-s1"
         )
 
     assert result["type"] == "agent"
-    assert result["answer"].startswith("## Ergebnis")
+    assert result["answer"].startswith("## Tasks" + chr(10) + "- **Anzahl:** 1")
     assert "Dichtung an Presse 3 pruefen" in result["answer"]
-    assert [entry["tool"] for entry in result["tool_trace"]] == ["search_tasks"]
+    assert result["answer_category"] == "structured_data"
+    assert result["structured_context"] == {"entity_type": "tasks", "status": "open"}
+    assert [entry["tool"] for entry in result["tool_trace"]] == ["list_tasks"]
     assert result["tool_trace"][0]["status"] == "ok"
     assert result["rag"]["agent"]["completed_nodes"] == [
         "guard",
@@ -227,7 +316,7 @@ def test_agent_answers_with_tools_offline(app, make_user, make_task):
     ]
     assert result["rag"]["agent"]["iterations"] == 2
     assert result["diagnostics"]["workflow"] == "agent"
-    assert result["diagnostics"]["agent_tool_calls"] == ["search_tasks"]
+    assert result["diagnostics"]["agent_tool_calls"] == ["list_tasks"]
     assert result["diagnostics"]["audit_event_id"]
     assert result["confidence"]["score"] >= 0
     assert result["sources"] and result["sources"][0]["type"] == "task"
@@ -287,7 +376,6 @@ def test_agent_stops_at_iteration_limit(app, make_user):
                 metadata={"input_tokens": 10, "output_tokens": 5, "total_tokens": 15},
             )
 
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     provider = LoopingProvider()
     with app.app_context():
         app.config["AI_AGENT_MAX_ITERATIONS"] = 2
@@ -315,7 +403,6 @@ def test_agent_reports_provider_failure_with_fallback(app, make_user):
             """Simulate a rate limit."""
             raise AIServiceError("rate limited", error_code="rate_limit")
 
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     with app.app_context():
         result = run_agent(
             "Welche Tasks sind offen?", _user(admin["id"]), provider=FailingProvider()
@@ -443,7 +530,7 @@ def test_agent_falls_back_to_chat_message_history_without_checkpointer(app, make
     with app.app_context():
         app.config["AI_AGENT_CHECKPOINTER"] = "none"
         app.extensions.pop("agent_checkpointer", None)
-        from app.ai.services import save_chat_message
+        from app.services.ai_history_service import save_chat_message
 
         save_chat_message(
             _user(admin["id"]),
@@ -465,47 +552,10 @@ def test_agent_falls_back_to_chat_message_history_without_checkpointer(app, make
     assert captured["messages"][1]["content"] == "Wie tausche ich den Filter?"
 
 
-def test_structured_fast_path_answers_without_model_call(app, make_user, make_task):
-    """Verify deterministic rule handlers answer structured questions before the loop."""
-    user = make_user(username="agent_fast_path_user", role=Role.PRODUKTION)
-    make_task("Riemen pruefen", user["username"])
-
-    class ExplodingProvider:
-        """Provider double that must not be called."""
-
-        name = "exploding"
-        supports_tool_calls = True
-
-        def chat_with_tools(self, messages, tools, workflow="agent"):
-            """Fail loudly if the fast path did not match."""
-            raise AssertionError("fast path should have answered")
-
-    with app.app_context():
-        result = run_agent(
-            "Wie viele Tasks sind offen?", _user(user["id"]), provider=ExplodingProvider()
-        )
-
-    assert result["diagnostics"]["agent_fast_path"] == "structured_rules"
-    assert result["rag"]["agent"]["engine"] == "fast_path"
-    assert result["type"] != "agent"
-    assert "1" in result["answer"]
-    assert result["diagnostics"]["audit_event_id"]
-
-
-def test_chat_mode_defaults_to_agent():
-    """Verify the shipped configuration routes chat through the agent."""
-    import os
-
-    from app.config import Config
-
-    assert Config.AI_CHAT_MODE == (os.getenv("AI_CHAT_MODE") or "agent").strip().lower()
-
-
 def test_agent_fallback_runner_matches_langgraph(app, make_user, make_task, monkeypatch):
     """Verify the deterministic runner produces the same node sequence without LangGraph."""
     admin = make_user(username="agent_fallback_admin", role=Role.MASTER_ADMIN, department_name=None)
     make_task("Riemen spannen", admin["username"])
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     monkeypatch.setattr(agent_graph, "_compiled_graph", lambda *args, **kwargs: None)
     monkeypatch.setattr(agent_graph, "_workflow_engine_name", lambda: "fallback")
 
@@ -639,7 +689,6 @@ def test_agent_route_persists_chat_and_lists_tools(app, client, make_user, make_
     """Verify the agent endpoint stores history and the tools endpoint is permission-aware."""
     user = make_user(username="agent_route_user", role=Role.PRODUKTION)
     make_task("Sensor reinigen", user["username"])
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
     headers = auth_headers(user["username"])
 
     response = client.post(
@@ -662,14 +711,12 @@ def test_agent_route_persists_chat_and_lists_tools(app, client, make_user, make_
     assert "search_employees" not in {tool["name"] for tool in tools["tools"]}
 
 
-def test_chat_endpoint_routes_through_agent_when_configured(
+def test_chat_endpoint_answers_through_agent_with_answer_only_mode(
     app, client, make_user, make_task, auth_headers
 ):
-    """Verify AI_CHAT_MODE=agent switches the existing chat endpoint to the agent."""
+    """Verify the chat endpoint runs the agent and honours answer-only redaction."""
     user = make_user(username="agent_mode_user", role=Role.PRODUKTION)
     make_task("Kette schmieren", user["username"])
-    app.config["AI_AGENT_STRUCTURED_FAST_PATH"] = False
-    app.config["AI_CHAT_MODE"] = "agent"
 
     response = client.post(
         "/api/v1/ai/chat",
@@ -682,7 +729,7 @@ def test_chat_endpoint_routes_through_agent_when_configured(
     assert payload["type"] == "agent"
     assert payload["evidence_visible"] is False
     assert payload["sources"] == []
-    assert payload["tool_trace"] == [{"tool": "search_tasks", "status": "ok"}]
+    assert payload["tool_trace"] == [{"tool": "list_tasks", "status": "ok"}]
     assert "Kette schmieren" in payload["answer"]
 
 
