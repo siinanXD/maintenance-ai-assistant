@@ -5,8 +5,12 @@ to prevent duplicate retrieval paths from reappearing.
 
 ## Public Entry Points
 
-- `app/ai/routes.py` owns HTTP routes and response redaction.
-- `app/ai/services.py` is a compatibility facade for existing imports and tests.
+- `app/ai/routes.py` owns HTTP routes and response redaction; every chat
+  request runs `app/agent/service.py::run_agent`.
+- The agent reaches retrieval only through tools: `search_knowledge` calls
+  `build_rag_context(...)`, the `search_<scope>` tools call
+  `retrieve_ai_context(...)`, and the `list_*`/`count_records` tools query
+  the permission-aware SQL services directly (`app/agent/queries/`).
 - `app/services/rag_service.py` is the stable RAG facade with:
   - `build_rag_context(...)`
   - `answer_with_rag(...)`
@@ -24,7 +28,7 @@ to prevent duplicate retrieval paths from reappearing.
 - `app/services/retrieval_service.py` is the single orchestration layer for
   structured retrieval, vector retrieval, context assembly and final ranking.
 - `app/services/ai_retrieval.py` remains the structured SQL retrieval component
-  used by legacy structured answer services and the consolidated retrieval
+  used by the agent's `search_<scope>` tools and the consolidated retrieval
   pipeline.
 - `app/services/sql_keyword_retrieval_service.py` remains a fallback only. It is
   not a primary retrieval path.

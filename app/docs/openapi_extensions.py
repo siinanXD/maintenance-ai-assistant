@@ -50,11 +50,32 @@ ADDITIONAL_SCHEMAS = {
     "AIChatResponse": {
         "type": "object",
         "properties": {
-            "type": {"type": "string", "example": "assistant"},
+            "type": {"type": "string", "example": "agent"},
             "answer": {
                 "type": "string",
-                "example": "## Antwort\n- Anlage Quelle ist sichtbar.",
+                "example": "## Tasks\n- **Anzahl:** 1\n- **Quelle:** Strukturierte Daten",
             },
+            "answer_category": {
+                "type": "string",
+                "enum": ["structured_data", "rag", "general_ai_knowledge", "agent"],
+                "example": "structured_data",
+            },
+            "structured_context": {
+                "type": "object",
+                "example": {"entity_type": "tasks", "status": "open"},
+            },
+            "tool_trace": {
+                "type": "array",
+                "items": {"type": "object"},
+                "example": [
+                    {
+                        "tool": "list_tasks",
+                        "status": "ok",
+                        "arguments": {"status": "open", "count_only": False},
+                    }
+                ],
+            },
+            "pending_action": {"type": "object", "nullable": True},
             "sources": {
                 "type": "array",
                 "items": {"type": "object"},

@@ -887,9 +887,12 @@ OpenAI-Fehler werden in `diagnostics.error` getrennt ausgewiesen:
 | `timeout` | Provider-Anfrage hat das Timeout erreicht |
 | `openai_error` | Sonstiger Providerfehler |
 
-Normale allgemeine Fragen werden als `type: general_chat` gespeichert und
-enthalten sichtbar den Hinweis, dass Chat-Historie und AI-Nutzungsmetadaten
-protokolliert werden.
+Jede Chat-Antwort hat `type: agent` (nach bestaetigter Aktion `agent_action`)
+und traegt `answer_category` (`structured_data`, `rag`,
+`general_ai_knowledge`, `agent`) sowie bei strukturierten Antworten
+`structured_context` (`entity_type`, Filter), das im naechsten Turn derselben
+`session_id` fuer Folgefragen wiederverwendet wird. Antworten ohne Tool
+(`general_ai_knowledge`) tragen `source_label: Modellwissen`.
 
 ### Agent
 
@@ -908,11 +911,15 @@ Response `200` (Auszug):
 ```json
 {
   "type": "agent",
-  "answer": "## Ergebnis
-- Dichtung an Presse 3 pruefen (open)",
-  "tool_trace": [{ "tool": "search_tasks", "status": "ok", "summary": "1 Treffer in tasks" }],
+  "answer": "## Tasks\n- **Anzahl:** 1\n- **Filter:** Status open, Maschine Presse 3\n- **Quelle:** Strukturierte Daten\n\nSichtbare Treffer:\n- #12 Dichtung an Presse 3 pruefen (open, normal, Produktion)",
+  "answer_category": "structured_data",
+  "structured_context": { "entity_type": "tasks", "status": "open", "machine": "Presse 3" },
+  "tool_trace": [
+    { "tool": "list_tasks", "status": "ok", "arguments": { "status": "open", "machine": "Presse 3", "count_only": false }, "source_count": 1 }
+  ],
+  "sources": [{ "type": "task", "id": 12, "title": "Dichtung an Presse 3 pruefen", "url": "/tasks" }],
   "pending_action": null,
-  "diagnostics": { "status": "openai_used", "workflow": "agent", "agent_tool_calls": ["search_tasks"] }
+  "diagnostics": { "status": "openai_used", "workflow": "agent", "agent_tool_calls": ["list_tasks"], "answer_category": "structured_data" }
 }
 ```
 
@@ -939,9 +946,8 @@ GET /api/v1/ai/agent/tools
 Authorization: Bearer <access_token>
 ```
 
-liefert den nach Berechtigung gefilterten Tool-Katalog. Mit
-`AI_CHAT_MODE=agent` laeuft auch `POST /api/v1/ai/chat` ueber den Agenten.
-Details: `docs/AI_AGENT.md`.
+liefert den nach Berechtigung gefilterten Tool-Katalog. `POST /api/v1/ai/chat`
+und `POST /api/v1/ai/agent` sind identisch. Details: `docs/AI_AGENT.md`.
 
 ### Chat-Historie
 

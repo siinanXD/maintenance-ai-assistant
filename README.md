@@ -101,7 +101,7 @@ checked-in UI state.
 |-------|-----------|
 | Backend | Flask, SQLAlchemy, Flask-JWT-Extended |
 | Database | SQLite for tests/dev, PostgreSQL + pgvector-ready Docker setup |
-| AI | OpenAI API with local rule-based fallback |
+| AI | Tool-using LangGraph agent on OpenAI function calling, offline mock policy for tests |
 | Frontend | Jinja2 templates, Tailwind CSS, React 19 route islands, small vanilla JS shell helpers |
 | Tests | pytest, Ruff, TypeScript check, no external services required for the standard suite |
 | CI | GitHub Actions: lint, compile, test, Docker build |
@@ -258,13 +258,10 @@ AI_BASE_URL=                # set for OpenAI-compatible local APIs, e.g. http://
 OPENAI_MODEL=gpt-4o-mini
 AI_TASK_PRIORITIZATION_TIMEOUT_SECONDS=6
 AI_TASK_PRIORITIZATION_MAX_RETRIES=0
-AI_GENERATE_WITHOUT_EVIDENCE=false  # true sends unsourced chat prompts to the provider
 AI_CHAT_RATE_LIMIT_PER_MINUTE=30    # per-user limit for AI chat/assistant calls, 0 disables
 AI_DAILY_TOKEN_BUDGET_PER_USER=0    # optional per-user daily token cap, 0 disables
-AI_CHAT_MODE=agent                  # default; legacy keeps the rule-based chat router only
 AI_AGENT_MAX_ITERATIONS=4
 AI_AGENT_ACTION_TTL_SECONDS=600
-AI_AGENT_STRUCTURED_FAST_PATH=true  # rule handlers answer structured questions without tokens
 AI_AGENT_CHECKPOINTER=auto          # session memory: auto, none, memory, sqlite, postgres
 AI_AGENT_CHECKPOINT_PATH=data/agent_checkpoints.sqlite
 LANGFUSE_ENABLED=false      # set true to trace OpenAI calls in Langfuse
@@ -523,8 +520,8 @@ Current implementation:
 - Nach Änderung von Embedding Provider, Embedding Modell oder Vector Store müssen Knowledge-Dokumente vollständig neu indexiert werden.
 - RAG scoring weights (`RAG_SCORE_*`), recency, aging and feedback windows are configuration-only tuning knobs; keep `RAG_SCORE_DEBUG=false` outside diagnostics because score details are admin-facing explainability, not user answer text.
 - `retrieval_service.py` combines permission-aware structured retrieval with RAG knowledge chunks.
-- `rag_service.py` exposes the stable RAG facade; `langgraph_rag_workflow.py` contains the modular LangGraph orchestration with a deterministic fallback runner. The chat route runs the complete node sequence including answer generation and validation. See `docs/LANGGRAPH_RAG_WORKFLOW.md`.
-- Empty retrieval never reaches the provider unless `AI_GENERATE_WITHOUT_EVIDENCE=true`; the default answer is a grounded local no-answer with `diagnostics.generation_skipped=no_evidence`.
+- `rag_service.py` exposes the stable RAG facade; `langgraph_rag_workflow.py` contains the modular LangGraph retrieval orchestration with a deterministic fallback runner. The agent's `search_knowledge` tool runs these retrieval nodes (`build_rag_context`); the answer itself is generated in the agent loop. See `docs/LANGGRAPH_RAG_WORKFLOW.md`.
+- Empty retrieval never turns into an unsourced prompt: `search_knowledge` returns a grounded local no-answer (`## Keine belastbare Quelle gefunden`) and the response carries `diagnostics.empty_retrieval=true`.
 - AI chat, error assistant and order planning are rate limited per user via `AI_CHAT_RATE_LIMIT_PER_MINUTE` and answer `429` with `Retry-After` when exceeded.
 - `retrieval_service.py` remains the single retrieval orchestration layer. Structured SQL retrieval, vector retrieval and keyword fallback stay separated as components; see `docs/AI_RAG_ARCHITECTURE.md`.
 - See `docs/MONGODB_ATLAS_VECTOR_SEARCH.md` for Atlas Vector Search setup, index configuration and fallback behavior.
@@ -563,19 +560,24 @@ Provider behavior:
 
 ### Maintenance Agent
 
-`POST /api/v1/ai/agent` runs a tool-using agent on top of the same services:
-a LangGraph loop with a deterministic safety guard, provider tool selection
-(OpenAI function calling or the offline mock policy), permission-gated tool
-execution and validation. Read tools cover tasks, errors, machines, inventory,
-documents, handovers, employees, knowledge search, machine profiles, the error
-assistant, task drafts, prioritization, order planning and the daily briefing.
-Write tools (`create_task`, `request_knowledge_reindex`) only return a signed
-`pending_action` that the user confirms through `POST /api/v1/ai/agent/confirm`.
-The agent is the default chat mode: structured questions (counts, lists,
-status, permission denials) are answered by the deterministic rule handlers as
-a fast path without a model call, everything else runs through the tool loop.
-Session memory is persisted by a LangGraph checkpointer (PostgreSQL, SQLite or
-in-process). Set `AI_CHAT_MODE=legacy` to keep the old router only. See
+The chat (`POST /api/v1/ai/chat`, alias `POST /api/v1/ai/agent`) is a
+tool-using agent on top of the same services: a LangGraph loop with a
+deterministic safety guard, provider tool selection (OpenAI function calling
+or the offline mock policy), permission-gated tool execution and validation.
+Structured questions (counts, filtered lists, status, availability) are
+answered by parameterized tools (`list_tasks`, `list_incidents`,
+`count_records`, `list_employees`, `list_employee_documents`,
+`list_vacations`, `list_documents`, `list_shift_entries`, `list_inventory`,
+`machine_incident_report`); free-text and how-to questions use the `search_*`
+tools and the hybrid `search_knowledge` RAG tool; machine profiles, the error
+assistant, task drafts, prioritization, order planning and the daily briefing
+are tools as well. Write tools (`create_task`, `request_knowledge_reindex`)
+only return a signed `pending_action` that the user confirms through
+`POST /api/v1/ai/agent/confirm`. Responses carry `answer_category`
+(`structured_data`, `rag`, `general_ai_knowledge`, `agent`) and
+`structured_context`, which the next turn of the same session reuses for
+follow-ups ("welche davon in der Produktion?"). Session memory is persisted
+by a LangGraph checkpointer (PostgreSQL, SQLite or in-process). See
 [`docs/AI_AGENT.md`](docs/AI_AGENT.md) and `flask --app run:app agent eval-tools`.
 
 ### Automated Knowledge Lifecycle

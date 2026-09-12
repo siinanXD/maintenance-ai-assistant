@@ -13,7 +13,7 @@ Living notes for maintainers. For product scope see [`FEATURES.md`](FEATURES.md)
 | Small | Seeds | Overlap between `seed.py` and `seed_demo.py` |
 | Large | `app/models.py` | Monolithic models file; split only with migration plan |
 | Large | Templates / islands | Further inline JS migration to external modules where useful |
-| Large | `app/ai/intent.py`, `app/ai/context.py`, `ai_*structured*` services | Rule handlers now run as the agent's structured fast path (~8k lines of keyword heuristics); migrate question types to agent tools and retire rules, then default `AI_AGENT_STRUCTURED_FAST_PATH=false` |
+| Small | `app/agent/mock_policy.py` | Offline keyword policy grows with every tool; keep golden cases in `app/agent/evals.py` in sync and prefer new `list_*` parameters over new keyword branches |
 
 ## New endpoint checklist
 

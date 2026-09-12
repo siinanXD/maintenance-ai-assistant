@@ -7,12 +7,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- The chat is agent-only: `POST /api/v1/ai/chat` and `POST /api/v1/ai/agent`
+  run the same LangGraph tool loop. The rule-based router (`app/ai/intent.py`,
+  `app/ai/context.py`, `app/ai/chat_answers.py`, `app/ai/handlers/`, the
+  `ai_*structured*` services, about 9.7k lines of keyword heuristics) and the
+  structured fast path were removed together with the `AI_CHAT_MODE`,
+  `AI_AGENT_STRUCTURED_FAST_PATH` and `AI_GENERATE_WITHOUT_EVIDENCE` settings
+- Structured questions are answered by ten parameterized tools with explicit
+  filters (`list_tasks`, `list_incidents`, `count_records`, `list_employees`,
+  `list_employee_documents`, `list_vacations`, `list_documents`,
+  `list_shift_entries`, `list_inventory`, `machine_incident_report`) backed by
+  pure query cores in `app/agent/queries/`; permission semantics are unchanged
+- `search_knowledge` runs the hybrid LangGraph retrieval (`build_rag_context`)
+  and returns the grounded no-answer text when nothing is found; chat responses
+  carry `answer_category` and `structured_context`, follow-up questions reuse
+  the persisted structured scope, knowledge gaps are tracked for `rag` answers
+- The offline mock policy extracts tool arguments, issues one `count_records`
+  call per scope and echoes prepared `answer_markdown`; golden tool cases cover
+  every tool
+
 ### Added
-- The agent is now the default chat mode (`AI_CHAT_MODE=agent`); the rule-based
-  router became a deterministic fast path inside the agent
-  (`AI_AGENT_STRUCTURED_FAST_PATH`) and LangGraph checkpointers persist agent
-  session memory (`AI_AGENT_CHECKPOINTER`: postgres, sqlite, memory, none)
-- Tool-using maintenance agent (`POST /api/v1/ai/agent`, `AI_CHAT_MODE=agent`):
+- LangGraph checkpointers persist agent session memory
+  (`AI_AGENT_CHECKPOINTER`: postgres, sqlite, memory, none)
+- Tool-using maintenance agent (`POST /api/v1/ai/agent`):
   LangGraph loop with safety guard, permission-gated tool registry over the
   existing services, provider tool calling (OpenAI function calling, offline mock
   policy), signed human-in-the-loop confirmations for write tools
@@ -21,15 +39,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   (`flask agent eval-tools`) and a per-user daily token budget
 - Per-user rate limiting for AI chat, error assistant and order planning
   (`AI_CHAT_RATE_LIMIT_PER_MINUTE`, `429` with `Retry-After`)
-- Explicit evidence policy `AI_GENERATE_WITHOUT_EVIDENCE` (default `false`):
-  unsourced chat questions stay local and grounded instead of calling the provider
+- Unsourced knowledge questions stay local and grounded instead of producing an
+  unsourced model answer
 - Edit and delete UI for employees, errors, and machines (PUT/DELETE routes were
   already in place; this wires up the missing frontend for all three entities)
 - `.ruff_cache/` added to `.gitignore`
 
 ### Fixed
-- The chat route now runs the complete LangGraph RAG workflow including the
-  answer generation and validation nodes; query-type prompt rules reach the provider
+- Knowledge retrieval in the chat runs the complete LangGraph retrieval node
+  sequence; query-type prompt rules reach the agent as tool output
 - Template hook stability test no longer requires a built React bundle
 - Shift rotation test is deterministic on weekends
 - Docstrings added to all public model classes and `to_dict` methods in `models.py`
