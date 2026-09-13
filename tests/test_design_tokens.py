@@ -141,8 +141,8 @@ def test_tailwind_theme_screens_match_the_four_breakpoints():
     assert screens == {"sm": "640px", "md": "768px", "lg": "1024px", "xl": "1440px"}
 
 
-def test_tokens_file_uses_the_tokens_studio_single_file_layout():
-    """Verify tokens.json keeps the shape Tokens Studio's free sync reads and writes."""
+def test_tokens_file_keeps_its_two_set_layout():
+    """Verify tokens.json holds exactly the core and semantic sets in one file."""
     payload = json.loads(TOKENS_FILE.read_text(encoding="utf-8"))
 
     assert [key for key in payload if not key.startswith("$")] == ["core", "semantic"]

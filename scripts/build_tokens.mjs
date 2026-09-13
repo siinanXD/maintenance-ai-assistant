@@ -8,11 +8,14 @@
  * installiert und dieses Skript dort nicht laeuft. tests/test_design_tokens.py
  * prueft bei jedem Lauf, dass sie zur Quelle passen.
  *
- * tokens.json hat das Single-File-Format von Tokens Studio: jedes Token-Set ist
- * ein Schluessel auf oberster Ebene ("core", "semantic"), daneben stehen $themes
- * und $metadata. Multi-File-Sync waere ein Pro-Feature; Free-Nutzer koennten
- * damit nur lesen. Aliase verweisen ohne Set-Namen ({color.blue.600}), weil das
- * Plugin die Sets zusammenfuehrt -- deshalb entpackt der Generator sie vorher.
+ * tokens.json haelt jedes Token-Set als Schluessel auf oberster Ebene ("core",
+ * "semantic"); Schluessel mit $ am Anfang sind Metadaten. Aliase verweisen ohne
+ * Set-Namen ({color.blue.600}), weil die Sets gemeinsam aufgeloest werden --
+ * deshalb entpackt der Generator sie vorher in einzelne Dateien.
+ *
+ * Gestalterische Quelle ist die Figma-Datei "Maintenance AI — Design System &
+ * Redesign". Ihre Variablen werden ueber die Figma-MCP-Anbindung nach
+ * tokens.json uebertragen, nicht ueber ein Figma-Plugin.
  *
  * Nur die semantische Ebene verlaesst den Generator. Die Primitive aus dem Set
  * "core" sind Eingabe und sollen in der Anwendung nicht auftauchen.
@@ -57,11 +60,10 @@ const BANNER = [
 /**
  * Split tokens.json into one file per token set and return their paths.
  *
- * Style Dictionary merges its source files into one tree, which is exactly how
- * Tokens Studio resolves aliases across sets. One file per set also keeps each
- * token's filePath, which isSemantic() uses to tell the layers apart.
- * Schluessel mit $ am Anfang ($themes, $metadata) sind Verwaltungsdaten des
- * Plugins und keine Sets.
+ * Style Dictionary merges its source files into one tree, so aliases resolve
+ * across sets. One file per set also keeps each token's filePath, which
+ * isSemantic() uses to tell the layers apart. Keys starting with $ are metadata,
+ * not sets.
  *
  * @returns {string[]} Absolute paths of the unpacked set files.
  */
