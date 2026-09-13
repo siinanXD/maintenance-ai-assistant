@@ -1,24 +1,22 @@
 /*
- * Design-Token aus design/tokens/tokens.json in die beiden Verbraucher uebersetzen:
+ * Design-Token in die beiden Verbraucher der Anwendung uebersetzen:
  *
- *   app/static/css/src/00-shell-tokens.css   CSS-Custom-Properties
- *   design/tokens/generated/tailwind.cjs     Tailwind-Theme und DaisyUI-Palette
+ *   app/static/css/src/00-shell-tokens.css   CSS-Custom-Properties, hell und dunkel
+ *   design/tokens/generated/tailwind.cjs     Tailwind-Farben, Breakpoints, Schriften
+ *
+ * Quellen:
+ *   design/tokens/tokens.json  Export der Figma-Datei (scripts/figma/export_tokens.js),
+ *                              Sets core, semantic, semantic-dark, layout,
+ *                              typography, effects. Nicht von Hand aendern.
+ *   design/tokens/app.json     App-eigene Namen, die Figma nicht kennt
+ *                              (--sidebar-width, Breakpoints). Von Hand gepflegt.
  *
  * Beide Ergebnisse sind eingecheckt, weil die CI nur die Frontend-Abhaengigkeiten
  * installiert und dieses Skript dort nicht laeuft. tests/test_design_tokens.py
  * prueft bei jedem Lauf, dass sie zur Quelle passen.
  *
- * tokens.json haelt jedes Token-Set als Schluessel auf oberster Ebene ("core",
- * "semantic"); Schluessel mit $ am Anfang sind Metadaten. Aliase verweisen ohne
- * Set-Namen ({color.blue.600}), weil die Sets gemeinsam aufgeloest werden --
- * deshalb entpackt der Generator sie vorher in einzelne Dateien.
- *
- * Gestalterische Quelle ist die Figma-Datei "Maintenance AI — Design System &
- * Redesign". Ihre Variablen werden ueber die Figma-MCP-Anbindung nach
- * tokens.json uebertragen, nicht ueber ein Figma-Plugin.
- *
- * Nur die semantische Ebene verlaesst den Generator. Die Primitive aus dem Set
- * "core" sind Eingabe und sollen in der Anwendung nicht auftauchen.
+ * Die Primitive aus "core" verlassen den Generator nicht. In der Anwendung soll
+ * var(--color-action-primary) stehen, nie ein Rampenwert.
  */
 
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -45,167 +43,119 @@ function posix(value) {
 const ROOT_DIR = posix(dirname(dirname(fileURLToPath(import.meta.url))));
 const TOKENS_DIR = posix(join(ROOT_DIR, "design", "tokens"));
 const TOKENS_FILE = `${TOKENS_DIR}/tokens.json`;
+const APP_FILE = `${TOKENS_DIR}/app.json`;
 const SETS_DIR = posix(join(ROOT_DIR, "tmp", "token-sets"));
 const GENERATED_DIR = posix(join(TOKENS_DIR, "generated"));
 const CSS_TARGET = posix(join(ROOT_DIR, "app", "static", "css", "src", "00-shell-tokens.css"));
 const TAILWIND_TARGET = posix(join(GENERATED_DIR, "tailwind.cjs"));
-const REQUIRED_SETS = ["core", "semantic"];
+
+const FIGMA_SETS = ["core", "semantic", "semantic-dark", "layout", "typography", "effects"];
+const LIGHT_SOURCES = ["core", "semantic", "layout", "typography", "effects", "app"];
+const LIGHT_EMITTED = new Set(["semantic", "layout", "typography", "effects", "app"]);
+const DARK_SOURCES = ["core", "semantic-dark"];
+const DARK_SELECTOR = ':root[data-theme="maintenance-dark"]';
+
+const SANS_FALLBACK = ["ui-sans-serif", "system-ui", "Segoe UI", "sans-serif"];
+const MONO_FALLBACK = ["ui-monospace", "SFMono-Regular", "Consolas", "monospace"];
 
 const BANNER = [
   "Erzeugt von scripts/build_tokens.mjs. Nicht von Hand aendern.",
-  "Quelle: design/tokens/tokens.json (Sets core und semantic).",
+  "Quelle: design/tokens/tokens.json (Figma-Export) und design/tokens/app.json.",
   "Neu erzeugen mit: npm run build:tokens"
 ];
 
 /**
- * Split tokens.json into one file per token set and return their paths.
+ * Split the token sources into one file per set and return their paths by set name.
  *
  * Style Dictionary merges its source files into one tree, so aliases resolve
- * across sets. One file per set also keeps each token's filePath, which
- * isSemantic() uses to tell the layers apart. Keys starting with $ are metadata,
- * not sets.
+ * across sets. semantic and semantic-dark share every path and therefore never
+ * go into the same run; each run gets exactly the sets it needs.
  *
- * @returns {string[]} Absolute paths of the unpacked set files.
+ * @returns {Record<string, string>} Unpacked file path per set name.
  */
-function tokenSourceFiles() {
+function unpackSets() {
   const payload = JSON.parse(readFileSync(TOKENS_FILE, "utf8"));
-  const sets = Object.keys(payload).filter((name) => !name.startsWith("$"));
-  const missing = REQUIRED_SETS.filter((name) => !sets.includes(name));
+  const missing = FIGMA_SETS.filter((name) => !(name in payload));
   if (missing.length > 0) {
     throw new Error(`tokens.json fehlen die Sets: ${missing.join(", ")}`);
+  }
+  if (!existsSync(APP_FILE)) {
+    throw new Error(`App-Token fehlen: ${APP_FILE}`);
   }
 
   rmSync(SETS_DIR, { recursive: true, force: true });
   mkdirSync(SETS_DIR, { recursive: true });
-  return sets.map((name) => {
-    const path = `${SETS_DIR}/${name}.json`;
-    writeFileSync(path, JSON.stringify(payload[name], null, 2), "utf8");
-    return path;
+  const paths = {};
+  for (const name of FIGMA_SETS) {
+    paths[name] = `${SETS_DIR}/${name}.json`;
+    writeFileSync(paths[name], JSON.stringify(payload[name], null, 2), "utf8");
+  }
+  paths.app = `${SETS_DIR}/app.json`;
+  writeFileSync(paths.app, readFileSync(APP_FILE, "utf8"), "utf8");
+  return paths;
+}
+
+/**
+ * Resolve every alias across the given sets and return the flat token list.
+ *
+ * @param {string[]} sets Set names to load together.
+ * @param {Record<string, string>} paths Unpacked file path per set name.
+ * @returns {Promise<Array<{path: string[], $type: string, $value: unknown, set: string}>>}
+ */
+async function resolveTokens(sets, paths) {
+  const dictionary = new StyleDictionary({
+    source: sets.map((name) => paths[name]),
+    usesDtcg: true,
+    log: { verbosity: "verbose" },
+    platforms: { resolved: {} }
   });
+  const { allTokens } = await dictionary.getPlatformTokens("resolved");
+  return allTokens.map((token) => ({
+    path: token.path,
+    $type: token.$type,
+    $value: token.$value,
+    set: posix(token.filePath).split("/").pop().replace(/\.json$/, "")
+  }));
 }
 
 /**
- * Return whether a token came from the semantic layer.
+ * Return the CSS value for a token, adding fallback stacks to font families.
  *
- * @param {{filePath: string}} token One resolved design token.
- * @returns {boolean} True when the token is part of the semantic layer.
+ * @param {{path: string[], $type: string, $value: unknown}} token One resolved token.
+ * @returns {string} The CSS value.
  */
-function isSemantic(token) {
-  return token.filePath.endsWith("semantic.json");
-}
-
-/**
- * Return the CSS custom property name for a token.
- *
- * @param {{path: string[]}} token One resolved design token.
- * @returns {string} The custom property name without the leading dashes.
- */
-function cssName(token) {
-  return token.path.join("-");
-}
-
-/**
- * Return the token value as a plain string.
- *
- * @param {{$value?: unknown, value?: unknown}} token One resolved design token.
- * @returns {string} The resolved value.
- */
-function tokenValue(token) {
-  return String(token.$value ?? token.value);
-}
-
-/**
- * Return the tokens of one top-level group keyed by their remaining path.
- *
- * @param {Array<object>} tokens All semantic tokens.
- * @param {string} group The top-level group name.
- * @returns {Record<string, string>} Values keyed by the dash-joined rest path.
- */
-function group(tokens, group_) {
-  const result = {};
-  for (const token of tokens) {
-    if (token.path[0] !== group_ || token.path.length < 2) continue;
-    result[token.path.slice(1).join("-")] = tokenValue(token);
+function cssValue(token) {
+  if (token.$type === "fontFamily") {
+    return fontStack(token).map((family) => (family.includes(" ") ? `"${family}"` : family)).join(", ");
   }
-  return result;
+  return String(token.$value);
 }
 
-StyleDictionary.registerFormat({
-  name: "maintenance/css-variables",
-  /**
-   * Render the semantic tokens as custom properties inside Tailwind's base layer.
-   *
-   * @param {{dictionary: {allTokens: Array<object>}}} context Style Dictionary context.
-   * @returns {string} The CSS file contents.
-   */
-  format({ dictionary }) {
-    const lines = dictionary.allTokens
-      .filter(isSemantic)
-      .map((token) => `    --${cssName(token)}: ${tokenValue(token)};`);
-    return [
-      "/*",
-      ...BANNER.map((line) => ` * ${line}`),
-      " */",
-      "",
-      "@layer base {",
-      "  :root {",
-      ...lines,
-      "  }",
-      "}",
-      ""
-    ].join("\n");
-  }
-});
+/**
+ * Return the font family followed by its fallback stack.
+ *
+ * @param {{path: string[], $value: unknown}} token One typography token.
+ * @returns {string[]} Families in priority order.
+ */
+function fontStack(token) {
+  const fallback = token.path[token.path.length - 1] === "mono" ? MONO_FALLBACK : SANS_FALLBACK;
+  return [String(token.$value), ...fallback];
+}
 
-StyleDictionary.registerFormat({
-  name: "maintenance/tailwind-module",
-  /**
-   * Render the Tailwind theme fragment and the DaisyUI palette.
-   *
-   * @param {{dictionary: {allTokens: Array<object>}}} context Style Dictionary context.
-   * @returns {string} The CommonJS module contents.
-   */
-  format({ dictionary }) {
-    const tokens = dictionary.allTokens.filter(isSemantic);
-    const colors = group(tokens, "color");
-    const payload = {
-      colors,
-      screens: group(tokens, "breakpoint"),
-      radius: group(tokens, "radius"),
-      elevation: group(tokens, "elevation"),
-      daisyui: {
-        primary: colors["action-default"],
-        "primary-content": colors["action-on"],
-        secondary: colors["support-default"],
-        "secondary-content": colors["support-on"],
-        accent: colors["highlight-default"],
-        "accent-content": colors["highlight-on"],
-        neutral: colors["contrast-default"],
-        "neutral-content": colors["contrast-on"],
-        "base-100": colors["surface-page"],
-        "base-200": colors["surface-raised"],
-        "base-300": colors["surface-border"],
-        "base-content": colors["text-primary"],
-        info: colors["status-info"],
-        "info-content": colors["status-info-on"],
-        success: colors["status-ok"],
-        "success-content": colors["status-ok-on"],
-        warning: colors["status-warn"],
-        "warning-content": colors["status-warn-on"],
-        error: colors["status-critical"],
-        "error-content": colors["status-critical-on"]
-      }
-    };
-    return [
-      "/*",
-      ...BANNER.map((line) => ` * ${line}`),
-      " */",
-      "",
-      `module.exports = ${JSON.stringify(payload, null, 2)};`,
-      ""
-    ].join("\n");
-  }
-});
+/**
+ * Render one CSS rule block of custom properties.
+ *
+ * @param {string} selector The rule selector.
+ * @param {Array<{path: string[], $type: string, $value: unknown}>} tokens Tokens to declare.
+ * @returns {string[]} Lines of the block, indented for the base layer.
+ */
+function cssBlock(selector, tokens) {
+  return [
+    `  ${selector} {`,
+    ...tokens.map((token) => `    --${token.path.join("-")}: ${cssValue(token)};`),
+    "  }"
+  ];
+}
 
 /**
  * Build both token artifacts.
@@ -213,46 +163,63 @@ StyleDictionary.registerFormat({
  * @returns {Promise<void>} Resolves once every file is written.
  */
 async function main() {
-  mkdirSync(GENERATED_DIR, { recursive: true });
+  const paths = unpackSets();
+  const light = (await resolveTokens(LIGHT_SOURCES, paths)).filter((token) => LIGHT_EMITTED.has(token.set));
+  const dark = (await resolveTokens(DARK_SOURCES, paths)).filter((token) => token.set === "semantic-dark");
 
-  const dictionary = new StyleDictionary({
-    source: tokenSourceFiles(),
-    usesDtcg: true,
-    log: { verbosity: "verbose" },
-    platforms: {
-      css: {
-        transformGroup: "css",
-        files: [
-          {
-            destination: CSS_TARGET,
-            format: "maintenance/css-variables",
-            options: { usesDtcg: true }
-          }
-        ]
-      },
-      tailwind: {
-        transformGroup: "js",
-        files: [
-          {
-            destination: TAILWIND_TARGET,
-            format: "maintenance/tailwind-module",
-            options: { usesDtcg: true }
-          }
-        ]
-      }
-    }
-  });
-
-  await dictionary.buildAllPlatforms();
-
-  const missing = [CSS_TARGET, TAILWIND_TARGET].filter((path) => !existsSync(path));
-  if (missing.length > 0) {
-    throw new Error(`Token-Build hat nichts geschrieben: ${missing.join(", ")}`);
+  const lightColors = light.filter((token) => token.set === "semantic").map((token) => token.path.join("."));
+  const darkColors = dark.map((token) => token.path.join("."));
+  const unmatched = lightColors.filter((path) => !darkColors.includes(path));
+  if (unmatched.length > 0 || lightColors.length !== darkColors.length) {
+    throw new Error(`Hell und dunkel decken nicht dieselben Rollen ab: ${unmatched.join(", ")}`);
   }
 
+  const css = [
+    "/*",
+    ...BANNER.map((line) => ` * ${line}`),
+    " *",
+    ` * Dunkel ist vorbereitet, aber noch nirgends eingeschaltet: ${DARK_SELECTOR}.`,
+    " */",
+    "",
+    "@layer base {",
+    ...cssBlock(":root", light),
+    "",
+    ...cssBlock(DARK_SELECTOR, dark),
+    "}",
+    ""
+  ].join("\n");
+
+  const colors = Object.fromEntries(
+    light
+      .filter((token) => token.set === "semantic")
+      .map((token) => [token.path.slice(1).join("-"), `var(--${token.path.join("-")})`])
+  );
+  const screens = Object.fromEntries(
+    light
+      .filter((token) => token.set === "app" && token.path[0] === "breakpoint")
+      .map((token) => [token.path[1], String(token.$value)])
+  );
+  const fontFamily = Object.fromEntries(
+    light.filter((token) => token.set === "typography").map((token) => [token.path[token.path.length - 1], fontStack(token)])
+  );
+  const tailwind = [
+    "/*",
+    ...BANNER.map((line) => ` * ${line}`),
+    " */",
+    "",
+    `module.exports = ${JSON.stringify({ colors, screens, fontFamily }, null, 2)};`,
+    ""
+  ].join("\n");
+
+  mkdirSync(GENERATED_DIR, { recursive: true });
+  writeFileSync(CSS_TARGET, css, "utf8");
+  writeFileSync(TAILWIND_TARGET, tailwind, "utf8");
   writeFileSync(`${GENERATED_DIR}/.gitattributes`, "tailwind.cjs linguist-generated=true\n", "utf8");
-  const written = [CSS_TARGET, TAILWIND_TARGET].map((path) => path.replace(`${ROOT_DIR}/`, ""));
-  console.log(`Design-Token erzeugt: ${written.join(", ")}`);
+
+  console.log(
+    `Design-Token erzeugt: ${light.length} hell, ${dark.length} dunkel -> ` +
+      [CSS_TARGET, TAILWIND_TARGET].map((path) => path.replace(`${ROOT_DIR}/`, "")).join(", ")
+  );
 }
 
 await main();

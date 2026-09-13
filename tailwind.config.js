@@ -1,12 +1,18 @@
 /*
- * Farben und Breakpoints stammen aus design/tokens/. Werte gehoeren nicht in
- * diese Datei: geaendert wird core.json, danach `npm run build:tokens`.
+ * Farben, Breakpoints und Schriften stammen aus design/tokens/. Werte gehoeren
+ * nicht in diese Datei: gestaltet wird in Figma, uebertragen per
+ * scripts/figma/export_tokens.js, erzeugt mit `npm run build:tokens`.
+ *
+ * Die Farben verweisen auf CSS-Custom-Properties, damit Utilities dem dunklen
+ * Modus folgen, sobald er eingeschaltet wird.
  *
  * Bewusst nicht uebernommen sind radius und elevation. Beide wuerden Tailwinds
  * Standardskalen ueberschreiben und damit jedes vorhandene rounded-* und
- * shadow-* veraendern. Sie stehen als CSS-Custom-Properties bereit und werden
- * in Schritt 4 bis 6 des Werkbank-Briefs uebernommen, wenn die 295 Freihand-
- * Radien und 140 Freihand-Schatten abgeloest werden.
+ * shadow-* veraendern; sie stehen als --radius-* und --elevation-* bereit.
+ *
+ * DaisyUI ist entfernt. Version 5 setzt Tailwind 4 voraus und hat mit Tailwind
+ * 3.4 keine einzige Regel erzeugt; .btn, .badge und Co. stammen aus
+ * app/static/css/src/.
  */
 
 const tokens = require("./design/tokens/generated/tailwind.cjs");
@@ -22,11 +28,8 @@ module.exports = {
   theme: {
     extend: {
       colors: tokens.colors,
-      screens: tokens.screens
+      screens: tokens.screens,
+      fontFamily: tokens.fontFamily
     }
-  },
-  plugins: [require("daisyui")],
-  daisyui: {
-    themes: [{ maintenance: tokens.daisyui }]
   }
 };

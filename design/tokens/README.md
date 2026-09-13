@@ -1,78 +1,93 @@
 # Design-Token
 
-`tokens.json` ist die Quelle, aus der die Anwendung Farben, Masse und
-Breakpoints bezieht. Werte ändert man hier oder in Figma, nie in
-`tailwind.config.js` oder in den 60 CSS-Quelldateien.
+Gestaltet wird in Figma, gebaut wird aus diesem Ordner. Werte ändert man nie in
+`tailwind.config.js` und nie in den 60 Feature-CSS-Dateien.
 
-## Woher die Werte kommen
+## Der Weg eines Werts
 
-Gestalterische Quelle ist die Figma-Datei **„Maintenance AI — Design System &
-Redesign"**. Dort werden Farben, Radien und Schriften entworfen und auf allen
-14 Screens hell und dunkel geprüft.
+```
+Figma-Datei "Maintenance AI — Design System & Redesign"
+  │  scripts/figma/export_tokens.js  (läuft über die Figma-MCP-Anbindung von Claude Code)
+  ▼
+design/tokens/tokens.json            Export, nicht von Hand ändern
+design/tokens/app.json               App-eigene Namen, von Hand gepflegt
+  │  npm run build:tokens
+  ▼
+app/static/css/src/00-shell-tokens.css   CSS-Custom-Properties, hell und dunkel
+design/tokens/generated/tailwind.cjs     Tailwind-Farben, Breakpoints, Schriften
+  │  98-legacy-token-bridge.css
+  ▼
+das gewachsene Feature-CSS (--ui-*, --ops-*)
+```
 
-Übertragen werden die Werte über die Figma-MCP-Anbindung von Claude Code, die
-die Variablen direkt aus der Datei liest. Dafür ist kein Figma-Plugin, kein
-GitHub-Token und kein eigener Sync-Branch nötig.
+Übertragen heißt: Claude Code führt `scripts/figma/export_tokens.js` gegen die
+Datei aus und speichert das Ergebnis als `tokens.json`. Ein Figma-Plugin, ein
+GitHub-Token oder ein Sync-Branch sind dafür nicht nötig.
 
-Stand 13.09.2026: Die Figma-Datei zeigt bereits die Werkbank-Palette,
-`tokens.json` noch die alte. Die Übernahme ist der nächste Schritt.
+## tokens.json
 
-## Eine Datei, zwei Ebenen
-
-Jedes Token-Set ist ein Schlüssel auf oberster Ebene von `tokens.json`:
-
-| Set | Inhalt | Wer verweist darauf |
+| Set | Quelle in Figma | Inhalt |
 | --- | --- | --- |
-| `core` | Primitive Farbwerte, nach Farbton benannt (`color.blue.600`) | nur `semantic` |
-| `semantic` | Rollen (`color.action.default`), Masse, Breakpoints | die Anwendung |
+| `core` | Sammlung „1 Primitives" | Farbrampen (`color.neutral.500`, `color.signal.500`) |
+| `semantic` | „2 Semantic", Modus Light | Rollen (`color.action.primary`, `color.text.muted`) |
+| `semantic-dark` | „2 Semantic", Modus Dark | dieselben Rollen, dunkle Werte |
+| `layout` | „3 Layout" | `space.*`, `radius.*`, `size.*` in px |
+| `typography` | Textstile | Familie je Rolle: `font.display`, `label`, `body`, `mono` |
+| `effects` | Effektstile `elevation/*` | Schatten und Fokusring |
 
-Schlüssel mit `$` am Anfang (`$themes`, `$metadata`) sind Metadaten, keine
-Token.
+Nur die Rollen erreichen die Anwendung. Die Rampen aus `core` sind Eingabe:
+in CSS steht `var(--color-action-primary)`, nie ein Rampenwert.
 
-Die Trennung hat einen Zweck: Ein Rollenname wie `color.status.critical` bleibt
-stabil, während sich der Farbwert dahinter ändert.
+## app.json
 
-Aliase nennen den Set-Namen nicht (`{color.blue.600}`, nicht
-`{core.color.blue.600}`), weil beide Sets gemeinsam aufgelöst werden. Der
-Generator entpackt sie deshalb vor dem Build in einzelne Dateien.
+Namen, die die Anwendung liest, Figma aber nicht kennt. `--sidebar-width`,
+`--sidebar-width-collapsed` und `--topbar-height` verweisen per Alias auf
+`size.*` aus Figma; die vier Breakpoints (640/768/1024/1440) sind reine
+App-Regeln.
 
-Format ist [DTCG](https://tr.designtokens.org/format/) (`$value`, `$type`).
+## Dunkel
 
-## Erzeugte Dateien
+Der dunkle Satz wird unter `:root[data-theme="maintenance-dark"]` erzeugt, ist
+aber **nirgends eingeschaltet**. Rund 1.370 fest eingetragene Farbwerte im
+Feature-CSS würden einem Umschalter nicht folgen. Die Tailwind-Farben verweisen
+bereits auf die Custom Properties und würden mitziehen.
 
-`npm run build:tokens` schreibt aus `tokens.json`:
+## Brücke zum Bestand
 
-| Ziel | Inhalt | Verbraucher |
-| --- | --- | --- |
-| `app/static/css/src/00-shell-tokens.css` | CSS-Custom-Properties der semantischen Ebene | `base.html`, `99-shell-layout.css`, künftig die Feature-CSS |
-| `design/tokens/generated/tailwind.cjs` | Tailwind-Theme und DaisyUI-Palette | `tailwind.config.js` |
+`app/static/css/src/98-legacy-token-bridge.css` biegt die 49 gewachsenen
+`--ui-*`- und `--ops-*`-Variablen (601 Verwendungen) auf Token-Rollen um und
+überschreibt gezielt die Stellen, an denen fest eingetragene Blautöne über den
+Variablen liegen: Shell-Flächen, aktive Navigation, Zähler, Kartenleisten,
+Verweise, Status-Badges.
 
-Beide sind eingecheckt, weil die CI nur `npm --prefix frontend ci` ausführt und
-den Generator dort nicht laufen lässt. `npm run build:css` ruft den Token-Build
-automatisch vorher auf.
+Ein Teil der Feature-CSS steht außerhalb jeder `@layer` und schlägt damit jede
+gelayerte Regel. Die Überschreibungen dafür stehen am Ende der Brücke ebenfalls
+ungelayert.
 
-Die Primitive aus `core` verlassen den Generator nicht. In der Anwendung soll
-`--color-action-default` stehen, nie `--color-blue-600`.
+Neue Regeln gehören nicht in die Brücke. Neues CSS liest die Token direkt.
+
+## Schriften
+
+Selbst gehostet unter `app/static/fonts/`, erzeugt von `npm run build:fonts`
+aus den `@fontsource`-Paketen (SIL Open Font License, Lizenzdateien liegen
+bei). Kein Aufruf von fonts.googleapis.com, die App bleibt ohne Internet lesbar.
 
 ## Was der Drift-Wächter prüft
 
 `tests/test_design_tokens.py` leitet die erwartete Ausgabe in reinem Python neu
-her und läuft damit in der CI mit. Er schlägt an, wenn
+her, weil die CI den Node-Generator nicht ausführt. Er schlägt an, wenn
 
-- eine Tokenänderung nicht neu gebaut wurde,
-- eine DaisyUI-Rolle nicht mehr zu ihrem semantischen Token passt,
-- ein Farbliteral oder ein `px`-Wert nach `tailwind.config.js` zurückwandert,
-- die Namen verschwinden, die `base.html` und `99-shell-layout.css` lesen
-  (`--sidebar-width`, `--sidebar-width-collapsed`, `--topbar-height`),
-- `tokens.json` die Sets `core` und `semantic` verliert oder neben ihr wieder
-  einzelne Set-Dateien auftauchen.
+- `00-shell-tokens.css` hell oder dunkel nicht exakt zu `tokens.json` passt,
+- Tailwind-Farben, Breakpoints oder Schriften von den Token abweichen,
+- gedämpfter oder sekundärer Text auf Seiten-, Karten- oder abgesenktem
+  Hintergrund unter **4,5:1** Kontrast fällt (hell und dunkel),
+- eine `--ui-*`/`--ops-*`-Variable im Feature-CSS keine Brücke hat oder auf ein
+  nicht existierendes Token zeigt,
+- Farbliterale, px-Werte oder DaisyUI in die Tailwind-Konfiguration zurückkehren.
 
-## Noch nicht übernommen
+## DaisyUI
 
-`radius` und `elevation` stehen als CSS-Custom-Properties bereit, sind aber
-bewusst **nicht** in Tailwinds Theme gehängt: das würde Tailwinds Standardskalen
-ersetzen und jedes vorhandene `rounded-*` und `shadow-*` verändern. Sie lösen in
-Schritt 4 bis 6 die 295 Freihand-Radien und 140 Freihand-Schatten ab.
-
-`space` ist deckungsgleich mit Tailwinds Standardskala (Basis 4 px) und braucht
-deshalb keinen Override.
+Entfernt. Version 5 setzt Tailwind 4 voraus und hat mit Tailwind 3.4 keine
+einzige Regel erzeugt; `.btn`, `.badge` und Co. stammen aus
+`app/static/css/src/`. Der Build war mit und ohne Plugin bis auf die Token
+identisch.

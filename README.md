@@ -116,11 +116,14 @@ Navigation lives in exactly one place: `frontend/src/layout/ShellNavigationModel
 The Jinja shell renders placeholders only, so hydration never swaps one set of
 links for a different one.
 
-Design tokens are the source of truth for colors, shell sizes and breakpoints.
-Edit `design/tokens/tokens.json`, then run `npm run build:tokens`; the generated
-`app/static/css/src/00-shell-tokens.css` and `design/tokens/generated/tailwind.cjs`
-are committed, and `tests/test_design_tokens.py` fails when they drift from the
-source. See `design/tokens/README.md`.
+Design tokens are the source of truth for colors, shell sizes, fonts and
+breakpoints. They are designed in the Figma file, exported to
+`design/tokens/tokens.json` by `scripts/figma/export_tokens.js` and built with
+`npm run build:tokens`; the generated `app/static/css/src/00-shell-tokens.css` and
+`design/tokens/generated/tailwind.cjs` are committed, and
+`tests/test_design_tokens.py` fails when they drift. Legacy `--ui-*`/`--ops-*`
+variables are redirected in `app/static/css/src/98-legacy-token-bridge.css`. See
+`design/tokens/README.md`.
 
 ## Getting Started
 

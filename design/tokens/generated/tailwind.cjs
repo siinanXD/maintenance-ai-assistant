@@ -1,31 +1,66 @@
 /*
  * Erzeugt von scripts/build_tokens.mjs. Nicht von Hand aendern.
- * Quelle: design/tokens/tokens.json (Sets core und semantic).
+ * Quelle: design/tokens/tokens.json (Figma-Export) und design/tokens/app.json.
  * Neu erzeugen mit: npm run build:tokens
  */
 
 module.exports = {
   "colors": {
-    "action-default": "#2563eb",
-    "action-on": "#ffffff",
-    "support-default": "#0f766e",
-    "support-on": "#ffffff",
-    "highlight-default": "#06b6d4",
-    "highlight-on": "#083344",
-    "contrast-default": "#111827",
-    "contrast-on": "#f8fafc",
-    "surface-page": "#ffffff",
-    "surface-raised": "#f8fafc",
-    "surface-border": "#e2e8f0",
-    "text-primary": "#0f172a",
-    "status-info": "#0284c7",
-    "status-info-on": "#ffffff",
-    "status-ok": "#16a34a",
-    "status-ok-on": "#ffffff",
-    "status-warn": "#facc15",
-    "status-warn-on": "#422006",
-    "status-critical": "#dc2626",
-    "status-critical-on": "#ffffff"
+    "bg-canvas": "var(--color-bg-canvas)",
+    "bg-surface": "var(--color-bg-surface)",
+    "bg-surface-raised": "var(--color-bg-surface-raised)",
+    "bg-surface-sunken": "var(--color-bg-surface-sunken)",
+    "bg-hover": "var(--color-bg-hover)",
+    "bg-selected": "var(--color-bg-selected)",
+    "bg-sidebar": "var(--color-bg-sidebar)",
+    "bg-sidebar-hover": "var(--color-bg-sidebar-hover)",
+    "bg-sidebar-active": "var(--color-bg-sidebar-active)",
+    "bg-inverse": "var(--color-bg-inverse)",
+    "border-subtle": "var(--color-border-subtle)",
+    "border-default": "var(--color-border-default)",
+    "border-strong": "var(--color-border-strong)",
+    "border-focus": "var(--color-border-focus)",
+    "border-sidebar": "var(--color-border-sidebar)",
+    "text-primary": "var(--color-text-primary)",
+    "text-secondary": "var(--color-text-secondary)",
+    "text-muted": "var(--color-text-muted)",
+    "text-disabled": "var(--color-text-disabled)",
+    "text-inverse": "var(--color-text-inverse)",
+    "text-link": "var(--color-text-link)",
+    "text-sidebar": "var(--color-text-sidebar)",
+    "text-sidebar-active": "var(--color-text-sidebar-active)",
+    "action-primary": "var(--color-action-primary)",
+    "action-primary-hover": "var(--color-action-primary-hover)",
+    "action-primary-text": "var(--color-action-primary-text)",
+    "action-secondary": "var(--color-action-secondary)",
+    "action-secondary-border": "var(--color-action-secondary-border)",
+    "action-danger": "var(--color-action-danger)",
+    "action-danger-hover": "var(--color-action-danger-hover)",
+    "status-success-bg": "var(--color-status-success-bg)",
+    "status-success-border": "var(--color-status-success-border)",
+    "status-success-text": "var(--color-status-success-text)",
+    "status-success-solid": "var(--color-status-success-solid)",
+    "status-warning-bg": "var(--color-status-warning-bg)",
+    "status-warning-border": "var(--color-status-warning-border)",
+    "status-warning-text": "var(--color-status-warning-text)",
+    "status-warning-solid": "var(--color-status-warning-solid)",
+    "status-danger-bg": "var(--color-status-danger-bg)",
+    "status-danger-border": "var(--color-status-danger-border)",
+    "status-danger-text": "var(--color-status-danger-text)",
+    "status-danger-solid": "var(--color-status-danger-solid)",
+    "status-info-bg": "var(--color-status-info-bg)",
+    "status-info-border": "var(--color-status-info-border)",
+    "status-info-text": "var(--color-status-info-text)",
+    "status-neutral-bg": "var(--color-status-neutral-bg)",
+    "status-neutral-border": "var(--color-status-neutral-border)",
+    "status-neutral-text": "var(--color-status-neutral-text)",
+    "ai-accent": "var(--color-ai-accent)",
+    "ai-accent-bg": "var(--color-ai-accent-bg)",
+    "ai-accent-border": "var(--color-ai-accent-border)",
+    "ai-accent-text": "var(--color-ai-accent-text)",
+    "ai-knowledge": "var(--color-ai-knowledge)",
+    "ai-knowledge-bg": "var(--color-ai-knowledge-bg)",
+    "ai-knowledge-text": "var(--color-ai-knowledge-text)"
   },
   "screens": {
     "sm": "640px",
@@ -33,36 +68,34 @@ module.exports = {
     "lg": "1024px",
     "xl": "1440px"
   },
-  "radius": {
-    "sm": "2px",
-    "md": "3px",
-    "lg": "6px"
-  },
-  "elevation": {
-    "0": "none",
-    "1": "0 1px 2px rgba(15, 23, 42, 0.08)",
-    "2": "0 8px 24px rgba(15, 23, 42, 0.12)"
-  },
-  "daisyui": {
-    "primary": "#2563eb",
-    "primary-content": "#ffffff",
-    "secondary": "#0f766e",
-    "secondary-content": "#ffffff",
-    "accent": "#06b6d4",
-    "accent-content": "#083344",
-    "neutral": "#111827",
-    "neutral-content": "#f8fafc",
-    "base-100": "#ffffff",
-    "base-200": "#f8fafc",
-    "base-300": "#e2e8f0",
-    "base-content": "#0f172a",
-    "info": "#0284c7",
-    "info-content": "#ffffff",
-    "success": "#16a34a",
-    "success-content": "#ffffff",
-    "warning": "#facc15",
-    "warning-content": "#422006",
-    "error": "#dc2626",
-    "error-content": "#ffffff"
+  "fontFamily": {
+    "display": [
+      "Archivo",
+      "ui-sans-serif",
+      "system-ui",
+      "Segoe UI",
+      "sans-serif"
+    ],
+    "label": [
+      "Archivo Narrow",
+      "ui-sans-serif",
+      "system-ui",
+      "Segoe UI",
+      "sans-serif"
+    ],
+    "body": [
+      "IBM Plex Sans",
+      "ui-sans-serif",
+      "system-ui",
+      "Segoe UI",
+      "sans-serif"
+    ],
+    "mono": [
+      "IBM Plex Mono",
+      "ui-monospace",
+      "SFMono-Regular",
+      "Consolas",
+      "monospace"
+    ]
   }
 };
