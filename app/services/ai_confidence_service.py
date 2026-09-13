@@ -196,6 +196,9 @@ def uses_structured_sql_confidence(response_type, result=None):
         return False
     if isinstance(result, dict):
         diagnostics = result.get("diagnostics") or {}
+        answer_category = result.get("answer_category") or diagnostics.get("answer_category")
+        if answer_category == "structured_data":
+            return True
         if diagnostics.get("status") == "local_answer":
             return True
     return False

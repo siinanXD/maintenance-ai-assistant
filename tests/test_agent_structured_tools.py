@@ -660,3 +660,5 @@ def test_count_records_admin_sees_all_scopes(app, make_user, scope):
 
     assert result.status == "ok"
     assert result.content["count"] == 0
+    if scope == "inventory":
+        assert "- **Lagerwert:** 0,00 EUR" in result.content["answer_markdown"]

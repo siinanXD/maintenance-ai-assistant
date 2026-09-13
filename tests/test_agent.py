@@ -260,6 +260,7 @@ def test_mock_policy_refines_follow_up_from_structured_hint(app, make_user):
             [tool_spec("list_inventory").provider_schema()],
         )
 
+    assert "entity_type=tasks, tool=list_tasks, status=open" in system_prompt
     assert value_calls[0]["name"] == "list_inventory"
     assert value_calls[0]["arguments"] == {"filter": "all", "count_only": True}
     assert calls[0]["name"] == "list_tasks"

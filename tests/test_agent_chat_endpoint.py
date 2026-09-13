@@ -221,5 +221,7 @@ def test_multi_scope_count_runs_one_tool_per_scope(
     assert "## Tasks\n- **Gesamt:** 1" in payload["answer"]
     assert "## Fehlerkatalog\n- **Gesamt:** 1" in payload["answer"]
     assert payload["answer_category"] == "structured_data"
+    assert payload["confidence"]["level"] == "high"
+    assert payload["answer_quality"]["status"] != "low_confidence"
     with db.session.no_autoflush:
         assert ChatMessage.query.count() >= 1
