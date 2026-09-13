@@ -7,7 +7,7 @@ import {
 } from "./adminAiSourceCheckModel";
 import { useAdminAiRoleAccess } from "./adminAiRoleAccess";
 
-export type AdminAiSourceCheckProps = {
+type AdminAiSourceCheckProps = {
   readonly onCreateFaq: () => void;
   readonly onFeedback: (rating: string, comment?: string) => void;
   readonly onReset: () => void;

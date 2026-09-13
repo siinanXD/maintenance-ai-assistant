@@ -3,14 +3,13 @@
 Der Chat ist ein **Tool-nutzender Agent**: Ein LLM (oder offline die
 Mock-Policy) waehlt Werkzeuge und deren Argumente, die bestehenden
 permission-aware Services fuehren sie aus, deterministische Guards bleiben im
-Code. Es gibt keinen zweiten Antwortpfad mehr: `POST /api/v1/ai/chat` und
-`POST /api/v1/ai/agent` sind identisch. Schreibende Aktionen laufen nur nach
+Code. Es gibt genau einen Antwortpfad: `POST /api/v1/ai/chat`. Schreibende Aktionen laufen nur nach
 expliziter Bestaetigung des Nutzers.
 
 ## Architektur
 
 ```text
-POST /api/v1/ai/chat == POST /api/v1/ai/agent
+POST /api/v1/ai/chat
   -> guard      Safety-Check, Tool-Katalog nach Berechtigung, System-Prompt
                 (inkl. Hinweis auf den letzten strukturierten Datenbereich)
   -> agent      Provider.chat_with_tools(messages, tools)

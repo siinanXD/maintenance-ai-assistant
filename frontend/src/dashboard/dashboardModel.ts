@@ -220,13 +220,6 @@ export function dashboardKpiCards(state: DashboardViewState): readonly Dashboard
 }
 
 /**
- * Build the four operational KPI cards for the first viewport cockpit.
- */
-export function dashboardPrimaryKpiCards(state: DashboardViewState): readonly DashboardKpiState[] {
-  return dashboardKpiCards(state).slice(0, 4);
-}
-
-/**
  * Build compact status chips for secondary dashboard signals.
  */
 export function dashboardStatusChips(state: DashboardViewState): readonly DashboardStatusChipState[] {

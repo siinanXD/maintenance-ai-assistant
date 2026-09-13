@@ -1,6 +1,6 @@
 import { useAuthSession } from "../auth/useAuthSession";
 
-export type AdminAiRoleAccess = {
+type AdminAiRoleAccess = {
   readonly canUseAdminAiApi: boolean;
   readonly isTechnicalRole: boolean;
   readonly role: string;
@@ -18,7 +18,7 @@ export function canUseAdminAiApi(role: string | undefined): boolean {
 /**
  * Return whether the provided role may see technical AI diagnostics.
  */
-export function isTechnicalAiRole(role: string | undefined): boolean {
+function isTechnicalAiRole(role: string | undefined): boolean {
   return canUseAdminAiApi(role);
 }
 

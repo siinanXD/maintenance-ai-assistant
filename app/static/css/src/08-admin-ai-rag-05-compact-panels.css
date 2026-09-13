@@ -8,34 +8,13 @@
     @apply rounded-[1.35rem] border-slate-200/80 bg-white/95 shadow-lg shadow-slate-950/5;
   }
 
-  .page-hero-gradient {
-    @apply bg-[linear-gradient(135deg,#ffffff_0%,#eff6ff_48%,#f8fafc_100%)];
-  }
-
   .app-card,
-  .kpi-card,
-  .dashboard-section {
+  .kpi-card {
     @apply border-slate-200/80 bg-white/95 shadow-md shadow-slate-950/5;
   }
 
   .kpi-card {
     @apply rounded-[1.1rem] p-4;
-  }
-
-  .kpi-icon {
-    @apply text-sm font-black tracking-normal;
-  }
-
-  .dashboard-section {
-    @apply rounded-[1.35rem] bg-slate-100/70;
-  }
-
-  .dashboard-section > summary {
-    @apply rounded-[1.1rem] bg-white/95;
-  }
-
-  .cockpit-column {
-    @apply rounded-[1.1rem];
   }
 
   .chat-panel {
@@ -128,16 +107,6 @@
     width: 3px;
   }
 
-  .kpi-icon {
-    grid-area: icon;
-    width: 2rem;
-    height: 2rem;
-    margin-bottom: 0;
-    border-radius: .65rem;
-    font-size: .72rem;
-    line-height: 1;
-  }
-
   .kpi-label {
     grid-area: label;
     min-width: 0;
@@ -158,40 +127,8 @@
     line-height: 1rem;
   }
 
-  .ai-feature-card,
-  .ai-action-grid,
-  .dashboard-section {
-    margin-bottom: .875rem;
-  }
-
-  .ai-feature-card .card-body,
   .app-card .card-body {
     padding: 1.1rem;
-  }
-
-  .ai-action-grid {
-    gap: .625rem;
-  }
-
-  .ai-action-card {
-    min-height: 4.75rem;
-    border-radius: .9rem;
-    padding: .9rem 1rem;
-    box-shadow: 0 1px 2px rgb(15 23 42 / .05);
-  }
-
-  .dashboard-section {
-    border: 0;
-    background: transparent;
-    padding: 0;
-    box-shadow: none;
-  }
-
-  .dashboard-section > summary {
-    margin-bottom: .625rem;
-    border-radius: .9rem;
-    padding: .85rem 1rem;
-    box-shadow: 0 1px 2px rgb(15 23 42 / .05);
   }
 
   .dashboard-grid {

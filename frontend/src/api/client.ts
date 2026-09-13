@@ -1,16 +1,16 @@
-export type ApiRequestOptions = {
+type ApiRequestOptions = {
   readonly method?: string;
   readonly body?: unknown;
   readonly headers?: HeadersInit;
   readonly signal?: AbortSignal;
 };
 
-export type ApiErrorPayload = {
+type ApiErrorPayload = {
   readonly error?: string;
   readonly message?: string;
 };
 
-export class ApiRequestError extends Error {
+class ApiRequestError extends Error {
   readonly status: number;
 
   readonly payload: ApiErrorPayload | null;

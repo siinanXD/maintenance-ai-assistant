@@ -1,4 +1,4 @@
-﻿export type CreateActionKey =
+﻿type CreateActionKey =
   | "adminFaqDraft"
   | "adminKnowledgeUpload"
   | "adminPromptDraft"
@@ -23,7 +23,7 @@ export type CreateActionDefinition = {
   readonly primaryLabel: string;
 };
 
-export const CREATE_ACTION_DEFINITIONS: Record<CreateActionKey, CreateActionDefinition> = {
+const CREATE_ACTION_DEFINITIONS: Record<CreateActionKey, CreateActionDefinition> = {
   adminFaqDraft: {
     key: "adminFaqDraft",
     title: "FAQ-Entwurf erfassen",

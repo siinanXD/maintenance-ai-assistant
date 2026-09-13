@@ -186,56 +186,14 @@
     background: #f3fcf5;
   }
 
-  .frequent-code-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    border-top: 1px solid #edf1f6;
-    padding: 0.75rem 0.85rem 0.9rem;
-  }
-
-  .frequent-code-strip span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    border: 1px solid #d8e2ef;
-    border-radius: 0.35rem;
-    background: var(--color-bg-canvas);
-    color: var(--color-text-secondary);
-    padding: 0.32rem 0.48rem;
-    font-size: 0.72rem;
-    font-weight: 850;
-  }
-
-  .frequent-code-strip strong {
-    display: inline-grid;
-    min-width: 1.25rem;
-    height: 1.25rem;
-    place-items: center;
-    border-radius: 0.28rem;
-    background: #fff1f3;
-    color: #be123c;
-    font-size: 0.68rem;
-    font-weight: 950;
-  }
-
   @media (max-width: 1180px) {
     .executive-kpi-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .cockpit-workbench,
-    .cockpit-two-column {
-      grid-template-columns: 1fr;
-    }
-
     .machine-status-strip,
     .is-cockpit-actions {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .maintenance-cockpit-kpis {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .ai-ops-command-grid {

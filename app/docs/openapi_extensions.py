@@ -2697,66 +2697,6 @@ ADDITIONAL_PATHS = {
             },
         }
     },
-    "/api/v1/ai/agent": {
-        "post": {
-            "tags": ["AI"],
-            "summary": "Ask the tool-using maintenance agent",
-            "description": (
-                "Runs the LangGraph agent loop: deterministic safety guard, provider "
-                "tool selection, permission-gated tool execution, validation. Write "
-                "tools return a signed pending_action that must be confirmed."
-            ),
-            "security": [{"bearerAuth": []}],
-            "requestBody": {
-                "required": True,
-                "content": {
-                    "application/json": {
-                        "example": {
-                            "message": "Welche offenen Tasks gibt es an Presse 3?",
-                            "session_id": "chat-widget",
-                            "response_mode": "answer_only",
-                        }
-                    }
-                },
-            },
-            "responses": {
-                "200": {
-                    "description": (
-                        "Agent answer with tool trace, sources, confidence and optional "
-                        "pending_action for confirmable write tools"
-                    ),
-                    "content": {
-                        "application/json": {
-                            "schema": {"$ref": "#/components/schemas/AIChatResponse"},
-                            "example": {
-                                "type": "agent",
-                                "answer": "## Ergebnis\n- Dichtung an Presse 3 pruefen (open)",
-                                "tool_trace": [
-                                    {
-                                        "tool": "search_tasks",
-                                        "status": "ok",
-                                        "summary": "1 Treffer in tasks",
-                                        "source_count": 1,
-                                        "duration_ms": 12,
-                                    }
-                                ],
-                                "pending_action": None,
-                                "diagnostics": {
-                                    "status": "openai_used",
-                                    "workflow": "agent",
-                                    "agent_iterations": 2,
-                                    "agent_tool_calls": ["search_tasks"],
-                                },
-                            },
-                        }
-                    },
-                },
-                "400": {"$ref": "#/components/responses/ValidationError"},
-                "401": {"$ref": "#/components/responses/Unauthorized"},
-                "429": {"description": "Per-user rate limit or daily token budget exceeded"},
-            },
-        }
-    },
     "/api/v1/ai/agent/confirm": {
         "post": {
             "tags": ["AI"],
@@ -2832,14 +2772,6 @@ ADDITIONAL_PATHS = {
             "summary": "Search own AI chat history",
             "security": [{"bearerAuth": []}],
             "responses": {"200": {"description": "Chat history loaded"}},
-        }
-    },
-    "/api/v1/ai/chat/templates": {
-        "get": {
-            "tags": ["AI"],
-            "summary": "Load permission-aware chat templates",
-            "security": [{"bearerAuth": []}],
-            "responses": {"200": {"description": "Chat templates loaded"}},
         }
     },
     "/api/v1/ai/error-assistant": {
@@ -3010,32 +2942,6 @@ ADDITIONAL_PATHS = {
                 "201": {"description": "Feedback saved"},
                 "400": {"$ref": "#/components/responses/ValidationError"},
                 "401": {"$ref": "#/components/responses/Unauthorized"},
-            },
-        }
-    },
-    "/api/v1/ai/order-plan": {
-        "post": {
-            "tags": ["AI"],
-            "summary": "Plan a production order with machine, material and staffing checks",
-            "security": [{"bearerAuth": []}],
-            "requestBody": {
-                "required": True,
-                "content": {
-                    "application/json": {
-                        "example": {
-                            "product": "Deckel",
-                            "quantity": 100,
-                            "department": "Produktion",
-                            "work_date": "2026-05-18",
-                        }
-                    }
-                },
-            },
-            "responses": {
-                "200": {"description": "Order plan generated"},
-                "400": {"$ref": "#/components/responses/ValidationError"},
-                "401": {"$ref": "#/components/responses/Unauthorized"},
-                "403": {"$ref": "#/components/responses/Forbidden"},
             },
         }
     },

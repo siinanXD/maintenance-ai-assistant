@@ -1,30 +1,8 @@
     }
 
-    .ops-insights-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .ops-insights-drilldown {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (max-width: 640px) {
-    .dashboard-command-center {
-      grid-template-columns: 1fr;
-      border-radius: 0.65rem;
-      padding: 0.9rem;
-    }
-
-    .command-center-status {
-      justify-items: start;
-    }
-
-    .command-center-actions {
-      display: grid;
-      grid-template-columns: 1fr;
-    }
-
     .executive-kpi-grid,
     .machine-status-strip,
     .is-cockpit-actions {
@@ -39,15 +17,6 @@
       font-size: 1.65rem;
     }
 
-    .maintenance-cockpit-hero {
-      grid-template-columns: 1fr;
-    }
-
-    .maintenance-cockpit-state {
-      justify-items: start;
-    }
-
-    .maintenance-cockpit-kpis,
     .ai-priority-rail {
       grid-template-columns: 1fr;
     }
@@ -59,17 +28,6 @@
 
     .ai-signal-card span:last-child {
       font-size: 1rem;
-    }
-
-    .ops-insights-header,
-    .ops-insights-controls {
-      display: grid;
-      justify-content: stretch;
-    }
-
-    .ops-insights-grid,
-    .ops-insights-drilldown {
-      grid-template-columns: 1fr;
     }
 
     .chat-widget.is-open {

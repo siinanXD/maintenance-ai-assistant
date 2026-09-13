@@ -102,12 +102,12 @@ function settledValue<TValue>(
   return fallback;
 }
 
-export type DashboardCoreData = Pick<
+type DashboardCoreData = Pick<
   DashboardRuntimeData,
   "employees" | "errors" | "handovers" | "inventorySummary" | "machines" | "operationsSummary" | "tasks" | "vacations"
 > & { readonly loadErrors: readonly string[] };
 
-export type DashboardInsightData = Pick<
+type DashboardInsightData = Pick<
   DashboardRuntimeData,
   "aiStatus" | "dailyBriefing" | "knowledgeGaps" | "knowledgeStatus" | "retrievalTelemetry"
 > & { readonly loadErrors: readonly string[] };
@@ -181,19 +181,6 @@ export async function loadDashboardInsightData(signal?: AbortSignal): Promise<Da
 }
 
 /**
- * Load all dashboard data at once; used where a single complete snapshot is needed.
- */
-export async function loadDashboardRuntimeData(signal?: AbortSignal): Promise<DashboardRuntimeData> {
-  const [core, insight] = await Promise.all([loadDashboardCoreData(signal), loadDashboardInsightData(signal)]);
-  return {
-    ...EMPTY_DASHBOARD_DATA,
-    ...core,
-    ...insight,
-    loadErrors: [...core.loadErrors, ...insight.loadErrors]
-  };
-}
-
-/**
  * Load one task for the React dashboard detail modal.
  */
 export async function loadDashboardTask(taskId: number, signal?: AbortSignal): Promise<DashboardPayload> {
@@ -259,24 +246,6 @@ export async function suggestDashboardTask(text: string): Promise<DashboardPaylo
       method: "POST"
     })
   ) ?? {};
-}
-
-/**
- * Load the shift calendar used by the React dashboard timeline.
- */
-export async function loadDashboardShiftCalendar(
-  employeeId: string,
-  signal?: AbortSignal
-): Promise<DashboardShiftCalendar> {
-  const params = new URLSearchParams();
-  params.set("days", "14");
-  if (employeeId) {
-    params.set("employee_id", employeeId);
-  }
-
-  return unwrapData<DashboardShiftCalendar>(
-    await apiRequest<unknown>(`/api/v1/shiftplans/calendar?${params.toString()}`, { signal })
-  );
 }
 
 export { EMPTY_DASHBOARD_DATA };

@@ -1,4 +1,4 @@
-export type SelectOption = {
+type SelectOption = {
   readonly label: string;
   readonly value: string;
 };

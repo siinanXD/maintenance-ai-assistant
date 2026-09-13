@@ -136,23 +136,6 @@ def retrieval_quality_gate_for_document(document):
     return retrieval_quality_gate_for_status(getattr(document, "quality_status", ""))
 
 
-def is_retrievable_by_quality(document):
-    """Return whether a knowledge document passes the retrieval quality gate."""
-    return retrieval_quality_gate_for_document(document).allowed
-
-
-def apply_retrieval_quality_score(score, document):
-    """Return a retrieval score adjusted by the document quality gate."""
-    gate = retrieval_quality_gate_for_document(document)
-    if not gate.allowed:
-        return 0.0
-    try:
-        numeric_score = float(score)
-    except (TypeError, ValueError):
-        return 0.0
-    return round(max(0.0, numeric_score) * gate.score_multiplier, 2)
-
-
 def automatic_quality_status_from_chunk_report(document, report):
     """Return a safe automatic quality status suggestion after indexing."""
     current_status = normalize_existing_quality_status(

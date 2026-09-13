@@ -10,7 +10,6 @@ from app.services.ai_question_normalizer import (
     detect_status,
     detect_time_range,
     is_structured_follow_up,
-    mentions_my_area,
     normalize_text,
 )
 
@@ -30,7 +29,6 @@ def test_ai_question_normalizer_detects_structured_terms():
     assert detect_time_range("Was wurde heute gemeldet?") == "today"
     assert detect_time_range("Was wurde gestern gemeldet?") == "yesterday"
     assert is_structured_follow_up("Und welche davon sind kritisch?")
-    assert mentions_my_area("St\u00f6rungen in meinem Bereich")
 
 
 def test_ai_question_normalizer_detects_department_with_word_boundaries(app):

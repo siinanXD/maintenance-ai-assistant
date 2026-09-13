@@ -11,8 +11,7 @@
     content: "−";
   }
 
-  .help-disclosure > p,
-  .help-disclosure > .next-step-list {
+  .help-disclosure > p {
     padding: 0 0.75rem 0.75rem;
   }
 
@@ -50,36 +49,11 @@
     font-style: normal;
   }
 
-  .next-step-list {
-    display: grid;
-    gap: 0.35rem;
-    margin: 0;
-    padding-left: 1.15rem;
-    color: var(--color-text-secondary);
-    line-height: 1.45;
-  }
-
-  .term-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    min-height: 1.6rem;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    border: 1px solid var(--color-border-default);
-    background: var(--color-bg-canvas);
-    color: var(--color-text-secondary);
-    font-size: 0.78rem;
-    font-weight: 800;
-    white-space: nowrap;
-  }
-
   .chat-guidance {
     margin: 0 0.85rem 0.75rem;
     font-size: 0.82rem;
   }
 
-  .skeleton-line,
   [data-skeleton-line] {
     min-height: 0.78rem;
     border-radius: 999px;
@@ -142,7 +116,6 @@
     .btn.is-busy::before,
     .chat-panel,
     .chat-toggle,
-    .skeleton-line,
     [data-skeleton-line] {
       animation: none !important;
       transition: none !important;
@@ -155,36 +128,6 @@
 }
 
 @layer components {
-  .bg-primary {
-    @apply bg-blue-600;
-  }
-
-  .text-primary-content {
-    @apply text-white;
-  }
-
-  .navbar {
-    @apply flex w-full items-center justify-between gap-3;
-  }
-
-  .navbar-start,
-  .navbar-center,
-  .navbar-end {
-    @apply flex min-w-0 items-center;
-  }
-
-  .navbar-start {
-    @apply flex-1 justify-start;
-  }
-
-  .navbar-center {
-    @apply justify-center;
-  }
-
-  .navbar-end {
-    @apply flex-1 justify-end;
-  }
-
   .menu {
     @apply flex flex-col;
   }

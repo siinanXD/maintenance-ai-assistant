@@ -49,13 +49,6 @@ TASK_STATUS_TERMS = {
 SEVERITY_TERMS = {
     "critical": ("kritisch", "kritische", "critical"),
 }
-MY_AREA_TERMS = (
-    "mein bereich",
-    "meinem bereich",
-    "meine abteilung",
-    "meiner abteilung",
-    "unserem bereich",
-)
 
 
 def contains_lookup_term(text, term):
@@ -134,12 +127,6 @@ def detect_department(value):
         if re.search(rf"(?<!\w){re.escape(normalized_name)}(?!\w)", text):
             return department.name
     return ""
-
-
-def mentions_my_area(value):
-    """Return whether a question asks for the user's own department or area."""
-    text = normalize_text(value)
-    return any(term in text for term in MY_AREA_TERMS)
 
 
 def is_structured_follow_up(value):

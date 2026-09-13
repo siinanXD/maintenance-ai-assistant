@@ -3,7 +3,7 @@ import { safeErrorMessage } from "../utils/errors";
 import { type AdminAiPayload } from "./adminAiApi";
 export { capabilityGroups } from "./adminAiCapabilityModel";
 
-export type AdminAiUserCostRow = {
+type AdminAiUserCostRow = {
   readonly estimated_cost_usd?: unknown;
   readonly events?: unknown;
   readonly fallback_rate?: unknown;

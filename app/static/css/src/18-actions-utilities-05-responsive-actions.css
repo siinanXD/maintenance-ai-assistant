@@ -29,26 +29,10 @@
     .inventory-card-grid,
     .employee-card-grid,
     .rag-game-board,
-    .effectiveness-chart-grid,
-    .rag-effectiveness-grid {
+    .effectiveness-chart-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .rag-game-shell {
-      grid-template-columns: minmax(14rem, 0.28fr) minmax(0, 1fr);
-    }
-
-    .rag-test-arena,
-    .rag-effectiveness-strip {
-      grid-column: 1 / -1;
-    }
-
-    .rag-test-arena {
-      border-left: 0;
-      border-top: 1px solid #dbe4ee;
-    }
-
-    .rag-board-layout,
     .source-test-layout {
       grid-template-columns: 1fr;
     }
@@ -87,24 +71,9 @@
     .employee-card-grid,
     .rag-game-board,
     .effectiveness-chart-grid,
-    .rag-effectiveness-grid,
-    .rag-game-shell,
-    .rag-board-support,
-    .rag-board-scorebar,
     .source-test-score-grid,
     .rag-index-track {
       grid-template-columns: 1fr;
-    }
-
-    .rag-health-rail,
-    .rag-test-arena {
-      border: 0;
-      border-bottom: 1px solid #dbe4ee;
-    }
-
-    .rag-game-main,
-    .rag-effectiveness-strip {
-      padding: 0.85rem;
     }
 
     .rag-index-track article:not(:last-child)::after {

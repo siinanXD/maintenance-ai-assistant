@@ -12,7 +12,6 @@ from app.extensions import db
 from app.models import AIPromptTemplate, AIPromptVersion
 
 PROMPT_STATUSES = {"draft", "active", "archived"}
-PROMPT_RESPONSE_MODES = {"text", "json"}
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useMemo, type ReactNode } from "react";
 
 import { legacyPermissionKeyFor } from "../app/runtimeBridge";
 import { canViewStoredDashboard } from "./permissions";
@@ -38,17 +38,3 @@ export function PermissionProvider({ children }: { readonly children: ReactNode 
   return <PermissionContext.Provider value={value}>{children}</PermissionContext.Provider>;
 }
 
-/**
- * Return permission helpers from the React shell provider.
- */
-export function usePermissions(): PermissionProviderValue {
-  const context = useContext(PermissionContext);
-  if (!context) {
-    return {
-      canView: () => false,
-      canWrite: () => false,
-      permissionKeyFor: legacyPermissionKeyFor
-    };
-  }
-  return context;
-}

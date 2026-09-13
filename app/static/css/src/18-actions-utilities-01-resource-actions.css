@@ -2,11 +2,6 @@
     align-items: stretch;
   }
 
-  .quick-action-row,
-  .ai-action-card {
-    align-content: center;
-  }
-
   .list-toolbar {
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);

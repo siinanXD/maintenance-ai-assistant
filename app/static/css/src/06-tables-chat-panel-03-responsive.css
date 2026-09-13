@@ -56,10 +56,6 @@
     @apply border-red-600 bg-red-600 text-white;
   }
 
-  .badge-primary {
-    @apply border-blue-600 bg-blue-600 text-white;
-  }
-
   .badge-ai {
     @apply border-cyan-200 bg-cyan-50 text-cyan-700;
   }
@@ -152,48 +148,18 @@
     @apply bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-600 hover:text-white;
   }
 
-  .nav-stack {
-    @apply flex flex-col gap-3;
-  }
-
-  .nav-group {
-    @apply rounded-2xl border border-slate-200 bg-slate-50/70 p-2;
-  }
-
-  .nav-group > summary {
-    @apply flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2 text-xs font-black uppercase tracking-wide text-slate-500 transition hover:bg-white hover:text-blue-700;
-  }
-
-  .nav-group > summary::-webkit-details-marker,
-  .top-nav-group > summary::-webkit-details-marker,
   .mobile-nav > summary::-webkit-details-marker {
     display: none;
   }
 
-  .nav-group > summary:focus,
-  .top-nav-group > summary:focus,
   .mobile-nav > summary:focus,
-  .dashboard-section > summary:focus,
   .mobile-action-summary:focus {
     outline: none;
   }
 
-  .nav-group > summary:focus-visible,
-  .top-nav-group > summary:focus-visible,
   .mobile-nav > summary:focus-visible,
-  .dashboard-section > summary:focus-visible,
   .mobile-action-summary:focus-visible {
     @apply ring-2 ring-blue-500 ring-offset-2;
-  }
-
-  .nav-group > summary::after {
-    content: "+";
-    @apply text-sm font-black text-slate-400;
-  }
-
-  .nav-group[open] > summary::after {
-    content: "-";
-    @apply text-blue-600;
   }
 
   .top-nav {

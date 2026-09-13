@@ -52,7 +52,7 @@ export function employeeErrorMessage(error: unknown): string {
 /**
  * Return the current employee access level from the existing auth runtime or storage.
  */
-export function currentEmployeeAccessLevel(): string {
+function currentEmployeeAccessLevel(): string {
   const runtimeLevel = legacyAuthRuntime()?.employeeAccessLevel?.();
   if (runtimeLevel) return runtimeLevel;
 

@@ -7,7 +7,7 @@ import type {
   TaskPriorityItem
 } from "./taskTypes";
 
-export type TaskAction = "start" | "complete";
+type TaskAction = "start" | "complete";
 
 /**
  * Load tasks visible to the current user.

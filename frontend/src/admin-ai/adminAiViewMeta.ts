@@ -1,6 +1,6 @@
 import { type AdminAiNavigationItem, type AdminAiView } from "./AdminAiTypes";
 
-export type AdminAiViewMeta = {
+type AdminAiViewMeta = {
   readonly description: string;
   readonly href: string;
   readonly label: string;

@@ -4,7 +4,6 @@ from collections import Counter
 
 from app.models import AIFeedback, KnowledgeDocument, KnowledgeGap
 from app.services.knowledge_aging_service import (
-    knowledge_aging_state,
     knowledge_aging_summary,
 )
 from app.services.knowledge_quality_service import (
@@ -203,29 +202,6 @@ def knowledge_lifecycle_overview(documents=None):
     }
 
 
-def knowledge_lifecycle_document_state(document):
-    """Return the lifecycle state for one knowledge document."""
-    if not isinstance(document, KnowledgeDocument):
-        raise ValueError("document must be a KnowledgeDocument")
-    aging_state = knowledge_aging_state(document)
-    return {
-        "id": document.id,
-        "source_type": document.source_type,
-        "source_id": document.source_id,
-        "status": document.status,
-        "quality_status": document.quality_status,
-        "indexed": document.status == INDEXED_STATUS and (document.chunk_count or 0) > 0,
-        "ready_for_admin_approval": document.quality_status == "technician_confirmed",
-        "approved_for_quality": document.quality_status == APPROVED_QUALITY_STATUS,
-        "needs_indexing": document.status in {"pending", "stale"},
-        "needs_attention": document.status in PROBLEM_INDEX_STATUSES
-        or document.quality_status in DRAFT_QUALITY_STATUSES | {"outdated"}
-        or aging_state.should_mark_outdated,
-        "aging": aging_state.to_dict(),
-        "next_action": _document_next_action(document, aging_state),
-    }
-
-
 def _document_items(documents):
     """Return a list of knowledge documents, querying when no list is provided."""
     if documents is None:
@@ -300,26 +276,3 @@ def _next_actions(quality_status_counts, problem_count, non_approved_indexed, ag
     if not actions:
         actions.append("Lifecycle ist aktuell ohne offene Review- oder Indexsignale.")
     return actions
-
-
-def _document_next_action(document, aging_state=None):
-    """Return the recommended next lifecycle action for one knowledge document."""
-    if document.status in {"pending", "stale"}:
-        return "reindex"
-    if document.status in {"error", "no_text"}:
-        return "fix_source"
-    if aging_state is not None and aging_state.should_mark_outdated:
-        return "aging_review"
-    if document.quality_status in DRAFT_QUALITY_STATUSES:
-        return "technician_review"
-    if document.quality_status == "technician_confirmed":
-        return "admin_approval"
-    if document.quality_status == "outdated":
-        return "refresh"
-    if document.quality_status == "low_quality":
-        return "quality_review"
-    if document.quality_status == "duplicate":
-        return "merge_or_reject"
-    if document.quality_status == "rejected":
-        return "revise_or_archive"
-    return "none"

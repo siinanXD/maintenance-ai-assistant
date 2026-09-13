@@ -3,7 +3,6 @@
 from app.services.text_normalization_service import (
     expand_german_synonyms,
     normalize_query,
-    normalize_technical_term,
     normalize_text,
     tokenize_text,
 )
@@ -23,15 +22,6 @@ def test_normalize_query_handles_dash_variants_and_synonyms():
     assert "frequenzumrichter" in normalized
     assert "notaus" in normalized
     assert "emergency stop" in normalized
-
-
-def test_normalize_technical_term_returns_canonical_terms():
-    """Verify known technical aliases resolve to stable canonical terms."""
-    assert normalize_technical_term("FU") == "frequenzumrichter"
-    assert normalize_technical_term("PLC") == "sps"
-    assert normalize_technical_term("Not Aus") == "notaus"
-    assert normalize_technical_term("Emergency Stop") == "notaus"
-    assert normalize_technical_term("Antrieb") == "motor"
 
 
 def test_expand_german_synonyms_returns_known_technical_variants():

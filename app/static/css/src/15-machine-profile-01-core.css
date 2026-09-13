@@ -87,8 +87,7 @@
     box-shadow: var(--ui-shadow-xs);
   }
 
-  .empty-state,
-  .table-message {
+  .empty-state {
     border: 1px dashed var(--ui-border-strong);
     border-radius: var(--ui-radius);
     background: var(--color-bg-canvas);
@@ -96,22 +95,8 @@
     font-weight: 800;
   }
 
-  .cockpit-workbench,
   .ai-ops-command-grid {
     gap: 1rem;
-  }
-
-  .cockpit-board {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.85rem;
-    padding: 0.95rem;
-  }
-
-  .cockpit-column {
-    min-height: 15rem;
-    background: var(--ui-surface-soft);
-    padding: 0.9rem;
   }
 
   .activity-feed,
@@ -127,7 +112,6 @@
   .activity-feed-item,
   .ai-signal-card,
   .ai-system-row,
-  .ops-drilldown-row,
   .review-check-item,
   .knowledge-block {
     border-radius: var(--ui-radius);
@@ -154,12 +138,6 @@
     border-radius: var(--ui-radius);
     background: rgba(255, 255, 255, 0.7);
     padding: 0.9rem;
-  }
-
-  .surface-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
   }
 
   .ai-admin-nav {
@@ -201,27 +179,6 @@
     color: var(--ui-danger);
   }
 
-  .ai-admin-map {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-
-  .ai-admin-map a {
-    min-height: 7.2rem;
-    border-radius: var(--ui-radius);
-    border-color: var(--ui-border);
-    background: var(--color-bg-surface);
-    box-shadow: var(--ui-shadow-xs);
-  }
-
-  .ai-admin-map a.is-active {
-    border-color: var(--ui-primary);
-    background: var(--color-bg-canvas);
-    box-shadow: var(--ui-shadow-sm);
-  }
-
-  .ai-section-guide,
-  .ai-info-box-grid,
   .ai-safety-grid,
   .ai-capability-grid,
   .content-grid.two-columns {
@@ -231,15 +188,6 @@
   .chat-toggle {
     border-radius: var(--ui-radius);
     background: linear-gradient(135deg, var(--ui-primary), var(--ui-teal));
-  }
-
-  .page-header {
-    border: 1px solid var(--ui-border);
-    border-left: 5px solid var(--ui-primary);
-    border-radius: var(--ui-radius);
-    background: var(--ui-surface);
-    padding: 1.2rem;
-    box-shadow: var(--ui-shadow-sm);
   }
 
   .stat-card {

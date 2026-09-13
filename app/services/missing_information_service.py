@@ -75,15 +75,6 @@ KNOWLEDGE_TEXT_FIELDS = (
 )
 
 
-def missing_information_for_entry(entry_type, data, user=None):
-    """Return structured follow-up prompts for a supported entry type."""
-    if entry_type in {"error", "error_entry", "fault"}:
-        return missing_information_for_error_entry(data, user=user)
-    if entry_type in {"knowledge", "knowledge_entry", "training", "assistant_training"}:
-        return missing_information_for_knowledge_entry(data, user=user)
-    raise ValueError("entry_type must be error_entry or knowledge_entry")
-
-
 def missing_information_for_error_entry(data, user=None):
     """Return missing-information prompts for an error catalog payload."""
     payload = _payload_dict(data)

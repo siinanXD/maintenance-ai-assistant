@@ -1,7 +1,7 @@
 import { safeErrorMessage } from "../utils/errors";
 import { type AdminAiPayload } from "./adminAiApi";
 
-export type AdminAiPromptVersion = {
+type AdminAiPromptVersion = {
   readonly id?: unknown;
   readonly status?: unknown;
   readonly version?: unknown;

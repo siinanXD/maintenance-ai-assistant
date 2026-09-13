@@ -216,11 +216,6 @@ def list_shift_templates() -> list[ShiftTemplate]:
     return list(SHIFT_TEMPLATES.values())
 
 
-def list_shift_model_templates() -> list[ShiftTemplate]:
-    """Return all supported shift model templates for compatibility imports."""
-    return list_shift_templates()
-
-
 def get_shift_template(key: str) -> ShiftTemplate:
     """Return a shift template for a canonical key."""
     try:
@@ -259,11 +254,6 @@ def resolve_shift_template(value: object) -> ShiftTemplate:
     if "tag" in normalized or "1" in normalized:
         return SHIFT_TEMPLATES["one_shift"]
     return SHIFT_TEMPLATES["two_shift"]
-
-
-def resolve_shift_model_template(value: object) -> ShiftTemplate:
-    """Resolve a shift model template for compatibility imports."""
-    return resolve_shift_template(value)
 
 
 def normalize_template_value(value: object) -> str:

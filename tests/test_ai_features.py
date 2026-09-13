@@ -41,6 +41,7 @@ from app.services.ai_service import get_ai_provider
 from app.services.document_service import document_path
 from app.services.empty_retrieval_response_service import build_empty_retrieval_answer
 from app.services.knowledge_service import register_source_document
+from app.services.order_planning_service import plan_order
 from app.services.retrieval_telemetry_service import retrieval_quality_analytics
 from app.services.vector_sync_status_service import (
     clear_vector_sync_observability,
@@ -2480,31 +2481,6 @@ def test_technician_quality_status_permissions_are_scoped(
     assert foreign_response.status_code == 403
 
 
-def test_chat_templates_are_permission_aware(
-    client,
-    make_user,
-    set_dashboard_permission,
-    auth_headers,
-):
-    """Verify chat template suggestions are filtered by dashboard permissions."""
-    user = make_user(username="chat_template_user")
-    set_dashboard_permission(user["username"], "tasks", can_view=True, can_write=False)
-    set_dashboard_permission(user["username"], "errors", can_view=False)
-    set_dashboard_permission(user["username"], "machines", can_view=True)
-
-    response = client.get(
-        "/api/v1/ai/chat/templates",
-        headers=auth_headers(user["username"]),
-    )
-
-    messages = [item["message"] for item in response.get_json()["data"]["items"]]
-    assert response.status_code == 200
-    assert "Welche Tasks sind heute wichtig?" in messages
-    assert "Welche Maschinen brauchen Aufmerksamkeit?" in messages
-    assert "Was bedeutet Fehler E104?" not in messages
-    assert "Task erstellen: Maschine 3 macht Geraeusche" not in messages
-
-
 def test_knowledge_reindex_registers_generated_documents(
     client,
     make_user,
@@ -2710,12 +2686,10 @@ def test_task_update_marks_rag_source_stale_and_reindex_recovers(
 
 def test_order_plan_selects_machine_staff_and_material(
     app,
-    client,
     make_user,
     make_machine,
     make_material,
     make_employee,
-    auth_headers,
 ):
     """Verify the order planner checks machine fit, staffing and stock."""
     admin = make_user(
@@ -2758,20 +2732,19 @@ def test_order_plan_selects_machine_staff_and_material(
         )
         db.session.commit()
 
-    response = client.post(
-        "/api/v1/ai/order-plan",
-        headers=auth_headers(admin["username"]),
-        json={
-            "product": "Deckel",
-            "quantity": 10,
-            "department": "Produktion",
-            "work_date": "2026-05-18",
-        },
-    )
+    with app.app_context():
+        payload, error, _status = plan_order(
+            {
+                "product": "Deckel",
+                "quantity": 10,
+                "department": "Produktion",
+                "work_date": "2026-05-18",
+            },
+            db.session.get(User, admin["id"]),
+        )
 
-    payload = response.get_json()["data"]
     recommended = payload["recommended_plan"]
-    assert response.status_code == 200
+    assert error is None
     assert payload["type"] == "order_plan"
     assert recommended["machine"]["id"] == machine_id
     assert recommended["status"] == "feasible"
@@ -2782,12 +2755,11 @@ def test_order_plan_selects_machine_staff_and_material(
 
 
 def test_order_plan_reports_material_shortage(
-    client,
+    app,
     make_user,
     make_machine,
     make_material,
     make_employee,
-    auth_headers,
 ):
     """Verify the order planner exposes missing stock as a blocker."""
     admin = make_user(
@@ -2804,14 +2776,14 @@ def test_order_plan_reports_material_shortage(
         qualifications="Gehaeuse Linie",
     )
 
-    response = client.post(
-        "/api/v1/ai/order-plan",
-        headers=auth_headers(admin["username"]),
-        json={"product": "Gehaeuse", "quantity": 5, "department": "Produktion"},
-    )
+    with app.app_context():
+        payload, error, _status = plan_order(
+            {"product": "Gehaeuse", "quantity": 5, "department": "Produktion"},
+            db.session.get(User, admin["id"]),
+        )
 
-    recommended = response.get_json()["data"]["recommended_plan"]
-    assert response.status_code == 200
+    recommended = payload["recommended_plan"]
+    assert error is None
     assert recommended["status"] == "blocked"
     assert recommended["material_check"]["status"] == "shortage"
     assert recommended["material_check"]["missing"][0]["shortage"] == 2
@@ -3380,7 +3352,6 @@ def test_admin_ai_page_contains_ai_and_knowledge_ui(client):
     assert "Low Quality" in source
     assert "duplicate" in source
     assert "low_quality" in script
-    assert "data-ai-health-panel" in source
     assert "data-retrieval-slo-panel" in source
     assert "data-retrieval-slo-kpi={key}" in source
     assert "data-retrieval-slo-trends" in source

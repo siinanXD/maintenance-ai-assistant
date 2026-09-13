@@ -117,7 +117,7 @@ export function storedMaintenanceUser(): MaintenanceUser | null {
 /**
  * Return a user's department name.
  */
-export function userDepartmentName(user: MaintenanceUser | null): string {
+function userDepartmentName(user: MaintenanceUser | null): string {
   const department = user?.department;
   if (typeof department === "string") return department;
   return department?.name || "";

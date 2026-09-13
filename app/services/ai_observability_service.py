@@ -2087,11 +2087,6 @@ def _structured_module_distribution(chats):
     }
 
 
-def _structured_module(chat):
-    """Return the canonical module for one structured answer."""
-    return _structured_domain(chat) or "unknown"
-
-
 def _structured_module_label(module):
     """Return a compact German label for one structured module key."""
     labels = {**STRUCTURED_DOMAIN_LABELS, "unknown": "Unbekannt"}

@@ -151,7 +151,6 @@
    * hellblauen Verlauf.
    */
   .page-hero,
-  .dashboard-command-center,
   .ai-admin-hero,
   .machine-profile-hero {
     background: var(--color-bg-surface);
@@ -160,7 +159,6 @@
 
   /* Blaues Streifenmuster im Kopfbereich (13-activity-feed-03). */
   .page-hero::after,
-  .dashboard-command-center::after,
   .ai-admin-hero::after {
     background: none;
   }
@@ -222,7 +220,6 @@
    */
   .page-kicker,
   .section-kicker,
-  .eyebrow-label,
   .control-center-topbar .page-kicker {
     /* !important nur, weil eine Legacy-Regel die Farbe bereits mit !important auf --ui-primary setzt. */
     color: var(--color-text-muted) !important;
@@ -262,7 +259,6 @@
   }
 
   /* Wertfelder in Karten: hellblau (#f4f8fc/#dbe6f0) in sieben Kartentypen. */
-  .cockpit-task-meta span,
   .record-card-meta span,
   .error-card-meta span,
   .task-card-meta span,
@@ -274,11 +270,7 @@
   }
 
   .record-card,
-  .quick-action-row,
-  .ai-action-card,
   .ai-clarity-panel,
-  .ai-info-box,
-  .ai-provider-panel,
   .ai-reindex-command-panel,
   .ai-observability-panel {
     border-left-color: var(--color-border-strong);

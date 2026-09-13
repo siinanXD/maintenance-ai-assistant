@@ -1,4 +1,3 @@
-  .rag-board-layout,
   .source-test-layout,
   .effectiveness-chart-grid {
     display: grid;
@@ -35,7 +34,6 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .rag-board-scorebar,
   .source-test-score-grid,
   .rag-index-track {
     display: grid;
@@ -47,7 +45,6 @@
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
-  .rag-board-scorebar article,
   .source-test-score-grid article,
   .rag-index-track article,
   .effectiveness-chart,
@@ -59,7 +56,6 @@
     padding: 0.8rem;
   }
 
-  .rag-board-scorebar span,
   .source-test-score-grid span,
   .rag-index-track span,
   .effectiveness-chart > span {
@@ -68,7 +64,6 @@
     font-weight: 820;
   }
 
-  .rag-board-scorebar strong,
   .source-test-score-grid strong,
   .rag-index-track strong {
     display: block;
@@ -181,38 +176,6 @@
     color: var(--ui-text);
     font-size: 0.88rem;
     font-weight: 900;
-  }
-
-  .rag-board-legend {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.1rem;
-    margin: 0.9rem 0 1rem;
-    color: var(--ui-muted);
-    font-size: 0.75rem;
-    font-weight: 780;
-  }
-
-  .rag-board-legend i {
-    display: inline-block;
-    width: 0.55rem;
-    height: 0.55rem;
-    margin-right: 0.3rem;
-    border-radius: 999px;
-    vertical-align: middle;
-  }
-
-  .rag-board-legend .is-good {
-    background: var(--ui-green);
-  }
-
-  .rag-board-legend .is-watch {
-    background: var(--ui-amber);
-  }
-
-  .rag-board-legend .is-critical {
-    background: var(--ui-red);
   }
 
   .rag-action-stack {

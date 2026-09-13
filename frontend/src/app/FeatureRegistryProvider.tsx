@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useMemo, type ReactNode } from "react";
 
 import { legacyFeatureRegistry, type MaintenanceFeatureRegistry } from "./runtimeBridge";
 
@@ -12,9 +12,3 @@ export function FeatureRegistryProvider({ children }: { readonly children: React
   return <FeatureRegistryContext.Provider value={registry}>{children}</FeatureRegistryContext.Provider>;
 }
 
-/**
- * Return the React feature registry context with a stable empty fallback.
- */
-export function useFeatureRegistry(): MaintenanceFeatureRegistry {
-  return useContext(FeatureRegistryContext) || { all: [] };
-}

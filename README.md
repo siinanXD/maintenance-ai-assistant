@@ -540,9 +540,9 @@ Current implementation:
 - Nach Änderung von Embedding Provider, Embedding Modell oder Vector Store müssen Knowledge-Dokumente vollständig neu indexiert werden.
 - RAG scoring weights (`RAG_SCORE_*`), recency, aging and feedback windows are configuration-only tuning knobs; keep `RAG_SCORE_DEBUG=false` outside diagnostics because score details are admin-facing explainability, not user answer text.
 - `retrieval_service.py` combines permission-aware structured retrieval with RAG knowledge chunks.
-- `rag_service.py` exposes the stable RAG facade; `langgraph_rag_workflow.py` contains the modular LangGraph retrieval orchestration with a deterministic fallback runner. The agent's `search_knowledge` tool runs these retrieval nodes (`build_rag_context`); the answer itself is generated in the agent loop. See `docs/LANGGRAPH_RAG_WORKFLOW.md`.
+- `rag_service.py` is the retrieval pipeline behind the agent's `search_knowledge` tool (`build_rag_context`); the answer itself is generated in the agent loop.
 - Empty retrieval never turns into an unsourced prompt: `search_knowledge` returns a grounded local no-answer (`## Keine belastbare Quelle gefunden`) and the response carries `diagnostics.empty_retrieval=true`.
-- AI chat, error assistant and order planning are rate limited per user via `AI_CHAT_RATE_LIMIT_PER_MINUTE` and answer `429` with `Retry-After` when exceeded.
+- AI chat and the error assistant are rate limited per user via `AI_CHAT_RATE_LIMIT_PER_MINUTE` and answer `429` with `Retry-After` when exceeded.
 - `retrieval_service.py` remains the single retrieval orchestration layer. Structured SQL retrieval, vector retrieval and keyword fallback stay separated as components; see `docs/AI_RAG_ARCHITECTURE.md`.
 - See `docs/MONGODB_ATLAS_VECTOR_SEARCH.md` for Atlas Vector Search setup, index configuration and fallback behavior.
 - `ai_traceability_service.py` stores metadata-only answer traces connected to chat messages and AI audit events. See `docs/AI_ANSWER_TRACEABILITY.md`.
@@ -580,7 +580,7 @@ Provider behavior:
 
 ### Maintenance Agent
 
-The chat (`POST /api/v1/ai/chat`, alias `POST /api/v1/ai/agent`) is a
+The chat (`POST /api/v1/ai/chat`) is a
 tool-using agent on top of the same services: a LangGraph loop with a
 deterministic safety guard, provider tool selection (OpenAI function calling
 or the offline mock policy), permission-gated tool execution and validation.

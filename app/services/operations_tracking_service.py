@@ -130,11 +130,6 @@ def record_event(
         return None
 
 
-def log_event(*args, **kwargs):
-    """Record one operations event using the public audit helper name."""
-    return record_event(*args, **kwargs)
-
-
 def _log_event_failure(event_type, entity_type, entity_id):
     """Log event failures without interrupting the primary workflow."""
     message = "operations_event_record_failed event_type=%s entity_type=%s entity_id=%s"
@@ -456,11 +451,6 @@ def aggregate_operations(period_type="day", args=None, user=None):
         saved.append(aggregate)
     db.session.commit()
     return {"aggregates": len(saved), "events": len(rows), "period_type": period_type}
-
-
-def retention_months():
-    """Return configured raw event retention in months."""
-    return int(current_app.config.get("OPERATIONS_EVENT_RETENTION_MONTHS", 24))
 
 
 def _ensure_range(args, start_at, end_at):

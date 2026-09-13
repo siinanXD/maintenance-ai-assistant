@@ -18,7 +18,7 @@ import {
   taskText
 } from "./dashboardTaskModel";
 
-export type DashboardFocusTone = "critical" | "good" | "muted" | "warning";
+type DashboardFocusTone = "critical" | "good" | "muted" | "warning";
 
 export type DashboardFocusItem = {
   readonly actionLabel: string;
@@ -44,7 +44,7 @@ export type DashboardSituationCard = {
   readonly value: string;
 };
 
-export type DashboardMachineHealthCounts = {
+type DashboardMachineHealthCounts = {
   readonly critical: number;
   readonly good: number;
   readonly muted: number;
@@ -63,14 +63,14 @@ export type DashboardAssetSignal = {
 /**
  * Return a stable key for flexible dashboard payloads.
  */
-export function dashboardPayloadKey(payload: DashboardPayload, fallback: string): string {
+function dashboardPayloadKey(payload: DashboardPayload, fallback: string): string {
   return String(payload.id ?? payload.name ?? payload.title ?? fallback);
 }
 
 /**
  * Return the most useful label for an incident row.
  */
-export function dashboardIncidentTitle(entry: DashboardPayload): string {
+function dashboardIncidentTitle(entry: DashboardPayload): string {
   return assetText(entry, "title", assetText(entry, "error_code", "Störung"));
 }
 

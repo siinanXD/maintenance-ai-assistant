@@ -90,40 +90,6 @@ def mongodb_timeout_ms(config=None):
     )
 
 
-def mongodb_status(config=None):
-    """Return prompt-safe MongoDB connectivity status for diagnostics."""
-    settings = _config(config)
-    database_name = mongodb_database_name(settings)
-    payload = {
-        "configured": mongodb_is_configured(settings),
-        "connected": False,
-        "database": database_name,
-        "collections_ready": False,
-        "collection_count": 0,
-        "reason": "",
-    }
-    if not payload["configured"]:
-        payload["reason"] = "mongodb_not_configured"
-        return payload
-
-    try:
-        database = get_mongodb_database(settings)
-        client = get_mongodb_client(settings)
-        client.admin.command("ping")
-        existing = set(database.list_collection_names())
-        expected = set(MAINTENANCE_MONGODB_COLLECTIONS)
-        payload["connected"] = True
-        payload["collection_count"] = len(existing.intersection(expected))
-        payload["collections_ready"] = expected.issubset(existing)
-        if not payload["collections_ready"]:
-            payload["reason"] = "collections_missing"
-    except MongoDBServiceError as exc:
-        payload["reason"] = str(exc)
-    except Exception as exc:
-        payload["reason"] = exc.__class__.__name__
-    return payload
-
-
 def get_mongodb_client(config=None, force_new=False):
     """Return a shared MongoDB client for the configured maintenance cluster."""
     global _MONGODB_CLIENT

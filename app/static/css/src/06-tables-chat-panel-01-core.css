@@ -35,15 +35,8 @@
   }
 
   .panel-meta.is-error,
-  .form-message.is-error,
-  .table-message.is-error {
+  .form-message.is-error {
     color: #dc2638;
-  }
-
-  .table-message {
-    color: var(--color-text-muted);
-    font-weight: 800;
-    text-align: center;
   }
 
   .workflow-status {
@@ -106,8 +99,7 @@
     animation: page-loading-bar 1.1s linear infinite;
   }
 
-  .page-hero,
-  .dashboard-page-hero {
+  .page-hero {
     border-radius: var(--ui-radius-md);
     border: 1px solid rgba(219, 228, 239, 0.85);
     background:
@@ -185,7 +177,6 @@
   }
 
   .empty-state,
-  .timeline-status,
   .interface-toast {
     border-radius: var(--ui-radius-sm);
   }

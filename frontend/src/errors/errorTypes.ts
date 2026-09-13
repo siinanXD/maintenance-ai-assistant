@@ -59,7 +59,7 @@ export type MessageState = {
   readonly error: boolean;
 };
 
-export type SimilarErrorMatch = {
+type SimilarErrorMatch = {
   readonly entry: ErrorEntry;
   readonly score: number;
   readonly reason?: string;
@@ -69,7 +69,7 @@ export type SimilarErrorResult = {
   readonly results?: readonly SimilarErrorMatch[];
 };
 
-export type ErrorAssistantSource = {
+type ErrorAssistantSource = {
   readonly title?: string;
   readonly source_type?: string;
   readonly url?: string;

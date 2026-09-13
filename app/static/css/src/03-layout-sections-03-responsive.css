@@ -6,8 +6,7 @@
     background: #fffafa;
   }
 
-  .ai-status-overview-card span,
-  .ai-info-box span {
+  .ai-status-overview-card span {
     color: #0b72e7;
     font-size: 0.68rem;
     font-weight: 950;
@@ -33,120 +32,6 @@
     border-left: 4px solid var(--ui-blue);
   }
 
-  .ai-clarity-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-
-  .ai-clarity-card {
-    display: grid;
-    min-width: 0;
-    align-content: start;
-    gap: 0.28rem;
-    border: 1px solid #dce8f4;
-    border-left: 4px solid var(--color-border-strong);
-    border-radius: 0.55rem;
-    background: var(--color-bg-surface);
-    padding: 0.78rem;
-    box-shadow: 0 0.55rem 1.35rem rgba(15, 23, 42, 0.045);
-  }
-
-  .ai-clarity-card.is-active {
-    border-left-color: var(--ui-green);
-    background: #f8fffb;
-  }
-
-  .ai-clarity-card.is-stale {
-    border-left-color: var(--ui-orange);
-    background: #fffdf7;
-  }
-
-  .ai-clarity-card.is-error {
-    border-left-color: var(--ui-red);
-    background: #fffafa;
-  }
-
-  .ai-clarity-card.is-muted {
-    border-left-color: var(--color-border-strong);
-    background: var(--color-bg-canvas);
-  }
-
-  .ai-clarity-card span,
-  .ai-clarity-list-header strong {
-    color: #0b72e7;
-    font-size: 0.68rem;
-    font-weight: 950;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .ai-clarity-card strong {
-    color: #071527;
-    font-size: 1.18rem;
-    font-weight: 950;
-    line-height: 1.05;
-    overflow-wrap: anywhere;
-  }
-
-  .ai-clarity-card small {
-    color: var(--ui-muted);
-    font-size: 0.74rem;
-    line-height: 1.35;
-  }
-
-  .ai-clarity-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
-    align-items: start;
-  }
-
-  .ai-clarity-detail-grid .stats-list {
-    min-width: 0;
-    min-height: 11rem;
-    border-color: #dce8f4;
-    background: var(--color-bg-surface);
-  }
-
-  .ai-clarity-list-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    padding-bottom: 0.35rem;
-  }
-
-  .ai-info-box-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.75rem;
-  }
-
-  .ai-info-box {
-    display: grid;
-    gap: 0.35rem;
-    border: 1px solid #bfdcf8;
-    border-left: 4px solid var(--ui-blue);
-    border-radius: 0.65rem;
-    background: var(--color-bg-canvas);
-    padding: 0.9rem 1rem;
-  }
-
-  .ai-info-box strong {
-    color: #0b1b33;
-    font-size: 0.95rem;
-    font-weight: 900;
-    line-height: 1.25;
-  }
-
-  .ai-info-box p {
-    margin: 0;
-    color: #40516a;
-    font-size: 0.86rem;
-    line-height: 1.5;
-  }
-
   .admin-ai-toolbar {
     align-items: center;
     justify-content: flex-end;
@@ -164,13 +49,8 @@
     min-width: min(100%, 22rem);
   }
 
-  .ai-provider-panel,
   .ai-reindex-command-panel {
     border-left: 4px solid var(--ui-blue);
-  }
-
-  .ai-provider-card {
-    min-height: 6.25rem;
   }
 
   .ai-safety-grid {

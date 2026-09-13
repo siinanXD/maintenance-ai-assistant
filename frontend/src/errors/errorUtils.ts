@@ -160,7 +160,7 @@ export function incidentDate(value: unknown): string {
 /**
  * Build the searchable plain text for one error entry.
  */
-export function incidentSearchText(entry: ErrorEntry): string {
+function incidentSearchText(entry: ErrorEntry): string {
   return [
     entry.error_code,
     entry.machine,

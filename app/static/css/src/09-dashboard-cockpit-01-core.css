@@ -1,24 +1,9 @@
   }
 
-  .cockpit-board {
-    gap: .625rem;
-  }
-
-  .cockpit-column {
-    min-height: 11rem;
-    border-radius: .85rem;
-    padding: .85rem;
-  }
-
   .shift-calendar {
     gap: .625rem;
   }
 
-  .shift-calendar-day {
-    min-height: 7.5rem;
-    border-radius: .85rem;
-    padding: .75rem;
-  }
 }
 
 @layer components {

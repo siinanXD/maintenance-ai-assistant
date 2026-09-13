@@ -378,14 +378,13 @@ for _tool_name, (_scope, _description) in SCOPE_SEARCH_TOOLS.items():
 def _search_knowledge(user, arguments):
     """Search maintenance knowledge through the full hybrid retrieval pipeline.
 
-    Uses the LangGraph retrieval nodes (structured SQL + vector + keyword
+    Uses the retrieval pipeline (structured SQL + vector + keyword
     fallback, safety, conflicts, explainability). When nothing is found, the
     grounded no-answer text is included so the model can answer honestly.
     """
     from app.services.ai_question_normalizer import detect_requested_scopes
     from app.services.empty_retrieval_response_service import build_empty_retrieval_answer
-    from app.services.langgraph_rag_workflow import prompt_rules_for_retrieval
-    from app.services.rag_service import build_rag_context
+    from app.services.rag_service import build_rag_context, prompt_rules_for_retrieval
 
     query = arguments["query"]
     retrieval = build_rag_context(query, user, requested_scopes=detect_requested_scopes(query))

@@ -17,20 +17,12 @@
   }
 
   body.high-contrast .app-card,
-  body.high-contrast .ai-action-card,
-  body.high-contrast .ai-feature-card,
   body.high-contrast .hero-command-panel,
-  body.high-contrast .priority-insight,
   body.high-contrast .knowledge-block,
   body.high-contrast .rag-source-panel,
-  body.high-contrast .rag-source-chip,
   body.high-contrast .ai-action-preview,
   body.high-contrast .ai-response,
   body.high-contrast .kpi-card,
-  body.high-contrast .dashboard-section,
-  body.high-contrast .dashboard-section > summary,
-  body.high-contrast .cockpit-column,
-  body.high-contrast .cockpit-task-card,
   body.high-contrast .task-card,
   body.high-contrast .stat-row,
   body.high-contrast .resource-card,
@@ -38,10 +30,7 @@
   body.high-contrast .resource-note,
   body.high-contrast .upload-check-panel,
   body.high-contrast .review-score-card,
-  body.high-contrast .timeline-item,
   body.high-contrast .review-check-item,
-  body.high-contrast .shiftplan-card,
-  body.high-contrast .shift-calendar-day,
   body.high-contrast .table-wrap,
   body.high-contrast .data-table,
   body.high-contrast .modal-box,
@@ -58,22 +47,16 @@
 
   body.high-contrast .panel-meta,
   body.high-contrast .hero-command-label,
-  body.high-contrast .ai-action-card span,
   body.high-contrast .page-description,
   body.high-contrast .stat-label,
   body.high-contrast .kpi-meta,
   body.high-contrast .task-card-description,
-  body.high-contrast .cockpit-task-meta,
-  body.high-contrast .shift-calendar-time,
-  body.high-contrast .shift-calendar-meta,
   body.high-contrast .resource-card-subtitle,
   body.high-contrast .resource-label,
   body.high-contrast .resource-value,
   body.high-contrast .machine-profile-record-summary,
   body.high-contrast .machine-profile-record-header p,
-  body.high-contrast .machine-profile-empty strong,
-  body.high-contrast .rag-source-chip small,
-  body.high-contrast .timeline-summary {
+  body.high-contrast .machine-profile-empty strong {
     @apply text-slate-200;
   }
 
@@ -84,11 +67,9 @@
   }
 
   body.high-contrast .btn,
-  body.high-contrast .ai-action-card.is-button,
   body.high-contrast .nav-link,
   body.high-contrast .top-nav-link,
   body.high-contrast .mobile-nav,
-  body.high-contrast .top-nav-panel,
   body.high-contrast .mobile-nav-panel {
     @apply border-slate-500 bg-slate-900 text-white;
   }
@@ -106,26 +87,6 @@
     @apply border-slate-500 bg-slate-950 text-white;
   }
 
-  body.high-contrast .shift-calendar-day.is-green {
-    @apply border-green-300 bg-green-950 text-green-100;
-  }
-
-  body.high-contrast .shift-calendar-day.is-blue {
-    @apply border-blue-300 bg-blue-950 text-blue-100;
-  }
-
-  body.high-contrast .shift-calendar-day.is-red {
-    @apply border-red-300 bg-red-950 text-red-100;
-  }
-
-  body.high-contrast .shift-calendar-day.is-violet {
-    @apply border-violet-300 bg-violet-950 text-violet-100;
-  }
-
-  body.high-contrast .shift-calendar-day.is-amber {
-    @apply border-amber-300 bg-amber-950 text-amber-100;
-  }
-
   body.high-contrast .knowledge-block.is-cause {
     @apply border-amber-300 bg-amber-950 text-amber-100;
   }
@@ -136,18 +97,6 @@
 }
 
 @layer components {
-  .control-center-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.72fr);
-    gap: 1.25rem;
-    align-items: start;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-      linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(20, 184, 166, 0.08));
-    box-shadow: var(--ui-shadow-md);
-  }
-
   .control-center-copy {
     min-width: 0;
   }
@@ -181,41 +130,13 @@
     min-height: 10rem;
   }
 
-  .control-center-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(20rem, 0.78fr);
-    gap: 1rem;
-    align-items: start;
-    margin-top: 1rem;
-  }
-
-  .control-center-grid > .operations-status-card {
-    grid-column: span 2;
-  }
-
-  .control-center-side-column {
-    display: grid;
-    gap: 1rem;
-  }
-
-  .control-center-side-column {
-    position: sticky;
-    top: 5.5rem;
-  }
-
-  .critical-today-list,
-  .priority-task-list,
   .incident-card-list,
-  .machine-status-card-list,
-  .handover-card-list,
-  .people-hint-list {
+  .machine-status-card-list {
     display: grid;
     gap: 0.72rem;
   }
 
-  .control-center-item,
-  .machine-status-card,
-  .handover-card {
+  .machine-status-card {
     display: grid;
     gap: 0.35rem;
     min-width: 0;
@@ -229,22 +150,13 @@
     transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
   }
 
-  .control-center-item {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-  }
-
-  .control-center-item:hover,
-  .machine-status-card:hover,
-  .handover-card:hover {
+  .machine-status-card:hover {
     border-color: rgba(37, 99, 235, 0.32);
     box-shadow: var(--ui-shadow-sm);
     transform: translateY(-1px);
   }
 
-  .control-center-item strong,
-  .machine-status-card strong,
-  .handover-card strong {
+  .machine-status-card strong {
     display: block;
     min-width: 0;
     overflow-wrap: anywhere;

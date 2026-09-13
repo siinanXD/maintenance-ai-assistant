@@ -29,24 +29,6 @@
     gap: 0.7rem;
   }
 
-  .vacation-pending-card {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    border: 1px solid #dfe7f1;
-    border-radius: 0.55rem;
-    background: var(--color-bg-surface);
-    padding: 0.85rem;
-  }
-
-  .vacation-summary-table-wrap {
-    max-height: 26.25rem;
-    overflow: auto;
-    border: 1px solid #dfe7f1;
-    border-radius: 0.55rem;
-    background: var(--color-bg-surface);
-  }
-
   .vacation-card-actions {
     display: flex;
     align-items: flex-start;
@@ -57,71 +39,6 @@
   .vacation-card-actions {
     flex-wrap: wrap;
     justify-content: flex-end;
-  }
-
-  .vacation-summary-table {
-    min-width: 40rem;
-    margin: 0;
-  }
-
-  .vacation-summary-table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    border-bottom: 1px solid #dfe7f1;
-    background: var(--color-bg-canvas);
-    color: #34445c;
-    font-size: 0.7rem;
-    font-weight: 850;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
-  .vacation-summary-table td,
-  .vacation-summary-table th {
-    white-space: nowrap;
-  }
-
-  .vacation-summary-table tbody tr.is-critical {
-    background: #fff1f2;
-  }
-
-  .vacation-summary-table tbody tr.is-warning {
-    background: #fffbeb;
-  }
-
-  .vacation-summary-name {
-    color: var(--color-text-primary);
-    font-weight: 850;
-  }
-
-  .vacation-balance-chip {
-    display: inline-flex;
-    min-width: 2.25rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    background: #ecfdf3;
-    color: #15803d;
-    font-size: 0.76rem;
-    font-weight: 850;
-    line-height: 1;
-    padding: 0.35rem 0.55rem;
-  }
-
-  .vacation-balance-chip.is-warning {
-    background: #fff7ed;
-    color: #c2410c;
-  }
-
-  .vacation-balance-chip.is-critical {
-    background: #ffe4e6;
-    color: #be123c;
-  }
-
-  .vacation-balance-chip.is-muted {
-    background: var(--color-bg-surface-sunken);
-    color: var(--color-text-secondary);
   }
 
   .vacation-hero {
@@ -135,7 +52,6 @@
       radial-gradient(circle at 12% 15%, rgba(20, 184, 166, 0.12), transparent 32%);
   }
 
-  .vacation-hero-actions,
   .vacation-history-controls {
     display: flex;
     flex-wrap: wrap;

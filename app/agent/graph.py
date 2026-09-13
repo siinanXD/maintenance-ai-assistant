@@ -100,7 +100,7 @@ RAG_META_KEYS = (
     "retrieval_duration_ms",
     "retrieval_debug",
     "explainability",
-    "langgraph",
+    "pipeline_trace",
 )
 DEFAULT_MAX_ITERATIONS = 4
 DEFAULT_HISTORY_MESSAGES = 4

@@ -16,15 +16,15 @@ export type InventoryMaterial = {
   readonly total_value?: number;
 };
 
-export type ForecastTask = {
+type ForecastTask = {
   readonly title?: string;
 };
 
-export type ForecastMaterial = {
+type ForecastMaterial = {
   readonly name?: string;
 };
 
-export type ForecastMachine = {
+type ForecastMachine = {
   readonly name?: string;
 };
 

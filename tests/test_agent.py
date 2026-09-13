@@ -647,7 +647,7 @@ def test_agent_confirm_endpoint_executes_action(app, client, make_user, auth_hea
     headers = auth_headers(technician["username"])
 
     response = client.post(
-        "/api/v1/ai/agent",
+        "/api/v1/ai/chat",
         headers=headers,
         json={"message": "Task anlegen: Schmierung Linie 5 pruefen", "session_id": "confirm-1"},
     )
@@ -713,7 +713,7 @@ def test_agent_route_persists_chat_and_lists_tools(app, client, make_user, make_
     headers = auth_headers(user["username"])
 
     response = client.post(
-        "/api/v1/ai/agent",
+        "/api/v1/ai/chat",
         headers=headers,
         json={"message": "Welche offenen Tasks gibt es?", "session_id": "route-1"},
     )
@@ -766,7 +766,7 @@ def test_daily_token_budget_blocks_requests(app, client, make_user, auth_headers
         db.session.add(AIAuditEvent(user_id=user["id"], workflow="chat", total_tokens=10))
         db.session.commit()
 
-    response = client.post("/api/v1/ai/agent", headers=headers, json={"message": "Welche Tasks?"})
+    response = client.post("/api/v1/ai/chat", headers=headers, json={"message": "Welche Tasks?"})
 
     assert response.status_code == 429
     assert response.get_json()["error"] == "ai_daily_token_budget_exceeded"

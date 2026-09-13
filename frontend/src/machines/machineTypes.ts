@@ -18,7 +18,7 @@ export type MachineDraft = {
   readonly required_employees: string;
 };
 
-export type MachineHistoryItem = {
+type MachineHistoryItem = {
   readonly type?: string;
   readonly date?: string;
   readonly title?: string;

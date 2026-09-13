@@ -2,21 +2,15 @@
     .surface-stat-grid,
     .executive-kpi-grid,
     .dashboard-grid.dashboard-grid-4,
-    .ai-status-overview,
-    .ai-admin-kpi-grid,
-    .ai-admin-map {
+    .ai-status-overview {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .task-card-grid,
     .kanban-board,
     .error-card-grid,
-    .document-card-grid,
     .record-card-grid,
-    .machine-profile-kpi-grid,
-    .cockpit-board,
-    .ai-action-grid,
-    .page-command-bar {
+    .machine-profile-kpi-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -28,14 +22,10 @@
       position: static;
     }
 
-    .ai-admin-hero,
-    .knowledge-center-shell {
+    .ai-admin-hero {
       grid-template-columns: 1fr;
     }
 
-    .knowledge-test-chat {
-      min-height: 24rem;
-    }
   }
 
   @media (max-width: 760px) {
@@ -48,7 +38,6 @@
     }
 
     .page-hero,
-    .dashboard-command-center,
     .ai-admin-hero {
       padding: 1rem;
     }
@@ -57,16 +46,10 @@
     .executive-kpi-grid,
     .dashboard-grid.dashboard-grid-4,
     .ai-status-overview,
-    .ai-admin-kpi-grid,
-    .ai-admin-map,
     .task-card-grid,
     .kanban-board,
     .error-card-grid,
     .error-card-blocks,
-    .document-card-grid,
-    .cockpit-board,
-    .ai-action-grid,
-    .page-command-bar,
     .machine-profile-layout,
     .machine-profile-kpi-grid,
     .machine-profile-facts,
@@ -117,73 +100,10 @@
       display: grid;
     }
 
-    .catalog-card-table .data-table,
-    .document-card-table .data-table {
-      min-width: 0;
-    }
-
-    .catalog-card-table .data-table thead,
-    .document-card-table .data-table thead {
-      display: none;
-    }
-
-    .catalog-card-table .data-table tbody,
-    .document-card-table .data-table tbody {
-      display: grid;
-      gap: 0.75rem;
-      padding: 0.75rem;
-    }
-
-    .catalog-card-table .data-table tbody tr,
-    .document-card-table .data-table tbody tr {
-      display: grid;
-      gap: 0.35rem;
-      border: 1px solid var(--ui-border);
-      border-radius: var(--ui-radius);
-      background: var(--color-bg-surface);
-      padding: 0.75rem;
-      box-shadow: inset 4px 0 var(--ui-primary), var(--ui-shadow-xs);
-    }
-
-    .catalog-card-table .data-table td,
-    .document-card-table .data-table td {
-      display: grid;
-      grid-template-columns: minmax(6.5rem, 0.38fr) minmax(0, 1fr);
-      gap: 0.55rem;
-      border: 0;
-      padding: 0.25rem 0;
-      white-space: normal;
-    }
-
-    .catalog-card-table .data-table td::before,
-    .document-card-table .data-table td::before {
-      color: var(--ui-muted);
-      font-size: 0.68rem;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .catalog-card-table .data-table td:nth-child(1)::before { content: "Code"; }
-    .catalog-card-table .data-table td:nth-child(2)::before { content: "Maschine"; }
-    .catalog-card-table .data-table td:nth-child(3)::before { content: "Fehler"; }
-    .catalog-card-table .data-table td:nth-child(4)::before { content: "Bereich"; }
-    .catalog-card-table .data-table td:nth-child(5)::before { content: "Ursache"; }
-    .catalog-card-table .data-table td:nth-child(6)::before { content: "Lösung"; }
-    .catalog-card-table .data-table td:nth-child(7)::before { content: "Aktionen"; }
-
-    .document-card-table .data-table td:nth-child(1)::before { content: "Titel"; }
-    .document-card-table .data-table td:nth-child(2)::before { content: "Task/Maschine"; }
-    .document-card-table .data-table td:nth-child(3)::before { content: "Bereich"; }
-    .document-card-table .data-table td:nth-child(4)::before { content: "Status"; }
-    .document-card-table .data-table td:nth-child(5)::before { content: "Version/Summary"; }
-    .document-card-table .data-table td:nth-child(6)::before { content: "Aktionen"; }
-    .document-card-table .data-table td:nth-child(7)::before { content: "Erstellt"; }
-    .document-card-table .data-table td:nth-child(8)::before { content: "Aktionen"; }
   }
 }
 
-.machine-status-strip,
-.frequent-code-strip {
+.machine-status-strip {
   display: flex;
 }
 

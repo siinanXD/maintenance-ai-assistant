@@ -21,19 +21,19 @@ export type AdminEmployee = {
   readonly personnel_number?: string;
 };
 
-export type PermissionDashboard = {
+type PermissionDashboard = {
   readonly key: string;
   readonly label: string;
   readonly supports_employee_access?: boolean;
 };
 
-export type PermissionGroup = {
+type PermissionGroup = {
   readonly key: string;
   readonly label: string;
   readonly dashboards: readonly string[];
 };
 
-export type EmployeeAccessLevel = {
+type EmployeeAccessLevel = {
   readonly key: string;
   readonly label: string;
 };

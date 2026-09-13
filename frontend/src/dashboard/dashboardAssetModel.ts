@@ -1,7 +1,6 @@
-import { formatGermanDate } from "../utils/date";
 import { type DashboardPayload } from "./dashboardApi";
 
-export type DashboardSignal = "critical" | "good" | "muted" | "warning";
+type DashboardSignal = "critical" | "good" | "muted" | "warning";
 
 /**
  * Return a normalized text field from a dashboard payload.
@@ -46,52 +45,6 @@ export function activeDashboardIncidents(errors: readonly DashboardPayload[]): r
 }
 
 /**
- * Return frequent incident codes and counts for the dashboard strip.
- */
-export function frequentIncidentCodes(errors: readonly DashboardPayload[]): readonly (readonly [string, number])[] {
-  const counts = new Map<string, number>();
-
-  errors.forEach((entry) => {
-    const code = assetText(entry, "error_code", assetText(entry, "code", "ohne Code"));
-    counts.set(code, (counts.get(code) ?? 0) + 1);
-  });
-
-  return [...counts.entries()].sort((first, second) => second[1] - first[1]).slice(0, 5);
-}
-
-/**
- * Return a badge class for one incident.
- */
-export function incidentBadgeClass(entry: DashboardPayload): string {
-  const severity = assetText(entry, "severity").toLowerCase();
-  return severity === "critical" || severity === "high"
-    ? "badge badge-priority is-urgent"
-    : "badge badge-priority is-soon";
-}
-
-/**
- * Return a localized incident status label.
- */
-export function incidentStatusLabel(status: unknown): string {
-  const value = String(status || "open").toLowerCase();
-  if (value === "closed") return "Geschlossen";
-  if (value === "in_progress") return "In Arbeit";
-  if (value === "open") return "Offen";
-  return value;
-}
-
-/**
- * Return a compact date label for an incident timestamp.
- */
-export function incidentDateLabel(entry: DashboardPayload): string {
-  return formatGermanDate(assetText(entry, "last_seen_at", assetText(entry, "created_at")), {
-    day: "2-digit",
-    fallback: "-",
-    month: "2-digit"
-  });
-}
-
-/**
  * Return a dashboard severity class from a signal name.
  */
 export function dashboardSignalClass(signal: DashboardSignal): string {
@@ -132,12 +85,3 @@ export function machineStatusText(machine: DashboardPayload): string {
   return status;
 }
 
-/**
- * Return a badge class from a dashboard signal.
- */
-export function signalBadgeClass(signal: DashboardSignal): string {
-  if (signal === "critical") return "badge badge-status is-open";
-  if (signal === "warning") return "badge badge-status is-progress";
-  if (signal === "good") return "badge badge-status is-done";
-  return "badge badge-status is-neutral";
-}

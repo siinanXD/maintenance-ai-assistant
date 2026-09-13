@@ -1,4 +1,4 @@
-export type ReactIslandMountOptions = {
+type ReactIslandMountOptions = {
   readonly mountEvent: string;
   readonly mountedFlag: string;
 };
@@ -6,7 +6,7 @@ export type ReactIslandMountOptions = {
 /**
  * Publish the mounted state for static fallback loaders.
  */
-export function announceMount(mountedFlag: string, mountEvent: string): void {
+function announceMount(mountedFlag: string, mountEvent: string): void {
   (window as unknown as Record<string, unknown>)[mountedFlag] = true;
   window.dispatchEvent(new Event(mountEvent));
 }

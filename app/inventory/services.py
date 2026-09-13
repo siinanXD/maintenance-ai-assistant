@@ -80,12 +80,6 @@ def _materials_by_machine():
     return grouped
 
 
-def _match_machine(task, machines):
-    """Return the first machine whose name appears in the task text."""
-    machine, _reason = _match_machine_with_reason(task, machines)
-    return machine
-
-
 def _match_machine_with_reason(task, machines):
     """Return the best matching machine and a short explanation."""
     task_text = " ".join(

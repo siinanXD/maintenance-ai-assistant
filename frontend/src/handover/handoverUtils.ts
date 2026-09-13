@@ -92,7 +92,7 @@ export function machineName(handover: HandoverRecord): string {
 /**
  * Build the searchable text blob for one handover card.
  */
-export function handoverSearchText(handover: HandoverRecord): string {
+function handoverSearchText(handover: HandoverRecord): string {
   return [
     handover.department,
     handover.area,

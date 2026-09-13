@@ -44,12 +44,6 @@ def normalize_session_id(value):
     return normalized[:MAX_SESSION_ID_LENGTH]
 
 
-def structured_scope_to_dashboard_scope(structured_scope):
-    """Return the dashboard permission scope for a structured memory payload."""
-    entity_type = str((structured_scope or {}).get("entity_type") or "").strip()
-    return ENTITY_TYPE_SCOPES.get(entity_type)
-
-
 def build_structured_context_metadata(message, result, requested_scopes=None):
     """Return compact structured scope metadata to persist with chat diagnostics."""
     context = _safe_structured_context(result.get("structured_context") if result else None)
