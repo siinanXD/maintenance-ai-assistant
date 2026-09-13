@@ -200,6 +200,12 @@ def machine_detail_page(machine_id):
     return render_template("machine_detail.html", machine_id=machine_id)
 
 
+@web_bp.get("/maintenance")
+def maintenance_page():
+    """Render the inspections and maintenance plans page."""
+    return render_template("maintenance.html")
+
+
 @web_bp.get("/m/<int:machine_id>")
 def machine_short_link(machine_id):
     """Resolve the short link printed on machine QR labels."""

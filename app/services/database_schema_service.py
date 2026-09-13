@@ -315,6 +315,10 @@ LOCAL_DEV_SCHEMA_COLUMNS = {
         sa.Column("reopened_count", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("error_entry_id", sa.Integer(), nullable=True),
     ),
+    "maintenance_plan": (
+        sa.Column("kind", sa.String(length=20), nullable=False, server_default="maintenance"),
+        sa.Column("legal_basis", sa.String(length=120), nullable=False, server_default=""),
+    ),
     "machine": (
         sa.Column("site_id", sa.Integer(), nullable=True),
         sa.Column("criticality", sa.String(length=40), nullable=False, server_default="normal"),

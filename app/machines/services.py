@@ -2,7 +2,7 @@
 
 import io
 import logging
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from urllib.parse import quote_plus
 
 import segno
@@ -465,7 +465,7 @@ def _profile_maintenance_payload(plan):
     """Return a compact maintenance plan payload for the machine profile."""
     payload = plan.to_dict()
     payload["is_due"] = plan.is_active and plan.next_due_date <= date.today()
-    payload["ui_url"] = "/machines"
+    payload["ui_url"] = "/maintenance"
     return payload
 
 
@@ -503,6 +503,40 @@ def _machine_profile_materials(machine, user):
     return [material.to_dict() for material in materials]
 
 
+RELIABILITY_WINDOW_DAYS = 90
+
+
+def machine_reliability(errors, days=RELIABILITY_WINDOW_DAYS, now=None):
+    """Return availability, MTBF and MTTR over the last ``days`` from incidents.
+
+    Every incident in the window counts as one failure; its ``downtime_minutes``
+    is the repair time. Availability = (window - downtime) / window. MTBF and
+    MTTR are ``None`` without failures, so the UI can say "keine Ausfälle".
+    """
+    now = now or datetime.now(UTC)
+    since = now - timedelta(days=days)
+    failures = []
+    for error in errors:
+        created = error.get("created_at")
+        if not created:
+            continue
+        created_at = datetime.fromisoformat(created)
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=UTC)
+        if created_at >= since:
+            failures.append(int(error.get("downtime_minutes") or 0))
+    window_minutes = days * 24 * 60
+    downtime = min(sum(failures), window_minutes)
+    uptime = window_minutes - downtime
+    return {
+        "reliability_window_days": days,
+        "failure_count": len(failures),
+        "availability_percent": round(uptime / window_minutes * 100, 2),
+        "mtbf_hours": round(uptime / len(failures) / 60, 1) if failures else None,
+        "mttr_minutes": round(downtime / len(failures)) if failures else None,
+    }
+
+
 def _machine_profile_kpis(
     machine,
     open_tasks,
@@ -527,6 +561,7 @@ def _machine_profile_kpis(
     ]
     downtime_minutes = sum(int(error.get("downtime_minutes") or 0) for error in errors)
     return {
+        **machine_reliability(errors),
         "open_tasks": len(open_tasks),
         "active_errors": len(active_errors),
         "critical_errors": len(critical_errors),

@@ -850,6 +850,33 @@ GET  /api/v1/inventory/reorder
 Bestellmenge fuellt auf das Doppelte des Minimums auf und deckt den Verbrauch
 der letzten 90 Tage waehrend `lead_time_days`.
 
+## Pruefpflichten und Wartung
+
+Wartungsplaene (`/api/v1/machines/maintenance-plans`) haben `kind`
+(`maintenance` oder `inspection`) und `legal_basis` (z. B. `DGUV Vorschrift 3`).
+Jeder Plan liefert `due_state` (`overdue`, `due_soon` innerhalb von 30 Tagen,
+`ok`, `inactive`) und `last_record`.
+
+```http
+POST /api/v1/machines/maintenance-plans/{plan_id}/records
+Content-Type: application/json
+
+{ "performed_on": "2026-09-12", "performed_by": "TUEV Sued", "result": "defects",
+  "notes": "Kondensatableiter undicht" }
+```
+
+`passed` und `defects` setzen `next_due_date` auf Durchfuehrung plus Intervall,
+`failed` auf eine Nachpruefung nach 7 Tagen. Bei `defects` und `failed` entsteht
+eine Aufgabe "Maengel beheben" (`failed` dringend und sofort faellig), ausser
+`create_follow_up` ist `false`; dafuer braucht der Nutzer `tasks:write`.
+`GET` auf denselben Pfad listet alle Nachweise. Die Weboberflaeche liegt unter
+`/maintenance`.
+
+Das Maschinenprofil (`GET /api/v1/machines/{id}/profile`) liefert in `kpis`
+zusaetzlich `availability_percent`, `mtbf_hours`, `mttr_minutes` und
+`failure_count` fuer die letzten 90 Tage. Jede Stoerung zaehlt als Ausfall, ihre
+`downtime_minutes` als Reparaturzeit.
+
 ## QR-Etikett je Maschine
 
 ```http

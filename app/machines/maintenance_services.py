@@ -4,6 +4,7 @@ from datetime import UTC, date, datetime, timedelta
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.domain_models.machines import PLAN_KIND_INSPECTION, PLAN_KIND_MAINTENANCE, RECORD_RESULTS
 from app.extensions import db
 from app.handover.services import visible_handovers_query
 from app.models import (
@@ -11,6 +12,7 @@ from app.models import (
     GeneratedDocument,
     Machine,
     MaintenancePlan,
+    MaintenanceRecord,
     Priority,
     Role,
     ShiftHandover,
@@ -49,6 +51,18 @@ def parse_interval_days(value):
     return interval_days
 
 
+RETEST_AFTER_FAILURE_DAYS = 7
+PLAN_KINDS = (PLAN_KIND_MAINTENANCE, PLAN_KIND_INSPECTION)
+
+
+def parse_plan_kind(value, default=PLAN_KIND_MAINTENANCE):
+    """Return a valid plan kind."""
+    kind = str(value or default).strip()
+    if kind not in PLAN_KINDS:
+        raise ValueError("kind must be 'maintenance' or 'inspection'")
+    return kind
+
+
 def resolve_machine(machine_id):
     """Resolve an optional machine id from a plan payload."""
     if machine_id in (None, ""):
@@ -72,6 +86,8 @@ def create_maintenance_plan(data, user):
         department = get_department_for_payload(data, user)
         plan = MaintenancePlan(
             title=title,
+            kind=parse_plan_kind(data.get("kind")),
+            legal_basis=str(data.get("legal_basis") or "").strip()[:120],
             description=str(data.get("description") or "").strip(),
             interval_days=parse_interval_days(data.get("interval_days")),
             next_due_date=parse_date(data.get("next_due_date")),
@@ -105,6 +121,10 @@ def update_maintenance_plan(plan, data, user):
             plan.title = title
         if "description" in data:
             plan.description = str(data["description"] or "").strip()
+        if "kind" in data:
+            plan.kind = parse_plan_kind(data["kind"], default=plan.kind)
+        if "legal_basis" in data:
+            plan.legal_basis = str(data["legal_basis"] or "").strip()[:120]
         if "interval_days" in data:
             plan.interval_days = parse_interval_days(data["interval_days"])
         if "next_due_date" in data:
@@ -139,6 +159,80 @@ def delete_maintenance_plan(plan):
         db.session.rollback()
         return {"error": "Database error while deleting maintenance plan"}, 500
     return None, 204
+
+
+def record_maintenance(plan, data, user):
+    """Document one execution of a plan and schedule the next one.
+
+    ``passed`` and ``defects`` move the due date one interval past the execution
+    date. ``failed`` schedules a re-test after seven days. For ``defects`` and
+    ``failed`` a follow-up task is created unless ``create_follow_up`` is false;
+    that needs task write permission.
+    """
+    try:
+        performed_on = parse_date(data.get("performed_on"))
+        if performed_on > date.today():
+            raise ValueError("performed_on must not be in the future")
+        performed_by = str(data.get("performed_by") or "").strip()
+        if not performed_by:
+            raise ValueError("performed_by is required")
+        result = str(data.get("result") or "").strip()
+        if result not in RECORD_RESULTS:
+            raise ValueError("result must be 'passed', 'defects' or 'failed'")
+    except ValueError as exc:
+        return None, {"error": str(exc)}, 400
+
+    notes = str(data.get("notes") or "").strip()
+    wants_follow_up = result != "passed" and parse_optional_bool(
+        data.get("create_follow_up"), default=True
+    )
+    if wants_follow_up and not has_dashboard_permission(user, "tasks", "write"):
+        return None, {"error": "tasks write permission is required for a follow-up task"}, 403
+
+    follow_up_task = _follow_up_task(plan, result, notes, user) if wants_follow_up else None
+    record = MaintenanceRecord(
+        plan=plan,
+        performed_on=performed_on,
+        performed_by=performed_by[:120],
+        result=result,
+        notes=notes,
+        follow_up_task=follow_up_task,
+        recorded_by=user.id,
+    )
+    retest = result == "failed"
+    plan.next_due_date = performed_on + timedelta(
+        days=RETEST_AFTER_FAILURE_DAYS if retest else plan.interval_days
+    )
+    db.session.add(record)
+    try:
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        return None, {"error": "Database error while recording maintenance"}, 500
+    return record, None, 201
+
+
+def _follow_up_task(plan, result, notes, user):
+    """Build the task that fixes defects found during an execution."""
+    machine = f" ({plan.machine.name})" if plan.machine else ""
+    return Task(
+        title=f"Mängel beheben: {plan.title}{machine}"[:160],
+        description="\n".join(
+            part
+            for part in (
+                f"{'Prüfung' if plan.kind == PLAN_KIND_INSPECTION else 'Wartung'} "
+                f"{'nicht bestanden' if result == 'failed' else 'mit Mängeln'}.",
+                f"Grundlage: {plan.legal_basis}" if plan.legal_basis else "",
+                notes,
+            )
+            if part
+        ),
+        priority=Priority.URGENT if result == "failed" else Priority.SOON,
+        status=TaskStatus.OPEN,
+        due_date=date.today() + timedelta(days=0 if result == "failed" else 7),
+        department=plan.department,
+        created_by=user.id,
+    )
 
 
 def get_visible_maintenance_plan(plan_id, user):

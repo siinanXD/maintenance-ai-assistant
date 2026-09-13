@@ -30,6 +30,7 @@ def test_openapi_json_documents_core_endpoints(client):
     assert "/api/v1/attachments" in paths
     assert "/api/v1/tasks/{task_id}/materials" in paths
     assert "/api/v1/inventory/reorder" in paths
+    assert "/api/v1/machines/maintenance-plans/{plan_id}/records" in paths
     assert "/api/v1/machines/{machine_id}/qr.svg" in paths
     assert "/api/v1/ai/error-assistant" in paths
     assert "/api/v1/ai/feedback" in paths

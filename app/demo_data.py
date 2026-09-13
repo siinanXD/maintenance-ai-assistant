@@ -16,6 +16,7 @@ from app.demo_seed.assets import (
 from app.demo_seed.employees import EMPLOYEE_DATA
 from app.demo_seed.knowledge import (
     ACTIVE_ERROR_STATES,
+    INSPECTION_PLAN_DEFINITIONS,
     MAINTENANCE_PLAN_DEFINITIONS,
     MANUAL_DEFINITIONS,
     SHIFT_HANDOVER_DEFINITIONS,
@@ -37,6 +38,7 @@ from app.models import (
     Machine,
     MachineManual,
     MaintenancePlan,
+    MaintenanceRecord,
     Priority,
     Role,
     ShiftHandover,
@@ -366,6 +368,53 @@ def _seed_maintenance_plans(departments, users, machines):
         plan.priority = priority_map[priority]
         plan.is_active = is_active
         plan.machine = machine
+    _seed_inspection_plans(departments, creator, machines, today)
+
+
+def _seed_inspection_plans(departments, creator, machines, today):
+    """Create legally required inspections with their last documented execution."""
+    for (
+        title,
+        legal_basis,
+        description,
+        interval_days,
+        due_days,
+        dept_name,
+        machine_key,
+        last_execution,
+    ) in INSPECTION_PLAN_DEFINITIONS:
+        department = departments.get(dept_name)
+        if not department:
+            continue
+        plan = MaintenancePlan.query.filter_by(title=title, department=department).first()
+        if not plan:
+            plan = MaintenancePlan(
+                title=title,
+                department=department,
+                created_by=creator.id,
+                interval_days=interval_days,
+                next_due_date=today,
+            )
+            db.session.add(plan)
+        plan.kind = "inspection"
+        plan.legal_basis = legal_basis
+        plan.description = description
+        plan.interval_days = interval_days
+        plan.next_due_date = today + timedelta(days=due_days)
+        plan.priority = Priority.NORMAL
+        plan.is_active = True
+        plan.machine = _machine_by_key(machines, machine_key) if machine_key else None
+        if last_execution and not plan.records:
+            days_ago, performed_by, result, notes = last_execution
+            plan.records.append(
+                MaintenanceRecord(
+                    performed_on=today - timedelta(days=days_ago),
+                    performed_by=performed_by,
+                    result=result,
+                    notes=notes,
+                    recorded_by=creator.id,
+                )
+            )
 
 
 def _seed_tasks(departments, users, machines):

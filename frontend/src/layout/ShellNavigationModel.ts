@@ -15,6 +15,13 @@ export const SHELL_NAVIGATION_SECTIONS: readonly ShellNavigationSection[] = [
       { dashboardKey: "errors", href: "/errors", iconId: "icon-alert", label: "Störungen" },
       { dashboardKey: "tasks", href: "/tasks", iconId: "icon-tasks", label: "Aufgaben" },
       {
+        dashboardKey: "machines",
+        featureKey: "maintenance",
+        href: "/maintenance",
+        iconId: "icon-inspection",
+        label: "Prüfungen & Wartung"
+      },
+      {
         dashboardKey: "shiftplans",
         featureKey: "handover",
         href: "/handover",

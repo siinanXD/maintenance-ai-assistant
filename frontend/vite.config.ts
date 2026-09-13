@@ -26,6 +26,7 @@ export default defineConfig({
         inventory: resolve(configDirectory, "src/inventory/inventoryEntrypoint.tsx"),
         login: resolve(configDirectory, "src/login/loginEntrypoint.tsx"),
         machines: resolve(configDirectory, "src/machines/machinesEntrypoint.tsx"),
+        maintenance: resolve(configDirectory, "src/maintenance/maintenanceEntrypoint.tsx"),
         shellChrome: resolve(configDirectory, "src/layout/shellChromeEntrypoint.tsx"),
         shiftplans: resolve(configDirectory, "src/shiftplans/shiftplansEntrypoint.tsx"),
         tasks: resolve(configDirectory, "src/tasks/taskEntrypoint.tsx"),

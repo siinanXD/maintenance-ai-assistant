@@ -7,6 +7,7 @@ const SHELL_ICON_PATHS = {
   "icon-calendar": "M7 2h2v2h6V2h2v2h3v18H4V4h3V2Zm11 8H6v10h12V10ZM6 8h12V6H6v2Z",
   "icon-dashboard": "M4 13h7V4H4v9Zm9 7h7V4h-7v16ZM4 20h7v-5H4v5Z",
   "icon-document": "M6 2h8l5 5v15H6V2Zm7 1.8V8h4.2L13 3.8ZM8 12h8v2H8v-2Zm0 4h8v2H8v-2Z",
+  "icon-inspection": "M9 2h6v2h4v18H5V4h4V2Zm2 2v2h2V4h-2ZM7 6v14h10V6h-2v2H9V6H7Zm8.3 4.3 1.4 1.4-5.2 5.2-3.2-3.2 1.4-1.4 1.8 1.8 3.8-3.8Z",
   "icon-handover": "M7 7h9.2l-2.6-2.6L15 3l5 5-5 5-1.4-1.4L16.2 9H7V7Zm10 10H7.8l2.6 2.6L9 21l-5-5 5-5 1.4 1.4L7.8 15H17v2Z",
   "icon-inventory": "M4 5.5 12 2l8 3.5V18l-8 4-8-4V5.5Zm8 2.2 4.9-2.1L12 3.8 7.1 5.6 12 7.7Zm-6 9.1 5 2.5V9.4l-5-2.2v9.6Zm7 2.5 5-2.5V7.2l-5 2.2v9.9Z",
   "icon-machine": "M4 5h16v8H4V5Zm2 2v4h12V7H6Zm-1 8h14l2 4v1H3v-1l2-4Zm3 .8L7.4 18h9.2l-.6-2.2H8Z",
