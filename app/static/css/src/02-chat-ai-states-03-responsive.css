@@ -16,7 +16,6 @@
 
 @layer components {
   :root {
-    --sidebar-width: 268px;
     --ui-bg: #f4f7fb;
     --ui-surface: #ffffff;
     --ui-surface-muted: #f8fafc;
@@ -55,10 +54,6 @@
     background: #12263f;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: none;
-  }
-
-  .app-shell-layout.is-sidebar-collapsed {
-    --sidebar-width: 88px;
   }
 
   .app-shell-layout.is-sidebar-collapsed .sidebar-brand > span:not(.sidebar-brand-mark),

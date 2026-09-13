@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Maintenance Assistant{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b7cff'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='Arial,sans-serif' font-size='22' font-weight='800' fill='white'%3EMA%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}?v=20260529-ui-cockpit3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}?v=20260913-shell-tokens1">
   </head>
   <body class="app-body min-h-screen text-slate-900 antialiased">
     {% block app_shell %}
@@ -14,74 +14,39 @@
     <div id="maintenance-shell-icons-root"></div>
     <div class="app-shell-layout min-h-screen lg:grid lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]">
       <div id="maintenance-shell-sidebar-root" hidden></div>
-      <aside class="app-sidebar hidden lg:flex lg:min-h-screen lg:flex-col" data-react-shell-sidebar-fallback>
-        <a class="sidebar-brand" href="/">
+      {#
+        Platzhalter, keine Navigation: die Links kommen ausschliesslich aus
+        frontend/src/layout/ShellNavigationModel.ts. Eine zweite Linkliste hier
+        wuerde beim Hydrieren gegen die React-Variante ausgetauscht und dabei
+        Beschriftungen und Gruppenreihenfolge sichtbar springen lassen.
+      #}
+      <aside class="app-sidebar hidden lg:flex lg:min-h-screen lg:flex-col" data-react-shell-sidebar-fallback aria-hidden="true">
+        <span class="sidebar-brand">
           <span class="sidebar-brand-mark" aria-hidden="true">MA</span>
           <span>
             <span class="sidebar-brand-title">Maintenance</span>
             <span class="sidebar-brand-title">Assistant</span>
           </span>
-        </a>
-        <nav aria-label="Hauptnavigation" class="sidebar-nav" data-nav-root>
-          <section class="sidebar-nav-group" data-nav-group>
-            <h2>Cockpit</h2>
-            <a class="nav-link" href="/" data-dashboard-nav="dashboard"><span>Cockpit</span></a>
-          </section>
-          <section class="sidebar-nav-group" data-nav-group>
-            <h2>Arbeit</h2>
-            <a class="nav-link" href="/tasks" data-dashboard-nav="tasks"><span>Aufgaben</span></a>
-            <a class="nav-link" href="/errors" data-dashboard-nav="errors"><span>Fehlerliste</span></a>
-            <a class="nav-link" href="/handover" data-dashboard-nav="handover"><span>Schichtübergabe</span></a>
-          </section>
-          <section class="sidebar-nav-group" data-nav-group>
-            <h2>Planung &amp; Personal</h2>
-            <a class="nav-link" href="/employees" data-dashboard-nav="employees"><span>Mitarbeiter</span></a>
-            <a class="nav-link" href="/vacations" data-dashboard-nav="vacations"><span>Urlaubsplanung</span></a>
-            <a class="nav-link" href="/shiftplans" data-dashboard-nav="shiftplans"><span>Schichtplan</span></a>
-          </section>
-          <section class="sidebar-nav-group" data-nav-group>
-            <h2>Wissen &amp; Anlagen</h2>
-            <a class="nav-link" href="/machines" data-dashboard-nav="machines"><span>Maschinen</span></a>
-            <a class="nav-link" href="/inventory" data-dashboard-nav="inventory"><span>Lager</span></a>
-            <a class="nav-link" href="/documents" data-dashboard-nav="documents"><span>Dokumente</span></a>
-          </section>
-          <section class="sidebar-nav-group" data-nav-group>
-            <h2>Administration</h2>
-            <a class="nav-link is-admin-link" href="/admin/users" data-dashboard-nav="admin_users"><span>Benutzer</span></a>
-            <a class="nav-link is-admin-link" href="/admin/ai" data-dashboard-nav="admin_ai"><span>KI-Administration</span></a>
-          </section>
-        </nav>
+        </span>
       </aside>
       <div class="app-content min-w-0">
         <div id="maintenance-shell-topbar-root" hidden data-shell-title="{% block header_title %}Maintenance Assistant{% endblock %}"></div>
-        <header class="app-header" data-react-shell-topbar-fallback>
+        {#
+          Platzhalter, keine Bedienelemente: Suche, Werk, Datum, Schicht,
+          Benachrichtigungen und Benutzermenue rendert ShellTopbar.tsx. Nur der
+          serverseitige Seitentitel bleibt stehen, weil React ihn identisch
+          uebernimmt und er damit beim Hydrieren nicht springt.
+        #}
+        <header class="app-header" data-react-shell-topbar-fallback aria-hidden="true">
           <div class="mobile-header lg:hidden">
-            <a class="mobile-brand" href="/">
+            <span class="mobile-brand">
               <span class="sidebar-brand-mark" aria-hidden="true">MA</span>
               <span>Maintenance</span>
-            </a>
+            </span>
           </div>
           <div class="desktop-topbar">
-            <div class="topbar-title" aria-label="Aktuelle Seite: {{ self.header_title() }}">
+            <div class="topbar-title">
               {% block fallback_header_title %}{{ self.header_title() }}{% endblock %}
-            </div>
-            <div class="topbar-actions">
-              <form class="global-search" data-global-search-form role="search" autocomplete="off" action="/tasks">
-                <label class="sr-only" for="global-search-fallback">Globale Suche</label>
-                <input id="global-search-fallback" name="search" data-global-search-input type="search" placeholder="Aufgaben, Fehler, Dokumente suchen" aria-label="Globale Suche">
-              </form>
-              <button class="topbar-select" type="button" data-topbar-work><span>Werk 1</span></button>
-              <button class="topbar-select" type="button" data-topbar-date><span data-current-date>Heute</span></button>
-              <button class="notification-button" type="button" data-topbar-notifications aria-label="Benachrichtigungen">
-                <span class="notification-badge" data-notification-badge hidden>0</span>
-              </button>
-              <div class="user-menu" data-auth-session hidden>
-                <span class="user-avatar" aria-hidden="true">MA</span>
-                <span><strong data-session-name>Benutzer</strong><small>Angemeldet</small></span>
-                <button class="btn btn-ghost btn-sm" type="button" data-contrast-toggle>Hoher Kontrast</button>
-                <button class="btn btn-ghost btn-sm" type="button" data-logout-button>Abmelden</button>
-              </div>
-              <a data-auth-login-link class="btn btn-primary btn-sm" href="/login">Anmelden</a>
             </div>
           </div>
         </header>
@@ -93,8 +58,9 @@
     </div>
 
     <div id="maintenance-shell-chat-root" hidden></div>
-    <div class="chat-widget" data-react-shell-chat-fallback>
-      <button class="chat-toggle" type="button" aria-label="Maintenance AI Chat öffnen">AI</button>
+    {# Platzhalter ohne Funktion: den bedienbaren Chat rendert ShellChatWidget.tsx. #}
+    <div class="chat-widget" data-react-shell-chat-fallback aria-hidden="true">
+      <span class="chat-toggle">AI</span>
     </div>
     {% endblock %}
 

@@ -10,10 +10,6 @@
     box-shadow: none;
   }
 
-  .app-shell-layout.is-sidebar-collapsed {
-    --sidebar-width: 88px;
-  }
-
   .app-shell-layout.is-sidebar-collapsed .sidebar-brand > span:not(.sidebar-brand-mark),
   .app-shell-layout.is-sidebar-collapsed .sidebar-nav-group h2,
   .app-shell-layout.is-sidebar-collapsed .nav-link > span:not(.nav-icon),

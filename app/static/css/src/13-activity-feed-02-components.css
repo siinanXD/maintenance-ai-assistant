@@ -100,7 +100,6 @@
    * Kept at the end so it wins over older Tailwind/DaisyUI polish blocks.
    */
   :root {
-    --sidebar-width: 280px;
     --ui-bg: #edf3f8;
     --ui-bg-strong: #e6eef6;
     --ui-surface: #ffffff;
@@ -217,10 +216,6 @@
   }
 
   @media (min-width: 1024px) {
-    .app-shell-layout.is-sidebar-collapsed {
-      grid-template-columns: 4rem minmax(0, 1fr) !important;
-    }
-
     .app-shell-layout.is-sidebar-collapsed .app-sidebar {
       padding: 1rem 0.45rem;
       overflow-x: hidden;

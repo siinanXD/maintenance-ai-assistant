@@ -1,0 +1,18 @@
+/*
+ * Struktur der App-Huelle. Bewusst die letzte Quelldatei, damit sie ohne
+ * !important gewinnt.
+ *
+ * Die Spaltenbreite selbst kommt aus der Tailwind-Klasse in base.html
+ * (lg:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]) und damit aus dem Token
+ * in 00-shell-tokens.css. Eingeklappt zeigt dieselbe Variable auf den
+ * schmalen Wert, statt dass eine zweite Regel die Spalten neu setzt.
+ *
+ * Ersetzt: grid-template-columns: 264px ... !important (08-admin-ai-rag-05)
+ * und     grid-template-columns: 4rem ... !important  (13-activity-feed-02).
+ */
+
+@layer components {
+  .app-shell-layout.is-sidebar-collapsed {
+    --sidebar-width: var(--sidebar-width-collapsed);
+  }
+}
