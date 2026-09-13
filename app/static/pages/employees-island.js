@@ -21,8 +21,7 @@
 
   const reactMounted = await waitForReactIsland({
     mountedFlag: "maintenanceEmployeesReactMounted",
-    mountEvent: "maintenance-employees-react-mounted",
-    timeoutMs: 900
+    mountEvent: "maintenance-employees-react-mounted"
   });
 
   if (!reactMounted) reportEmployeesMountFailure();

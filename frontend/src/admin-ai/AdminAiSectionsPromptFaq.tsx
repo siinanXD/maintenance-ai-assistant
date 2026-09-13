@@ -84,8 +84,8 @@ export function AdminAiPromptFaq({
                 <span className="section-kicker">Prompts & FAQ</span>
                 <h3>Prompt-Versionen sind für technische Rollen ausgeblendet</h3>
                 <p className="panel-meta">
-                  FAQ-Entwuerfe und Wissensluecken bleiben sichtbar. Roh-Prompts,
-                  Prompt-Entwuerfe und Rollback-Aktionen sind IT/Master vorbehalten.
+                  FAQ-Entwürfe und Wissenslücken bleiben sichtbar. Roh-Prompts,
+                  Prompt-Entwürfe und Rollback-Aktionen sind IT/Master vorbehalten.
                 </p>
               </div>
             </div>

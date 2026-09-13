@@ -21,8 +21,7 @@
 
   const reactMounted = await waitForReactIsland({
     mountedFlag: "maintenanceHandoverReactMounted",
-    mountEvent: "maintenance-handover-react-mounted",
-    timeoutMs: 900
+    mountEvent: "maintenance-handover-react-mounted"
   });
 
   if (!reactMounted) reportHandoverMountFailure();

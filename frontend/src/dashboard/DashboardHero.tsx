@@ -58,7 +58,7 @@ export function DashboardHero({ dashboardState, statusChips }: DashboardHeroProp
         <span data-ai-ops-updated="">{status.updated}</span>
         <span data-dashboard-system-meta="">{status.meta}</span>
       </div>
-      <div className="dashboard-status-hook-row" aria-label="Sekundaere Statuswerte" hidden>
+      <div className="dashboard-status-hook-row" aria-label="Sekundäre Statuswerte" hidden>
         {statusChips.map((chip) => (
           <DashboardStatusHook key={chip.valueHook} chip={chip} />
         ))}

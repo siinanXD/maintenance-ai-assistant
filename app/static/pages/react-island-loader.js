@@ -1,4 +1,8 @@
-const DEFAULT_REACT_MOUNT_TIMEOUT_MS = 900;
+// A mount resolves immediately through its event, so a long ceiling costs a working
+// page nothing. 900 ms was too short for the larger islands (handover, shift plans)
+// while their first API calls were running, and showed a false "could not be loaded"
+// banner on pages that rendered correctly a moment later.
+const DEFAULT_REACT_MOUNT_TIMEOUT_MS = 8000;
 
 /**
  * Return true when React has mounted an island.
@@ -47,11 +51,31 @@ function waitForReactIsland(options) {
     const handleMounted = () => finish(true);
 
     window.addEventListener(options.mountEvent, handleMounted, { once: true });
-    window.setTimeout(
-      () => finish(reactIslandMounted(options)),
-      options.timeoutMs || DEFAULT_REACT_MOUNT_TIMEOUT_MS
-    );
+    window.setTimeout(() => {
+      const mounted = reactIslandMounted(options);
+      if (!mounted) clearFailureOnLateMount(options);
+      finish(mounted);
+    }, options.timeoutMs || DEFAULT_REACT_MOUNT_TIMEOUT_MS);
   });
+}
+
+/**
+ * Remove a mount-failure banner if the island mounts after the timeout after all.
+ *
+ * @param {object} options - Island wait options.
+ * @param {string} options.mountEvent - Event dispatched by React after mount.
+ * @returns {void}
+ */
+function clearFailureOnLateMount(options) {
+  window.addEventListener(
+    options.mountEvent,
+    () => {
+      if (window.maintenanceFrontend && window.maintenanceFrontend.setWorkflowStatus) {
+        window.maintenanceFrontend.setWorkflowStatus("", "info");
+      }
+    },
+    { once: true }
+  );
 }
 
 window.MaintenanceReactIslandLoader = {

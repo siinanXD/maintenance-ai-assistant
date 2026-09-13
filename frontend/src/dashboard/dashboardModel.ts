@@ -11,7 +11,10 @@ import {
 export type DashboardViewState = {
   readonly data: DashboardRuntimeData;
   readonly errorMessage: string;
+  /** Operational data (tasks, incidents, machines, people) is still loading. */
   readonly isLoading: boolean;
+  /** AI insights (briefing, AI and knowledge status) are still loading. */
+  readonly isInsightLoading: boolean;
 };
 
 export type DashboardKpiState = {
@@ -37,6 +40,7 @@ export type DashboardStatusChipState = {
 export const EMPTY_DASHBOARD_VIEW_STATE: DashboardViewState = {
   data: EMPTY_DASHBOARD_DATA,
   errorMessage: "",
+  isInsightLoading: true,
   isLoading: true
 };
 

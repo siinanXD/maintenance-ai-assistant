@@ -221,9 +221,12 @@
       element.hidden = loggedIn;
     });
 
-    if (loggedIn) {
+    // The React topbar (ShellTopbar.tsx) owns the notification badge on every shell page.
+    // Fetching here as well sent the same request two extra times per page view.
+    const reactOwnsNotifications = Boolean(document.getElementById("maintenance-shell-topbar-root"));
+    if (loggedIn && !reactOwnsNotifications) {
       refreshNotificationBadge();
-    } else {
+    } else if (!loggedIn) {
       updateNotificationBadge(0);
     }
 

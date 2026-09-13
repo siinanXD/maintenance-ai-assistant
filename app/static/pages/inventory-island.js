@@ -21,8 +21,7 @@
 
   const reactMounted = await waitForReactIsland({
     mountedFlag: "maintenanceInventoryReactMounted",
-    mountEvent: "maintenance-inventory-react-mounted",
-    timeoutMs: 900
+    mountEvent: "maintenance-inventory-react-mounted"
   });
 
   if (!reactMounted) reportInventoryMountFailure();

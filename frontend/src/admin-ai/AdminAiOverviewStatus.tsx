@@ -52,7 +52,7 @@ export function AdminAiOverviewStatus({ overviewState }: { readonly overviewStat
             {actionItems[0]?.key === "none" ? "Keine Aktion" : `${actionItems.length} offen`}
           </span>
         </div>
-        <ul className="action-hint-list" aria-label="Offene Admin-AI Massnahmen">
+        <ul className="action-hint-list" aria-label="Offene Admin-AI-Maßnahmen">
           {actionItems.map((item) => (
             <li className={`action-hint-item ${item.tone}`} key={item.key}>
               <div className="action-hint-copy">
@@ -79,7 +79,7 @@ export function AdminAiOverviewStatus({ overviewState }: { readonly overviewStat
           </div>
           <div className="table-wrap bounded-table-wrap">
             <table className="data-table">
-              <caption>Letzte KI-Fehler fuer schnelle Ursachenanalyse</caption>
+              <caption>Letzte KI-Fehler für schnelle Ursachenanalyse</caption>
               <thead>
                 <tr>
                   <th scope="col">Zeit</th>

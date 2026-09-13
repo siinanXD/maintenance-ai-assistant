@@ -27,6 +27,16 @@ from app.permissions import upsert_default_permissions
 _USER_COUNTER = count(1)
 
 
+@pytest.fixture(autouse=True)
+def _closed_atlas_circuit():
+    """Start every test with the Atlas circuit breaker closed."""
+    from app.services.vector_store_service import reset_atlas_circuit
+
+    reset_atlas_circuit()
+    yield
+    reset_atlas_circuit()
+
+
 @pytest.fixture()
 def app(tmp_path):
     """Create an isolated Flask app with an in-memory test database."""

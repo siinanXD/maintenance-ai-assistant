@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import { markIslandMounted } from "../app/islandMount";
+import { subscribeToSessionChange } from "../auth/sessionChange";
 import {
   SHIFTPLANS_ISLAND,
   SHIFTPLANS_ROOT_SELECTOR,
@@ -23,15 +24,8 @@ export function useShiftplansMountMarker(): void {
 }
 
 /**
- * Reload shiftplan data after login state changes.
+ * Reload shiftplan data after the login session actually changes.
  */
 export function useShiftplansAuthReload(onReload: () => void): void {
-  useEffect(() => {
-    window.addEventListener("maintenance-auth-ready", onReload);
-    window.addEventListener("maintenance-auth-changed", onReload);
-    return () => {
-      window.removeEventListener("maintenance-auth-ready", onReload);
-      window.removeEventListener("maintenance-auth-changed", onReload);
-    };
-  }, [onReload]);
+  useEffect(() => subscribeToSessionChange(onReload), [onReload]);
 }

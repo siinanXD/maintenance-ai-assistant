@@ -21,8 +21,7 @@
 
   const reactMounted = await waitForReactIsland({
     mountedFlag: "maintenanceDashboardReactMounted",
-    mountEvent: "maintenance-dashboard-react-mounted",
-    timeoutMs: 900
+    mountEvent: "maintenance-dashboard-react-mounted"
   });
 
   if (!reactMounted) reportDashboardMountFailure();

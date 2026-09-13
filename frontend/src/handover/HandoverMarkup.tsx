@@ -77,7 +77,7 @@ export function HandoverMarkup({
     <>
       <HandoverHero onCreateOpen={onCreateOpen} onFocusList={onFocusList} writable={writable} />
       <HandoverStats stats={stats} />
-      <section className="handover-workflow-grid" id="handover-workflow" aria-label="Schichtuebergabe Workflow">
+      <section className="handover-workflow-grid" id="handover-workflow" aria-label="Schichtübergabe-Workflow">
         <HandoverGuidance />
       </section>
       <HandoverList

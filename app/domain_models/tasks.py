@@ -74,13 +74,13 @@ class Task(db.Model):
             "due_date": self.due_date.isoformat(),
             "department": self.department.to_dict() if self.department else None,
             "created_by": self.created_by,
-            "creator": self.creator.to_dict() if self.creator else None,
+            "creator": self.creator.public_dict() if self.creator else None,
             "current_worker_id": self.current_worker_id,
-            "current_worker": (self.current_worker.to_dict() if self.current_worker else None),
+            "current_worker": (self.current_worker.public_dict() if self.current_worker else None),
             "started_at": self.started_at.isoformat() if self.started_at else None,
             "completed_by": self.completed_by_id,
             "completed_by_user": (
-                self.completed_by_user.to_dict() if self.completed_by_user else None
+                self.completed_by_user.public_dict() if self.completed_by_user else None
             ),
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
             "planned_minutes": self.planned_minutes,

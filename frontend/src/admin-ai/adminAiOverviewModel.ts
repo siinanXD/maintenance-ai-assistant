@@ -124,7 +124,7 @@ export function overviewCriticalCards(state: AdminAiOverviewLoadState): AdminAiS
       key: "no_source",
       label: "Ohne Quellen",
       value: percentText(noSourceRate),
-      detail: noSourceRate >= 0.2 ? "Schwellenwert kritisch" : "Antwortqualitaet im Zielbereich",
+      detail: noSourceRate >= 0.2 ? "Schwellenwert kritisch" : "Antwortqualität im Zielbereich",
       tone: noSourceRate >= 0.4 ? "is-error" : noSourceRate >= 0.2 ? "is-stale" : "is-active"
     },
     {
@@ -309,7 +309,7 @@ export function adminActionItems(state: AdminAiOverviewLoadState): AdminAiAction
 
   if (numberField(retrievalQuality, "knowledge_gaps_open") > 0) {
     actionItems.push({
-      detail: `${numberText(retrievalQuality.knowledge_gaps_open)} offene Wissensluecken.`,
+      detail: `${numberText(retrievalQuality.knowledge_gaps_open)} offene Wissenslücken.`,
       key: "open-knowledge-gaps",
       label: "Open knowledge gaps",
       tone: "is-stale"
@@ -336,7 +336,7 @@ export function adminActionItems(state: AdminAiOverviewLoadState): AdminAiAction
 
   if (numberField(feedback, "negative") > 0 || numberField(feedback, "not_helpful") > 0) {
     actionItems.push({
-      detail: `${numberText(feedback.negative || feedback.not_helpful)} negative Rueckmeldungen.`,
+      detail: `${numberText(feedback.negative || feedback.not_helpful)} negative Rückmeldungen.`,
       key: "negative-feedback",
       label: "Negative feedback",
       tone: "is-stale"
@@ -382,7 +382,7 @@ export function providerFields(state: AdminAiOverviewLoadState): AdminAiProvider
     {
       key: "streaming",
       label: "Streaming",
-      value: state.aiStatus?.streaming_available ? "aktiv" : "nicht verfuegbar",
+      value: state.aiStatus?.streaming_available ? "aktiv" : "nicht verfügbar",
       detail: state.aiStatus?.streaming_configured
         ? "Konfiguriert, API noch nicht freigegeben."
         : "Derzeit nicht konfiguriert."
@@ -399,7 +399,7 @@ export function providerDetailRows(state: AdminAiOverviewLoadState): AdminAiStat
     { label: "Modell", value: stringField(state.aiStatus, "model", "lokal") },
     {
       label: "Streaming",
-      value: state.aiStatus?.streaming_available ? "aktiv" : "nicht verfuegbar"
+      value: state.aiStatus?.streaming_available ? "aktiv" : "nicht verfügbar"
     },
     {
       label: "Letzter Fehler",

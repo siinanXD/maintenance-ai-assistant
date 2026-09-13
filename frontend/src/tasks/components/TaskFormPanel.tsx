@@ -134,14 +134,14 @@ export function TaskFormPanel({
                 onChange={(event) => updateField("department", event.target.value)}
                 value={draft.department}
               >
-                <option value="">Bereich waehlen</option>
+                <option value="">Bereich wählen</option>
                 {departments.map((department) => (
                   <option key={department.id ?? department.name} value={department.name}>{department.name}</option>
                 ))}
               </select>
             </div>
             <div className="field">
-              <label htmlFor="react-task-title">Ueberschrift</label>
+              <label htmlFor="react-task-title">Überschrift</label>
               <input
                 className="input input-bordered"
                 disabled={busy}
@@ -184,7 +184,7 @@ export function TaskFormPanel({
               </select>
             </div>
             <div className="field">
-              <label htmlFor="react-task-due-date">Faellig am</label>
+              <label htmlFor="react-task-due-date">Fällig am</label>
               <input
                 className="input input-bordered"
                 disabled={busy}

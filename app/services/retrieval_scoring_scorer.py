@@ -97,11 +97,46 @@ class HybridRetrievalScorer:
         self._known_departments_cache = None
         self._known_machines_cache = None
         self._known_manufacturers_cache = None
+        self._chunk_vectors = {}
+
+    def prime_chunk_vectors(self, chunks, batch_size=100):
+        """Resolve one comparable vector per chunk before scoring.
+
+        A stored chunk embedding is used when its dimension matches the query
+        vector. All other chunks are embedded together in batches. Embedding
+        each candidate on its own cost one provider round trip per chunk: 289
+        OpenAI calls and about 41 seconds for a single knowledge search.
+        """
+        if not self.query_vector or not self.embedding_provider:
+            return
+        dimension = len(self.query_vector)
+        pending = []
+        for chunk in chunks:
+            key = getattr(chunk, "id", None)
+            if key is None or key in self._chunk_vectors:
+                continue
+            stored = getattr(chunk, "embedding", None)
+            if stored is not None and len(stored) == dimension:
+                self._chunk_vectors[key] = list(stored)
+            else:
+                pending.append((key, getattr(chunk, "text", "") or ""))
+
+        for start in range(0, len(pending), batch_size):
+            batch = pending[start : start + batch_size]
+            try:
+                vectors = self.embedding_provider.embed_texts([text for _key, text in batch])
+            except Exception:  # noqa: BLE001 - provider errors degrade to no semantic signal
+                logger.warning("retrieval_chunk_embedding_batch_failed size=%s", len(batch))
+                for key, _text in batch:
+                    self._chunk_vectors[key] = None
+                continue
+            for (key, _text), vector in zip(batch, vectors, strict=False):
+                self._chunk_vectors[key] = vector
 
     def score_chunk(self, chunk, document):
         """Return the hybrid score for a persisted knowledge chunk."""
         text = getattr(chunk, "text", "") or ""
-        semantic_similarity = self._semantic_similarity(text)
+        semantic_similarity = self._chunk_semantic_similarity(chunk, text)
         token_text = getattr(chunk, "token_text", "") or text
         return self.score_text_result(
             text=text,
@@ -271,6 +306,16 @@ class HybridRetrievalScorer:
         if lexical_similarity > 0 or machine_signal > 0 or feedback_stats.success_count > 0:
             return True
         return semantic_similarity >= self.semantic_only_min_similarity
+
+    def _chunk_semantic_similarity(self, chunk, text):
+        """Return semantic similarity for a chunk, preferring primed vectors."""
+        key = getattr(chunk, "id", None)
+        if key in self._chunk_vectors:
+            vector = self._chunk_vectors[key]
+            if not vector or not self.query_vector:
+                return 0.0
+            return max(0.0, _cosine_similarity(self.query_vector, vector))
+        return self._semantic_similarity(text)
 
     def _semantic_similarity(self, text):
         """Return semantic similarity for local embedding-based retrieval."""

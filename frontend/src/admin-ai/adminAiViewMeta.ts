@@ -14,7 +14,7 @@ export type AdminAiViewMeta = {
  */
 export const ADMIN_AI_PRIMARY_NAVIGATION: readonly AdminAiNavigationItem[] = [
   {
-    description: "Status, Alerts, Kosten-Kurzinfo und letzte Aktivitaet.",
+    description: "Status, Alerts, Kosten-Kurzinfo und letzte Aktivität.",
     href: "/admin/ai",
     label: "Betrieb",
     number: "01",
@@ -62,14 +62,14 @@ export const ADMIN_AI_VIEW_META: Readonly<Record<AdminAiView, AdminAiViewMeta>> 
     label: "Betrieb",
     title: "KI-Betrieb",
     lead: "Monitoring, Alerts und Einstieg in Logs, Antworten und Prompts.",
-    description: "Status, Alerts, Kosten-Kurzinfo und letzte Aktivitaet."
+    description: "Status, Alerts, Kosten-Kurzinfo und letzte Aktivität."
   },
   technical: {
     view: "technical",
     href: "/admin/ai/technical",
     label: "Observability",
     title: "Observability",
-    lead: "Logging, Tracing, Metriken und Retrieval-Diagnose ohne Spieloberflaeche.",
+    lead: "Logging, Tracing, Metriken und Retrieval-Diagnose ohne Spieloberfläche.",
     description: "Logs, Tracing, Metriken, Retrieval-Diagnose und Jobs."
   },
   source_check: {
@@ -77,7 +77,7 @@ export const ADMIN_AI_VIEW_META: Readonly<Record<AdminAiView, AdminAiViewMeta>> 
     href: "/admin/ai/source-check",
     label: "Antworten",
     title: "Antworten prüfen",
-    lead: "Responses testen, Quellen sichten und Antwortqualitaet bewerten.",
+    lead: "Responses testen, Quellen sichten und Antwortqualität bewerten.",
     description: "Antworten testen, Quellen prüfen, Sicherheit und Feedback."
   },
   prompt_faq: {
@@ -101,7 +101,7 @@ export const ADMIN_AI_VIEW_META: Readonly<Record<AdminAiView, AdminAiViewMeta>> 
     href: "/admin/ai/effectiveness",
     label: "Kosten",
     title: "Kosten & Qualität",
-    lead: "Tokenverbrauch, geschaetzte Kosten und Qualitätssignale im Detail.",
+    lead: "Tokenverbrauch, geschätzte Kosten und Qualitätssignale im Detail.",
     description: "Detaillierte Kosten-, Feedback- und Qualitätsauswertung."
   }
 };

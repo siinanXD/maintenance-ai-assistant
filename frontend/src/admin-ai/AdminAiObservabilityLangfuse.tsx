@@ -64,7 +64,7 @@ export function AdminAiObservabilityLangfuse({
         <div>
           <h3>Langfuse Tracing</h3>
           <p className="panel-meta">
-            Externe Traces und Kostenmetriken. Vollstaendige Kostenansicht unter Betrieb oder
+            Externe Traces und Kostenmetriken. Vollständige Kostenansicht unter Betrieb oder
             /admin/ai/effectiveness.
           </p>
         </div>
@@ -82,7 +82,7 @@ export function AdminAiObservabilityLangfuse({
           <strong data-langfuse-runtime-host>
             {host ? (
               <a href={host} rel="noreferrer" target="_blank">
-                Langfuse oeffnen
+                Langfuse öffnen
               </a>
             ) : (
               "-"
@@ -90,7 +90,7 @@ export function AdminAiObservabilityLangfuse({
           </strong>
         </article>
         <article className="metric-card">
-          <span>Schluessel</span>
+          <span>Schlüssel</span>
           <strong data-langfuse-runtime-configured>{configured ? "gesetzt" : "fehlt"}</strong>
         </article>
       </div>

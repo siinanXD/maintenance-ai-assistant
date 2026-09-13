@@ -53,8 +53,12 @@ export function briefingSections(data: DashboardRuntimeData): readonly Dashboard
 /**
  * Return a compact briefing summary.
  */
-export function briefingSummary(data: DashboardRuntimeData): string {
-  return assetText(data.dailyBriefing ?? {}, "summary", "Kurzlage wird geladen.");
+export function briefingSummary(data: DashboardRuntimeData, isLoading = true): string {
+  return assetText(
+    data.dailyBriefing ?? {},
+    "summary",
+    isLoading ? "Kurzlage wird erstellt." : "Kurzlage ist gerade nicht verfügbar."
+  );
 }
 
 /**

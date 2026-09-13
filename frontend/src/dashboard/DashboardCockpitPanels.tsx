@@ -136,8 +136,8 @@ function ImmediateActionsPanel({ dashboardState, onOpenTask }: DashboardCockpitP
         ) : null}
         {primaryAction ? <PrimaryActionCard action={primaryAction} onOpenTask={onOpenTask} /> : null}
         {secondaryActions.length ? (
-          <div className="cockpit-next-list" aria-label="Naechste Eskalationen">
-            <span className="cockpit-section-label">Danach klaeren</span>
+          <div className="cockpit-next-list" aria-label="Nächste Eskalationen">
+            <span className="cockpit-section-label">Danach klären</span>
             {secondaryActions.map((action) => (
               <SecondaryActionRow key={action.id} action={action} onOpenTask={onOpenTask} />
             ))}
@@ -247,7 +247,7 @@ function peopleDecision(vacations: readonly DashboardPayload[], absent: readonly
       actionLabel: "Urlaub prüfen",
       href: "/vacations",
       meta: "Genehmigen oder ablehnen",
-      title: `${vacations.length} Urlaubsantraege offen`,
+      title: `${vacations.length} Urlaubsanträge offen`,
       tone: "warning"
     };
   }
@@ -324,7 +324,7 @@ function PeopleBriefingPanel({
           <h2>Schicht &amp; Personal</h2>
         </div>
         <a className="panel-link" data-feature-key="handover" data-dashboard-nav="handover" href="/handover">
-          Uebergabe
+          Übergabe
         </a>
       </header>
       <div className="cockpit-panel-body">
@@ -333,7 +333,7 @@ function PeopleBriefingPanel({
         </div>
         <PeopleDecisionCard decision={decision} />
         <p className="briefing-summary cockpit-briefing-summary" data-daily-briefing-summary="">
-          {briefingSummary(dashboardState.data)}
+          {briefingSummary(dashboardState.data, dashboardState.isInsightLoading)}
         </p>
         {briefing.length ? (
           <div className="cockpit-next-list cockpit-briefing-links" data-daily-briefing-list="">

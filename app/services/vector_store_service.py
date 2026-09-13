@@ -4,7 +4,7 @@ import logging
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from time import perf_counter
+from time import monotonic, perf_counter
 
 from flask import current_app, has_app_context
 from sqlalchemy import or_
@@ -59,6 +59,12 @@ DEFAULT_RAG_KEYWORD_SCAN_LIMIT = 500
 DEFAULT_RAG_MAX_KEYWORD_TERMS = 8
 DEFAULT_RAG_MIN_SCORE = 1
 ATLAS_EMBEDDING_DIMENSIONS = 1536
+DEFAULT_ATLAS_RETRY_COOLDOWN_SECONDS = 300
+
+# Circuit breaker for unreachable Atlas clusters. Building the client pings the
+# cluster and waits up to MONGODB_ATLAS_TIMEOUT_MS; a single request can build
+# several stores, so an unreachable cluster used to stall one page for 40 s.
+_atlas_circuit = {"open_until": 0.0, "reason": ""}
 RETRIEVAL_STOPWORDS = {
     "aber",
     "alle",
@@ -225,6 +231,7 @@ class SqlAlchemyKnowledgeVectorStore(BaseVectorStore):
             keyword_limit=keyword_scan_limit,
         )
         chunks = _deduplicate_chunks([*keyword_chunks, *recent_chunks])
+        scorer.prime_chunk_vectors(chunks)
         decisions = [
             retrieval_debug_decision(
                 "vector_candidate_scan",
@@ -892,6 +899,28 @@ class MongoAtlasVectorStore(BaseVectorStore):
         return results
 
 
+def reset_atlas_circuit():
+    """Close the Atlas circuit breaker so the next request tries the cluster again."""
+    _atlas_circuit["open_until"] = 0.0
+    _atlas_circuit["reason"] = ""
+
+
+def atlas_circuit_open():
+    """Return whether Atlas connections are currently skipped after a failure."""
+    return monotonic() < _atlas_circuit["open_until"]
+
+
+def _open_atlas_circuit(reason):
+    """Skip Atlas connection attempts for the configured cooldown."""
+    cooldown = _positive_int(
+        _config_value("MONGODB_ATLAS_RETRY_COOLDOWN_SECONDS", DEFAULT_ATLAS_RETRY_COOLDOWN_SECONDS),
+        DEFAULT_ATLAS_RETRY_COOLDOWN_SECONDS,
+    )
+    _atlas_circuit["open_until"] = monotonic() + cooldown
+    _atlas_circuit["reason"] = reason
+    logger.warning("atlas_circuit_open reason=%s cooldown_seconds=%s", reason, cooldown)
+
+
 def get_vector_store():
     """Return the configured vector store with a local fallback."""
     store_name = _config_value("RAG_VECTOR_STORE", "pgvector").lower()
@@ -912,12 +941,16 @@ def get_vector_store():
             logger.exception("vector_store_fallback store=chroma")
             return SqlAlchemyKnowledgeVectorStore()
     if store_name in {"mongodb_atlas", "mongo_atlas", "atlas"}:
+        if atlas_circuit_open():
+            return FallbackVectorStore("mongodb_atlas", _atlas_circuit["reason"])
         try:
             return MongoAtlasVectorStore()
         except VectorStoreError as exc:
             reason = _safe_fallback_reason(exc)
             record_atlas_fallback(reason)
             logger.warning("vector_store_fallback store=mongodb_atlas reason=%s", reason)
+            if reason == "connection_failed":
+                _open_atlas_circuit(reason)
         return FallbackVectorStore("mongodb_atlas", reason)
     logger.warning("vector_store_fallback store=%s reason=unsupported_store", store_name)
     return SqlAlchemyKnowledgeVectorStore()

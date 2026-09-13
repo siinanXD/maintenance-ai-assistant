@@ -129,7 +129,7 @@ export function AdminAiTechnical(props: AdminAiTechnicalProps): ReactNode {
         <div className="panel-header">
           <div>
             <h3>Kern-Kennzahlen (30 Tage)</h3>
-            <p className="panel-meta">Schneller Ueberblick vor den Protokollen.</p>
+            <p className="panel-meta">Schneller Überblick vor den Protokollen.</p>
           </div>
         </div>
         <div className="dashboard-grid dashboard-grid-3">
@@ -158,7 +158,7 @@ export function AdminAiTechnical(props: AdminAiTechnicalProps): ReactNode {
             <a className="action-hint-item is-muted" href="#ai-diagnostics">
               <div className="action-hint-copy">
                 <strong>Metriken & Alerts</strong>
-                <small>Governance, Workflows, Wissensluecken.</small>
+                <small>Governance, Workflows, Wissenslücken.</small>
               </div>
               <span>Details</span>
             </a>
@@ -211,7 +211,7 @@ function ObservabilityLogsPanel({
           </span>
         </div>
         <DataTable
-          caption="AI-Monitoring-Protokolle mit Antwortqualitaet, Sicherheit und Quellen"
+          caption="AI-Monitoring-Protokolle mit Antwortqualität, Sicherheit und Quellen"
           headers={["Zeit", "Referenz", "Qualität", "Quellen", "Dauer", "Langfuse", "Debug"]}
           dataAttr="data-ai-observability-logs"
           rows={logs.map((item) => {
