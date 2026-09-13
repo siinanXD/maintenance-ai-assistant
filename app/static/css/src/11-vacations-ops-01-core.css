@@ -16,7 +16,7 @@
   .vacation-history-panel {
     border: 1px solid #dbe5f1;
     border-radius: 0.75rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 1rem;
   }
 
@@ -30,7 +30,7 @@
 
   .vacation-panel-header h2 {
     margin: 0;
-    color: #102036;
+    color: var(--color-text-primary);
     font-size: 1.05rem;
     font-weight: 900;
     line-height: 1.2;
@@ -66,8 +66,8 @@
   .vacation-impact-preview {
     border: 1px solid #d7e1ec;
     border-radius: 0.65rem;
-    background: #f8fafc;
-    color: #334155;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     font-size: 0.8rem;
     font-weight: 750;
     line-height: 1.35;
@@ -98,7 +98,7 @@
   .vacation-calendar-item {
     border: 1px solid #dfe8f3;
     border-radius: 0.7rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.9rem;
   }
 
@@ -127,7 +127,7 @@
   .vacation-request-card h3,
   .vacation-summary-card h3 {
     margin: 0;
-    color: #102036;
+    color: var(--color-text-primary);
     font-size: 0.95rem;
     font-weight: 900;
     line-height: 1.2;
@@ -136,7 +136,7 @@
   .vacation-card-meta,
   .vacation-summary-card p {
     margin: 0.25rem 0 0;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.75rem;
     font-weight: 700;
     line-height: 1.35;
@@ -176,7 +176,7 @@
   }
 
   .vacation-metric strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.86rem;
     font-weight: 900;
     line-height: 1.1;
@@ -223,8 +223,8 @@
 
   .vacation-status-badge.is-cancelled,
   .vacation-card-state {
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--color-bg-surface-sunken);
+    color: var(--color-text-secondary);
   }
 
   .vacation-summary-list,

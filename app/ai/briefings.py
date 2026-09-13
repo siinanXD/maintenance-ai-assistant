@@ -59,6 +59,15 @@ def daily_briefing(user):
     }
 
 
+TASK_PRIORITY_LABELS = {"urgent": "Dringend", "soon": "Bald", "normal": "Normal"}
+TASK_STATUS_LABELS = {
+    "open": "Offen",
+    "in_progress": "In Arbeit",
+    "done": "Erledigt",
+    "cancelled": "Abgebrochen",
+}
+
+
 def task_briefing_section(user):
     """Return today's and overdue task briefing items."""
     today = date.today()
@@ -78,8 +87,9 @@ def task_briefing_section(user):
                 "title": task.title,
                 "severity": "critical" if task.due_date < today else "high",
                 "summary": (
-                    f"{task.priority.value}, {task.status.value}, "
-                    f"faellig {task.due_date.isoformat()}"
+                    f"{TASK_PRIORITY_LABELS.get(task.priority.value, task.priority.value)}, "
+                    f"{TASK_STATUS_LABELS.get(task.status.value, task.status.value)}, "
+                    f"fällig {task.due_date.strftime('%d.%m.%Y')}"
                 ),
                 "url": f"/api/tasks/{task.id}",
             }

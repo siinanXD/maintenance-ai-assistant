@@ -34,7 +34,7 @@
   display: grid;
   gap: 0.15rem;
   min-width: 0;
-  border: 1px solid #dbe6f0;
+  border: 1px solid var(--color-border-default);
   border-radius: var(--ui-radius-sm);
   background: #f7fbff;
   padding: 0.55rem;
@@ -57,9 +57,9 @@
 .handover-block {
   display: grid;
   gap: 0.3rem;
-  border-left: 4px solid #94a3b8;
+  border-left: 4px solid var(--color-border-strong);
   border-radius: var(--ui-radius-sm);
-  background: #f8fafc;
+  background: var(--color-bg-canvas);
   padding: 0.72rem;
 }
 

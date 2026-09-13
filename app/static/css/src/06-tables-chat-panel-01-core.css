@@ -4,7 +4,7 @@
 
   .chat-panel-form {
     border-top: 1px solid var(--ui-border, #dbe4ef);
-    background: #ffffff;
+    background: var(--color-bg-surface);
   }
 
   .chat-feedback-button[disabled],
@@ -41,7 +41,7 @@
   }
 
   .table-message {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-weight: 800;
     text-align: center;
   }
@@ -123,7 +123,7 @@
   .table-wrap {
     border-radius: var(--ui-radius-md);
     border: 1px solid rgba(219, 228, 239, 0.95);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     box-shadow: var(--ui-shadow-sm);
     transition:
       border-color 160ms ease,
@@ -217,15 +217,15 @@
   .guided-empty-state p,
   .status-explainer p {
     margin: 0;
-    color: #526173;
+    color: var(--color-text-secondary);
     line-height: 1.45;
   }
 
   .help-disclosure {
     border-radius: var(--ui-radius-sm);
-    border: 1px solid #dbe4ef;
-    background: #ffffff;
-    color: #334155;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    color: var(--color-text-secondary);
   }
 
   .help-disclosure > summary {

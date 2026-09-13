@@ -95,7 +95,7 @@
     gap: 0.55rem;
     border: 1px solid var(--ui-border);
     border-radius: 0.55rem;
-    background: #fbfdff;
+    background: var(--color-bg-surface);
     padding: 0.85rem;
     transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
   }
@@ -145,7 +145,7 @@
     gap: 0.75rem;
     border: 1px solid var(--ui-border);
     border-radius: 0.55rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 1rem;
     box-shadow: var(--ui-shadow-sm);
   }
@@ -190,10 +190,10 @@
     display: inline-flex;
     align-items: center;
     min-height: 1.55rem;
-    border: 1px solid #dbe4ef;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.35rem;
-    background: #f8fafc;
-    color: #475569;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     padding: 0.18rem 0.45rem;
     font-size: 0.68rem;
     font-weight: 900;
@@ -213,9 +213,9 @@
   }
 
   .status-pill.is-muted {
-    border-color: #dbe4ef;
-    background: #eef2f7;
-    color: #64748b;
+    border-color: var(--color-border-default);
+    background: var(--color-bg-surface-sunken);
+    color: var(--color-text-muted);
   }
 
   .status-pill.is-error {

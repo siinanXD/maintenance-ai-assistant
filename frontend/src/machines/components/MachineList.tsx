@@ -54,7 +54,11 @@ function MachineCard({
           <h3 className="record-card-title">{machine.name || "Maschine"}</h3>
           <p className="record-card-subtitle">{machine.produced_item || "Kein Produktionsinhalt hinterlegt"}</p>
         </div>
-        <span className="badge badge-status is-done">Aktiv</span>
+        {machine.active_errors ? (
+          <span className="badge badge-status is-open">{machine.active_errors} offen</span>
+        ) : (
+          <span className="badge badge-status is-done">In Betrieb</span>
+        )}
       </div>
       <div className="record-card-meta">
         <span>
@@ -63,7 +67,7 @@ function MachineCard({
         </span>
         <span>
           <small>Letzte Störung</small>
-          <strong>{machine.last_error || "Keine Angabe"}</strong>
+          <strong title={machine.last_error || undefined}>{machine.last_error || "Keine"}</strong>
         </span>
         <span>
           <small>Offene Aufgaben</small>
@@ -76,7 +80,7 @@ function MachineCard({
         {writable ? (
           <>
             <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => onEdit(machine)} type="button">Bearbeiten</button>
-            <button className="btn btn-error btn-sm text-white" disabled={busy} onClick={handleDelete} type="button">
+            <button className="btn btn-ghost btn-sm" disabled={busy} onClick={handleDelete} type="button">
               {busy ? "Löscht..." : "Löschen"}
             </button>
           </>

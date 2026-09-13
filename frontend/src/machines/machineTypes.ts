@@ -9,6 +9,7 @@ export type Machine = {
   readonly created_at?: string;
   readonly last_error?: string;
   readonly open_tasks?: number;
+  readonly active_errors?: number;
 };
 
 export type MachineDraft = {

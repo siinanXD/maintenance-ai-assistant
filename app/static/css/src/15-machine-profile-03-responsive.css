@@ -140,7 +140,7 @@
     border: 1px solid var(--ui-border);
     border-left: 4px solid var(--ui-teal);
     border-radius: var(--ui-radius);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.9rem;
   }
 
@@ -198,7 +198,7 @@
     justify-self: end;
     border-color: #bfc9d5;
     background: #2d3748;
-    color: #ffffff;
+    color: var(--color-text-inverse);
   }
 
   .chat-test-input {

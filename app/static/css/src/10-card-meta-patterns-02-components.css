@@ -4,7 +4,7 @@
 
   .briefing-item strong {
     grid-area: title;
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.78rem;
     font-weight: 850;
     line-height: 1.15;
@@ -12,7 +12,7 @@
 
   .briefing-item small {
     grid-area: meta;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.72rem;
     font-weight: 650;
     line-height: 1.2;
@@ -45,7 +45,7 @@
     top: 0;
     display: flex;
     justify-content: space-between;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 800;
   }
@@ -87,7 +87,7 @@
   }
 
   .timeline-row strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.78rem;
     font-weight: 850;
     line-height: 1.05;
@@ -96,7 +96,7 @@
   .timeline-row small {
     display: block;
     margin-top: 0.25rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 650;
   }
@@ -108,7 +108,7 @@
     height: 1rem;
     place-items: center;
     border-radius: 0.18rem;
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 0.68rem;
     font-weight: 900;
   }
@@ -141,7 +141,7 @@
 
   .timeline-status {
     margin: 0.45rem 0 0 5.6rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.72rem;
     font-weight: 750;
   }
@@ -160,7 +160,7 @@
     place-items: center;
     border: 1px solid var(--ops-border);
     border-radius: 0.35rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.55rem;
     text-align: center;
     box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
@@ -168,7 +168,7 @@
 
   .inventory-stats strong,
   .inventory-stats .stat-row span {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.72rem;
     font-weight: 850;
   }
@@ -178,14 +178,14 @@
   .inventory-stats > div:nth-child(3) strong { color: #12823d; }
   .inventory-stats span,
   .inventory-stats .stat-row strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 1.35rem;
     font-weight: 900;
     line-height: 1;
   }
 
   .inventory-stats small {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 700;
   }
@@ -227,7 +227,7 @@
     border: 4px solid #ffffff;
     border-radius: 999px;
     background: linear-gradient(135deg, #12bac7, #0790a4);
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 1.35rem;
     box-shadow: 0 16px 35px rgba(8, 145, 178, 0.32);
   }
@@ -247,4 +247,4 @@
   .vacation-balance-preview {
     border: 1px solid #d8e2ef;
     border-radius: 0.55rem;
-    background: #f8fafc;
+    background: var(--color-bg-canvas);

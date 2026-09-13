@@ -4,7 +4,7 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
-    background: #fbfdff;
+    background: var(--color-bg-surface);
   }
 
   .chat-suggestion {
@@ -24,7 +24,7 @@
   }
 
   .chat-suggestion strong {
-    color: #334155;
+    color: var(--color-text-secondary);
     font-size: 0.76rem;
     font-weight: 850;
     line-height: 1.2;
@@ -42,9 +42,9 @@
   .chat-sources a {
     display: grid;
     gap: 0.15rem;
-    border: 1px solid #dbe4ef;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.45rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.5rem 0.6rem;
     text-decoration: none;
   }
@@ -66,7 +66,7 @@
 
   .chat-panel-form {
     align-items: center;
-    background: #ffffff;
+    background: var(--color-bg-surface);
   }
 
   @keyframes chat-loading {

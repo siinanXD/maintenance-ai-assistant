@@ -32,6 +32,55 @@ ACTIVE_ERROR_STATUSES = {"open", "in_progress"}
 COMPLETED_TASK_STATUSES = {TaskStatus.DONE.value, TaskStatus.CANCELLED.value}
 
 
+def machine_list_signals(machines, user):
+    """Return open task, active error and last error signals per machine id.
+
+    Loads the visible tasks and errors once and matches them to machines the
+    same way the machine profile does, so list cards and profiles agree.
+    """
+    signals = {
+        machine.id: {"open_tasks": 0, "active_errors": 0, "last_error": ""} for machine in machines
+    }
+    if not machines:
+        return signals
+    if has_dashboard_permission(user, "tasks", "view"):
+        open_tasks = (
+            visible_tasks_query(user)
+            .filter(Task.status.in_([TaskStatus.OPEN, TaskStatus.IN_PROGRESS]))
+            .limit(1000)
+            .all()
+        )
+        for task in open_tasks:
+            text = f"{task.title} {task.description}".lower()
+            for machine in machines:
+                if machine.name and machine.name.lower() in text:
+                    signals[machine.id]["open_tasks"] += 1
+    if has_dashboard_permission(user, "errors", "view"):
+        errors = (
+            visible_errors_query(user)
+            .order_by(ErrorEntry.created_at.desc(), ErrorEntry.id.desc())
+            .limit(1000)
+            .all()
+        )
+        for error in errors:
+            for machine in machines:
+                if not _error_matches_machine(error, machine):
+                    continue
+                machine_signals = signals[machine.id]
+                if not machine_signals["last_error"]:
+                    machine_signals["last_error"] = error.title
+                if error.status in ACTIVE_ERROR_STATUSES:
+                    machine_signals["active_errors"] += 1
+    return signals
+
+
+def _error_matches_machine(error, machine):
+    """Return whether an error entry belongs to the machine."""
+    if error.machine_id is not None:
+        return error.machine_id == machine.id
+    return bool(machine.name) and machine.name.lower() in (error.machine or "").lower()
+
+
 def build_machine_history(machine, user):
     """Build a read-only maintenance history for one machine."""
     task_items = _task_timeline(machine, user)

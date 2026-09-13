@@ -60,12 +60,12 @@ export function useAdminUsersSidePanels(): AdminUsersSidePanelsData {
   }
 
   /**
-   * Refresh AI, audit and backup side panels independently.
+   * Refresh AI and backup side panels independently.
+   * The audit log loads through the search effect below, also on mount.
    */
   async function refreshSidePanels(): Promise<void> {
     await Promise.all([
       loadAiSummary().then(setAiSummary).catch(() => setAiSummary(null)),
-      refreshAuditEntries(),
       refreshBackups()
     ]);
   }

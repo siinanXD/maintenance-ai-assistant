@@ -25,7 +25,7 @@
     gap: 0.5rem;
     margin-top: 0.25rem;
     padding: 0;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.72rem;
     font-weight: 750;
   }
@@ -124,7 +124,7 @@
   }
 
   .incident-row strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.78rem;
     font-weight: 850;
   }
@@ -146,7 +146,7 @@
 
   .incident-list .stat-row strong,
   .briefing-list .stat-row strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.9rem;
     font-weight: 900;
   }
@@ -170,7 +170,7 @@
 
   .employee-row.is-head {
     min-height: 2.35rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.72rem;
     font-weight: 900;
   }
@@ -183,7 +183,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     font-weight: 800;
   }
 
@@ -220,7 +220,7 @@
   .briefing-summary {
     margin: 0;
     padding: 0.75rem 1rem 0.2rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.82rem;
     font-weight: 800;
   }

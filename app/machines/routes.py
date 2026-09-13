@@ -16,6 +16,7 @@ from app.machines.services import (
     answer_machine_assistant,
     build_machine_history,
     build_machine_profile,
+    machine_list_signals,
 )
 from app.models import InventoryMaterial, Machine, MaintenancePlan, ShiftPlanEntry, Site
 from app.responses import (
@@ -94,9 +95,11 @@ def list_machines():
     machine_id = request.args.get("machine_id", type=int)
     if machine_id is not None:
         query = query.filter(Machine.id == machine_id)
+    user = current_user()
+    signals = machine_list_signals(query.all(), user)
     return optional_paginated_response(
         query,
-        lambda machine: machine.to_dict(),
+        lambda machine: {**machine.to_dict(), **signals.get(machine.id, {})},
         message="Machines loaded",
         default_limit=100,
         max_limit=200,

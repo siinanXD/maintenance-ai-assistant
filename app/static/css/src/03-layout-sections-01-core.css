@@ -116,7 +116,7 @@
   }
 
   .data-table thead {
-    background: #f4f7fb;
+    background: var(--color-bg-canvas);
   }
 
   .dashboard-kpi-grid {
@@ -168,7 +168,7 @@
   .ops-panel-header {
     min-height: 3rem;
     padding: 0.8rem 0.95rem;
-    background: #fbfdff;
+    background: var(--color-bg-surface);
   }
 
   .task-cockpit-panel .cockpit-board {

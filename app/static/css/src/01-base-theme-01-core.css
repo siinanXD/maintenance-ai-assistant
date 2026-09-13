@@ -221,7 +221,7 @@
     min-width: 0;
     border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 0.95rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.78rem;
     color: var(--ui-text);
     text-decoration: none;

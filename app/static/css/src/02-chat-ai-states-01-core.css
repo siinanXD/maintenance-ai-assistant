@@ -81,9 +81,9 @@
     min-height: 4.15rem;
     align-content: center;
     gap: 0.12rem;
-    border: 1px solid #dbe4ef;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.48rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.55rem 0.6rem;
   }
 
@@ -133,10 +133,10 @@
     display: inline-grid;
     min-height: 1.35rem;
     place-items: center;
-    border: 1px solid #dbe4ef;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.34rem;
-    background: #f1f5f9;
-    color: #64748b;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-muted);
     font-size: 0.61rem;
     font-weight: 900;
     line-height: 1;
@@ -166,7 +166,7 @@
     gap: 0.5rem;
     border: 1px solid #e3eaf3;
     border-radius: 0.5rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.62rem;
   }
 
@@ -175,7 +175,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    color: #102036;
+    color: var(--color-text-primary);
   }
 
   .chat-answer-section-title strong {
@@ -185,7 +185,7 @@
   }
 
   .chat-answer-section-title span {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.66rem;
     font-weight: 850;
     line-height: 1;
@@ -206,10 +206,10 @@
     display: grid;
     min-width: 0;
     gap: 0.14rem;
-    border: 1px solid #dbe4ef;
+    border: 1px solid var(--color-border-default);
     border-left: 3px solid #60a5fa;
     border-radius: 0.45rem;
-    background: #f8fafc;
+    background: var(--color-bg-canvas);
     padding: 0.5rem 0.55rem;
   }
 
@@ -232,7 +232,7 @@
 
   .chat-answer-basis-card strong {
     overflow: hidden;
-    color: #102036;
+    color: var(--color-text-primary);
     font-size: 0.76rem;
     font-weight: 920;
     line-height: 1.18;

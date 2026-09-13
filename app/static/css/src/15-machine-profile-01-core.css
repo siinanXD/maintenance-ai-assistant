@@ -9,7 +9,7 @@
     display: grid;
     gap: 0.15rem;
     min-width: 0;
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-radius: var(--ui-radius-sm);
     background: #f7fbff;
     padding: 0.55rem;
@@ -36,7 +36,7 @@
     border: 1px solid var(--ui-border);
     border-left: 4px solid var(--ui-primary);
     border-radius: var(--ui-radius);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.9rem;
     box-shadow: var(--ui-shadow-xs);
   }
@@ -132,7 +132,7 @@
   .knowledge-block {
     border-radius: var(--ui-radius);
     border-color: var(--ui-border);
-    background: #ffffff;
+    background: var(--color-bg-surface);
   }
 
   .ai-admin-page {
@@ -185,7 +185,7 @@
 
   .ai-admin-nav a.is-active {
     background: var(--ui-primary);
-    color: #ffffff;
+    color: var(--color-text-inverse);
   }
 
   .ai-admin-load-message {
@@ -210,7 +210,7 @@
     min-height: 7.2rem;
     border-radius: var(--ui-radius);
     border-color: var(--ui-border);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     box-shadow: var(--ui-shadow-xs);
   }
 

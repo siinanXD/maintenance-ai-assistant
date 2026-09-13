@@ -29,7 +29,7 @@
 .task-board-shell {
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   box-shadow: var(--ui-shadow-xs);
 }
 
@@ -150,7 +150,7 @@
   border: 1px solid var(--ui-border);
   border-left: 4px solid var(--ui-primary);
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   padding: 0.9rem;
   box-shadow: var(--ui-shadow-xs);
 }
@@ -197,7 +197,7 @@
 
 .task-type-badge {
   justify-self: start;
-  border: 1px solid #dbe6f0;
+  border: 1px solid var(--color-border-default);
   border-radius: var(--ui-radius-sm);
   background: #eef7ff;
   color: var(--ui-primary-dark);
@@ -227,7 +227,7 @@
 
 .task-card-meta span {
   min-width: 0;
-  border: 1px solid #dbe6f0;
+  border: 1px solid var(--color-border-default);
   border-radius: var(--ui-radius-sm);
   background: #f4f8fc;
   color: var(--ui-text-soft);

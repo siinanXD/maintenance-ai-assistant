@@ -21,7 +21,7 @@ export function MachineStats({ machines, issueCount }: MachineStatsProps): React
       <article className="surface-stat-card is-warning">
         <span>Störungen</span>
         <strong data-dashboard-machine-issue-count>{issueCount}</strong>
-        <small>Aktive oder bekannte Fehler mit Maschinenbezug.</small>
+        <small>Offene Störungen mit Maschinenbezug.</small>
       </article>
       <article className="surface-stat-card is-ai">
         <span>Wartung</span>

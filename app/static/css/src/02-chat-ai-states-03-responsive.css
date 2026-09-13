@@ -86,7 +86,7 @@
   }
 
   .nav-link.is-active {
-    background: #ffffff;
+    background: var(--color-bg-surface);
     border-color: rgba(255, 255, 255, 0.24);
     color: #0d2744;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
