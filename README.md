@@ -112,6 +112,16 @@ Frontend convention: Jinja templates render the shared shell and mount points.
 feature registry, API client and shell fallback behavior small. Templates avoid
 large inline scripts.
 
+Navigation lives in exactly one place: `frontend/src/layout/ShellNavigationModel.ts`.
+The Jinja shell renders placeholders only, so hydration never swaps one set of
+links for a different one.
+
+Design tokens are the source of truth for colors, shell sizes and breakpoints.
+Edit `design/tokens/*.json`, then run `npm run build:tokens`; the generated
+`app/static/css/src/00-shell-tokens.css` and `design/tokens/generated/tailwind.cjs`
+are committed, and `tests/test_design_tokens.py` fails when they drift from the
+source. See `design/tokens/README.md`.
+
 ## Getting Started
 
 **Prerequisites:** Python 3.11 or 3.12. Node.js is only needed when rebuilding
@@ -463,6 +473,7 @@ app/
 |-- search/              # cross-domain knowledge search
 `-- admin/               # users, permissions, AI admin and operations APIs
 frontend/src/           # React route islands built by Vite
+design/tokens/          # design tokens (DTCG) and their generated output
 migrations/             # Alembic database migrations
 tests/                  # pytest suite, SQLite in-memory
 docs/

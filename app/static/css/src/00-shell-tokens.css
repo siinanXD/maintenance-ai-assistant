@@ -1,29 +1,51 @@
 /*
- * Shell-Token: die einzige Quelle fuer die Masse der App-Huelle.
- *
- * Bis Schritt 3 (Figma-Variablen -> Tokens Studio -> Style Dictionary) diese
- * Werte erzeugt, werden sie hier von Hand gepflegt. Regeln dazu:
- *
- *   1. --sidebar-width und Verwandte werden NUR hier deklariert. Frueher lagen
- *      vier Deklarationen mit drei Werten in zufaelligen Feature-Dateien, und
- *      die tatsaechliche Breite kam aus zwei !important-Regeln daneben.
- *   2. Breakpoints sind ausschliesslich die vier unten genannten. Ein neuer
- *      Wert ist ein Fehler, kein Sonderfall.
- *
- * Breakpoints (Custom Properties sind in @media nicht erlaubt, daher als
- * verbindliche Liste statt als Variablen):
- *
- *   bp-sm    640px   Tabellen werden zu Zeilenkarten
- *   bp-md    768px   Sidebar als Overlay
- *   bp-lg   1024px   Sidebar fest, Chat als Panel
- *   bp-xl   1440px   dritte Spalte fuer Detailansichten
+ * Erzeugt von scripts/build_tokens.mjs. Nicht von Hand aendern.
+ * Quelle: design/tokens/core.json und design/tokens/semantic.json.
+ * Neu erzeugen mit: npm run build:tokens
  */
 
 @layer base {
   :root {
+    --color-action-default: #2563eb;
+    --color-action-on: #ffffff;
+    --color-support-default: #0f766e;
+    --color-support-on: #ffffff;
+    --color-highlight-default: #06b6d4;
+    --color-highlight-on: #083344;
+    --color-contrast-default: #111827;
+    --color-contrast-on: #f8fafc;
+    --color-surface-page: #ffffff;
+    --color-surface-raised: #f8fafc;
+    --color-surface-border: #e2e8f0;
+    --color-text-primary: #0f172a;
+    --color-status-info: #0284c7;
+    --color-status-info-on: #ffffff;
+    --color-status-ok: #16a34a;
+    --color-status-ok-on: #ffffff;
+    --color-status-warn: #facc15;
+    --color-status-warn-on: #422006;
+    --color-status-critical: #dc2626;
+    --color-status-critical-on: #ffffff;
     --sidebar-width: 264px;
     --sidebar-width-collapsed: 64px;
     --topbar-height: 56px;
     --shell-row-height: 36px;
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1440px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --radius-sm: 2px;
+    --radius-md: 3px;
+    --radius-lg: 6px;
+    --elevation-0: none;
+    --elevation-1: 0 1px 2px rgba(15, 23, 42, 0.08);
+    --elevation-2: 0 8px 24px rgba(15, 23, 42, 0.12);
   }
 }
