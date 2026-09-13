@@ -12,7 +12,7 @@
  * sind Eingabe und sollen in der Anwendung nicht auftauchen.
  */
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -44,6 +44,28 @@ const BANNER = [
   "Quelle: design/tokens/core.json und design/tokens/semantic.json.",
   "Neu erzeugen mit: npm run build:tokens"
 ];
+
+/**
+ * Return the token source files, ignoring Tokens Studio's bookkeeping files.
+ *
+ * Beim Multi-File-Sync legt Tokens Studio $metadata.json (Reihenfolge der Sets)
+ * und $themes.json (Theme-Liste) im selben Ordner ab. Style Dictionary laesst
+ * beide nachweislich links liegen, die Ausgabe bleibt mit ihnen byteidentisch.
+ * Die Liste ist hier trotzdem explizit, damit nicht eine kuenftige Version oder
+ * ein anderes Format still Muell aus $themes.json einliest -- das ist ein Array
+ * und kein Token-Set. Zusaetzlich schlaegt ein leerer Ordner so laut fehl.
+ *
+ * @returns {string[]} Absolute paths of the token files, in a stable order.
+ */
+function tokenSourceFiles() {
+  const files = readdirSync(TOKENS_DIR)
+    .filter((name) => name.endsWith(".json") && !name.startsWith("$"))
+    .sort();
+  if (files.length === 0) {
+    throw new Error(`Keine Token-Dateien in ${TOKENS_DIR}`);
+  }
+  return files.map((name) => `${TOKENS_DIR}/${name}`);
+}
 
 /**
  * Return whether a token came from the semantic layer.
@@ -177,7 +199,7 @@ async function main() {
   mkdirSync(GENERATED_DIR, { recursive: true });
 
   const dictionary = new StyleDictionary({
-    source: [`${TOKENS_DIR}/*.json`],
+    source: tokenSourceFiles(),
     usesDtcg: true,
     log: { verbosity: "verbose" },
     platforms: {
