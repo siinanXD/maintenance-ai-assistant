@@ -46,6 +46,10 @@ def count_records(user, scope):
     if scope not in COUNT_SCOPES:
         raise ValueError(f"unsupported scope: {scope}")
     entity_type = COUNT_ENTITY_TYPES[scope]
+    if scope == "inventory":
+        from .inventory import list_inventory
+
+        return list_inventory(user, filter="all", count_only=True)
     if scope == "employees":
         if not can_read_employee_context(user):
             return denied_outcome(entity_type, "employees")

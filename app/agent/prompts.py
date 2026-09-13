@@ -23,16 +23,24 @@ AGENT_SYSTEM_PROMPT = (
     "hinzuziehen.\n"
     "7. Antworte kurz, technisch klar und auf Deutsch. Format: '## Ergebnis' mit "
     "Bulletpoints, danach '- **Quelle:** ...' und '- **Unsicherheit:** niedrig/mittel/hoch'.\n"
-    "8. Rufe hoechstens die Werkzeuge auf, die fuer die Frage noetig sind.\n"
+    "8. Rufe hoechstens die Werkzeuge auf, die fuer die Frage noetig sind. Fragen nach "
+    "Zahlen, Summen, Werten, Listen oder Status aus der App beantwortest du nie ohne "
+    "Werkzeug; lehne sie nicht ab und schaetze nicht.\n"
     "Werkzeugwahl: Fuer gefilterte Listen und Zaehlungen (offene Tasks, Stoerungen je "
     "Maschine, Mitarbeiter je Abteilung, Urlaub, Lager unter Mindestbestand, Dokument-"
     "Metadaten, Schichtplan) nutze list_* bzw. count_records mit expliziten Argumenten. "
+    "Lagerwert, Gesamtwert oder Gesamtmenge des Lagers liefert list_inventory mit "
+    "count_only=true. "
+    "search_<bereich> ist nur Freitext-Relevanzsuche nach Stichwoertern, nicht fuer "
+    "Abteilungs-, Status- oder Zeitfilter. "
     "Fuer Wie-/Warum-/Nachschlagefragen zu Handbuechern, Anleitungen und Wartungswissen "
     "nutze search_knowledge. Fuer Fehlercodes und Stoerungsbeschreibungen nutze "
     "error_assistant. Allgemeine Fragen ohne App-Bezug beantwortest du ohne Werkzeug und "
     "kennzeichnest sie als Modellwissen. Liefert ein Werkzeug answer_markdown, uebernimm "
-    "dessen Fakten und Struktur. Folgefragen wie 'welche davon' beziehen sich auf den "
-    "zuletzt genutzten Datenbereich: rufe dasselbe Werkzeug mit den vererbten Filtern auf."
+    "dessen Fakten und Struktur. Folgefragen wie 'welche davon' oder kurze Fragen ohne "
+    "eigenen Datenbereich ('was ist der Gesamtwert?') beziehen sich auf den zuletzt "
+    "genutzten Datenbereich ([structured_context]): rufe das dort genannte Werkzeug mit "
+    "den vererbten Filtern plus den neuen Filtern auf, statt ohne Werkzeug zu antworten."
 )
 
 
@@ -51,6 +59,19 @@ def build_agent_system_prompt(allowed_scopes, safety_rules=(), structured_contex
     return "\n".join(lines)
 
 
+STRUCTURED_CONTEXT_TOOLS = {
+    "tasks": "list_tasks",
+    "incidents": "list_incidents",
+    "employees": "list_employees",
+    "vacations": "list_vacations",
+    "documents": "list_documents",
+    "shiftplans": "list_shift_entries",
+    "inventory": "list_inventory",
+    "machines": "machine_incident_report",
+    "daily_briefing": "daily_briefing",
+}
+
+
 def _structured_context_hint(structured_context):
     """Return a one-line hint about the last structured data scope of this session."""
     context = structured_context if isinstance(structured_context, dict) else {}
@@ -58,6 +79,9 @@ def _structured_context_hint(structured_context):
     if not entity_type:
         return ""
     parts = [f"entity_type={entity_type}"]
+    tool_name = STRUCTURED_CONTEXT_TOOLS.get(entity_type)
+    if tool_name:
+        parts.append(f"tool={tool_name}")
     for key in ("department", "status", "time_range", "machine", "query", "shift", "employee_name"):
         value = str(context.get(key) or "").strip()
         if value:

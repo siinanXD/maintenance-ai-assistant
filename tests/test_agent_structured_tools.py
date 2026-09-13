@@ -544,6 +544,16 @@ def test_list_inventory_filters_low_stock_critical_and_machine(
     assert by_machine.content["count"] == 1
     assert count.content["count"] == 3
     assert count.content["answer_markdown"].startswith("## Lager\n- **Sichtbare Artikel:** 3")
+    assert "- **Lagerwert:** 1.055,00 EUR" in count.content["answer_markdown"]
+    assert count.content["totals"] == {
+        "positions": 3,
+        "total_quantity": 521,
+        "total_value": 1055.0,
+        "below_minimum": 1,
+    }
+    assert low.content["totals"]["total_value"] == 5.0
+    assert "- **Gesamtwert der Treffer:** 5,00 EUR" in low.content["answer_markdown"]
+    assert low.content["items"][0]["stock_value"] == 5.0
 
 
 def test_machine_incident_report_needs_both_permissions(
@@ -650,3 +660,5 @@ def test_count_records_admin_sees_all_scopes(app, make_user, scope):
 
     assert result.status == "ok"
     assert result.content["count"] == 0
+    if scope == "inventory":
+        assert "- **Lagerwert:** 0,00 EUR" in result.content["answer_markdown"]

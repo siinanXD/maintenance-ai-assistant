@@ -167,7 +167,7 @@ function metaFromPayload(payload: ShellChatResponse): ShellChatAnswerMeta {
   const zeroResult = isZeroResult(data.answer || "", data, sourceCount);
 
   return {
-    answerType: appDataBadge ? "App-Daten" : answerType,
+    answerType,
     appDataBadge,
     evidenceLabel: evidenceLabel(data.evidence_visible, diagnostics.evidence_visible),
     sourceCount,

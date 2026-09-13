@@ -511,7 +511,8 @@ register_tool(
         description=(
             "Lagerartikel: filter=all, low_stock (unter Mindestbestand, nachbestellen), "
             "critical (kritische Teile), machine (Teile einer Maschine). count_only "
-            "liefert die Anzahl sichtbarer Artikel."
+            "liefert die Lagerzusammenfassung: Anzahl Artikel, Gesamtmenge, Lagerwert "
+            "(Gesamtwert in EUR) und Artikel unter Mindestbestand."
         ),
         parameters={
             "type": "object",

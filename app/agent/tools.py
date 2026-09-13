@@ -352,8 +352,10 @@ for _tool_name, (_scope, _description) in SCOPE_SEARCH_TOOLS.items():
             name=_tool_name,
             label=_tool_name.replace("_", " ").title(),
             description=(
-                f"Durchsucht {_description} Nur sichtbare, freigegebene Datensaetze. "
-                "Nutze eine kurze Suchanfrage mit Maschine, Code oder Stichwort."
+                f"Freitext-Relevanzsuche: durchsucht {_description} Nur sichtbare, "
+                "freigegebene Datensaetze. Nutze eine kurze Suchanfrage mit Maschine, Code "
+                "oder Stichwort. Nicht fuer Filter nach Abteilung, Status, Zeitraum oder "
+                "Zaehlungen: dafuer list_* bzw. count_records verwenden."
             ),
             parameters={
                 "type": "object",
