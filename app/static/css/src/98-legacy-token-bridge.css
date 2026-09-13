@@ -302,3 +302,24 @@
 .filter-chip.is-active {
   background: var(--color-bg-selected);
 }
+
+/* Chat-Widget: Kopfzeile und Verlaufszaehler waren fest Blau. */
+.chat-panel-header .chat-panel-kicker {
+  color: var(--color-text-muted);
+}
+
+.chat-history-panel .chat-history-summary span {
+  background: var(--color-status-neutral-bg);
+  color: var(--color-status-neutral-text);
+}
+
+/* Fortschrittsbalken der neutralen Kennzahl und Info-Badge (Quellregeln ungelayert). */
+.executive-kpi-card.is-blue .kpi-progress span {
+  background: var(--color-text-secondary);
+}
+
+.badge.badge-info {
+  border-color: var(--color-status-info-border);
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-text);
+}
