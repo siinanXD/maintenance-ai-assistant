@@ -45,7 +45,7 @@
 
 @layer components {
   .app-body {
-    background: #f5f7fb;
+    background: var(--color-bg-canvas);
   }
 
   @media (min-width: 1024px) {

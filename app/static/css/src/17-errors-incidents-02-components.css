@@ -19,7 +19,7 @@
 .handover-list-shell {
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   box-shadow: var(--ui-shadow-xs);
 }
 
@@ -62,7 +62,7 @@
 .handover-step {
   border: 1px solid #e1eaf4;
   border-radius: var(--ui-radius);
-  background: #f8fbff;
+  background: var(--color-bg-canvas);
   padding: 0.9rem;
 }
 
@@ -80,7 +80,7 @@
   height: 2rem;
   border-radius: var(--ui-radius-sm);
   background: #0f766e;
-  color: #ffffff;
+  color: var(--color-text-inverse);
   font-size: 0.82rem;
   font-weight: 950;
 }
@@ -104,7 +104,7 @@
   gap: 1rem;
   border: 1px solid #d7e5f2;
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   padding: 0.9rem;
 }
 
@@ -158,9 +158,9 @@
   grid-template-columns: 1.7rem minmax(0, 1fr);
   gap: 0.55rem;
   align-items: center;
-  border: 1px solid #dbe6f0;
+  border: 1px solid var(--color-border-default);
   border-radius: var(--ui-radius-sm);
-  background: #f7fbff;
+  background: var(--color-bg-canvas);
   padding: 0.55rem;
 }
 
@@ -225,7 +225,7 @@
   border: 1px solid var(--ui-border);
   border-left: 4px solid #f97316;
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   padding: 1rem;
   box-shadow: var(--ui-shadow-xs);
 }

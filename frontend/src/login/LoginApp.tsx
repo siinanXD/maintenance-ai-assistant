@@ -10,50 +10,59 @@ const LOGIN_ISLAND = {
   mountEvent: "maintenance-login-react-mounted"
 };
 
+const LOGIN_CAPABILITIES = [
+  ["Störungen", "Fehlerkatalog mit Ursache, Lösung und Stillstandszeit"],
+  ["Aufgaben", "Kanban nach Priorität, Fälligkeit und Bereich"],
+  ["Assistent", "Antworten aus App-Daten, Handbüchern und Berichten mit Quelle"]
+] as const;
+
 /**
- * Render the logged-in panel matching the current Jinja markup.
+ * Render the logged-in panel shown when a session already exists.
  */
 function LoggedInPanel(): ReactNode {
   return (
-    <article className="card app-card lg:col-span-8" data-logged-in-panel>
-      <div className="card-body">
-        <div className="panel-header">
-          <div>
-            <h2 className="panel-title">Du bist eingeloggt</h2>
-            <p className="panel-meta">Die Sitzung ist aktiv. Oben rechts kannst du dich wieder abmelden.</p>
-          </div>
-          <span className="badge badge-success badge-outline">aktiv</span>
-        </div>
-        <div className="toolbar">
-          <a className="btn btn-primary" href="/">Zum Cockpit</a>
-          <button className="btn btn-ghost" type="button" data-logout-button>Abmelden</button>
-        </div>
+    <article className="login-card" data-logged-in-panel>
+      <p className="page-kicker">Sitzung aktiv</p>
+      <h2 className="login-card-title">Du bist angemeldet</h2>
+      <p className="login-card-meta">Weiter zum Cockpit oder abmelden, um das Konto zu wechseln.</p>
+      <div className="login-actions">
+        <a className="btn btn-primary" href="/">Zum Cockpit</a>
+        <button className="btn btn-ghost" type="button" data-logout-button>Abmelden</button>
       </div>
     </article>
   );
 }
 
 /**
- * Render the static role overview matching the current Jinja login page.
+ * Render the product panel beside the login form.
  */
-function RoleOverview(): ReactNode {
+function LoginBrandPanel(): ReactNode {
   return (
-    <aside className="card app-card lg:col-span-4">
-      <div className="card-body">
-        <div className="panel-header">
-          <div>
-            <h2 className="panel-title">Rollen</h2>
-            <p className="panel-meta">Zugriff nach Bereich</p>
-          </div>
-        </div>
-        <p className="stat-label">master_admin, it, verwaltung, instandhaltung, produktion</p>
+    <section className="login-brand" aria-label="Maintenance Assistant">
+      <div className="login-brand-mark">
+        <span className="sidebar-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" role="img">
+            <path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.4-2.4 1a8.2 8.2 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.6A8.2 8.2 0 0 0 7 6.6l-2.4-1-2 3.4 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.4 2.4-1a8.2 8.2 0 0 0 2.6 1.5l.4 2.6h4l.4-2.6a8.2 8.2 0 0 0 2.6-1.5l2.4 1 2-3.4-2-1.5ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z" />
+          </svg>
+        </span>
+        <span>Maintenance Assistant</span>
       </div>
-    </aside>
+      <h1 className="login-brand-title">Instandhaltung, Schicht und Wissen an einem Ort.</h1>
+      <dl className="login-capabilities">
+        {LOGIN_CAPABILITIES.map(([term, description]) => (
+          <div key={term}>
+            <dt>{term}</dt>
+            <dd>{description}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="login-brand-foot">Sichtbar ist nur, was Rolle und Bereich freigeben.</p>
+    </section>
   );
 }
 
 /**
- * Render the React login island without changing the existing visual layout.
+ * Render the React login island.
  */
 export function LoginApp(): ReactNode {
   const [session, setSession] = useState(() => readStoredSession());
@@ -88,24 +97,11 @@ export function LoginApp(): ReactNode {
   }
 
   return (
-    <>
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-        <div className="page-hero mb-0">
-          <div>
-            <p className="page-kicker">Zugang</p>
-            <h1 className="page-title">Einloggen</h1>
-            <p className="page-description">
-              Melde dich an, um Wartungsaufgaben, Fehlerwissen und KI-Funktionen rollenbasiert zu nutzen.
-            </p>
-          </div>
-        </div>
-        {loggedIn ? null : <LoginForm onLogin={handleLogin} />}
-      </section>
-
-      <section className="dashboard-grid mt-6">
-        <RoleOverview />
-        {loggedIn ? <LoggedInPanel /> : null}
-      </section>
-    </>
+    <div className="login-screen">
+      <LoginBrandPanel />
+      <div className="login-panel">
+        {loggedIn ? <LoggedInPanel /> : <LoginForm onLogin={handleLogin} />}
+      </div>
+    </div>
   );
 }

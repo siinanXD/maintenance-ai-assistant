@@ -2,7 +2,7 @@
     height: 1.4rem;
     place-items: center;
     border-radius: 999px;
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
     color: #0b72e7;
     font-weight: 900;
   }
@@ -55,7 +55,7 @@
     gap: 0.35rem;
     margin: 0;
     padding-left: 1.15rem;
-    color: #475569;
+    color: var(--color-text-secondary);
     line-height: 1.45;
   }
 
@@ -66,9 +66,9 @@
     min-height: 1.6rem;
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
-    border: 1px solid #dbe4ef;
-    background: #f8fafc;
-    color: #334155;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     font-size: 0.78rem;
     font-weight: 800;
     white-space: nowrap;
@@ -98,7 +98,7 @@
 
   .chat-panel-form {
     border-top: 1px solid var(--ui-border, #dbe4ef);
-    background: #ffffff;
+    background: var(--color-bg-surface);
   }
 
   .chat-feedback-button[disabled],

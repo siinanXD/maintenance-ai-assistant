@@ -19,7 +19,7 @@ export function TaskStats({ tasks }: TaskStatsProps): ReactNode {
   return (
     <section className="task-control-strip" aria-label="Aufgaben Kennzahlen">
       <article className="task-control-stat is-total">
-        <span>Aktiver Backlog</span>
+        <span>Gesamt</span>
         <strong data-dashboard-task-count>{tasks.length}</strong>
         <small>sichtbare Aufgaben</small>
       </article>

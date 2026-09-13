@@ -28,7 +28,7 @@
     min-height: 6.1rem;
     border: 1px solid #dbe5ef;
     border-radius: 0.65rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.82rem 0.9rem;
   }
 
@@ -91,7 +91,7 @@
     min-height: 3.4rem;
     border: 1px solid #e0e8f1;
     border-radius: 0.55rem;
-    background: #fbfdff;
+    background: var(--color-bg-surface);
     padding: 0.65rem 0.75rem;
   }
 
@@ -112,7 +112,7 @@
 
   .ops-drilldown-row small {
     grid-column: 1 / -1;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.72rem;
     font-weight: 750;
   }
@@ -135,7 +135,7 @@
 
   .maintenance-cockpit-copy h2 {
     margin: 0;
-    color: #102036;
+    color: var(--color-text-primary);
     font-size: 1.55rem;
     font-weight: 950;
     line-height: 1.05;
@@ -154,7 +154,7 @@
     display: grid;
     justify-items: end;
     gap: 0.35rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.74rem;
     font-weight: 800;
   }
@@ -165,8 +165,8 @@
     align-items: center;
     border: 1px solid #d8e2ef;
     border-radius: 0.35rem;
-    background: #f8fafc;
-    color: #334155;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     padding: 0.35rem 0.65rem;
     font-size: 0.72rem;
     font-weight: 900;
@@ -194,8 +194,8 @@
   .ops-status-pill.is-loading,
   .ops-status-pill.is-muted {
     border-color: #d8e2ef;
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-muted);
   }
 
   .maintenance-cockpit-actions {
@@ -208,7 +208,7 @@
   .maintenance-cockpit-actions a {
     border: 1px solid #d8e2ef;
     border-radius: 0.35rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     color: #1e3a5f;
     padding: 0.4rem 0.55rem;
     font-size: 0.74rem;

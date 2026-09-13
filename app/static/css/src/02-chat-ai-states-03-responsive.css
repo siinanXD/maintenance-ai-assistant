@@ -86,7 +86,7 @@
   }
 
   .nav-link.is-active {
-    background: #ffffff;
+    background: var(--color-bg-surface);
     border-color: rgba(255, 255, 255, 0.24);
     color: #0d2744;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
@@ -105,7 +105,7 @@
   }
 
   .nav-link.is-active .nav-icon {
-    background: #eaf3ff;
+    background: var(--color-bg-canvas);
     color: #075fca;
   }
 
@@ -172,7 +172,7 @@
     height: 1.45rem;
     place-items: center;
     border-radius: 0.35rem;
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-blue);
     font-size: 0.62rem;
     font-weight: 900;

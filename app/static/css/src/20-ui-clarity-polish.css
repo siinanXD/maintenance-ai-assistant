@@ -161,7 +161,7 @@
     align-items: center;
     gap: 0.65rem;
     border: 1px solid var(--ui-border);
-    border-left: 3px solid #94a3b8;
+    border-left: 3px solid var(--color-border-strong);
     border-radius: 0.5rem;
     background: var(--ui-surface);
     padding: 0.55rem 0.68rem;
@@ -206,8 +206,8 @@
 
   .action-hint-item > span {
     border-radius: 999px;
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     padding: 0.18rem 0.45rem;
     font-size: 0.68rem;
     font-weight: 900;

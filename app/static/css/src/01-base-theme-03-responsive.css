@@ -139,7 +139,7 @@
     max-width: 96%;
     gap: 0.7rem;
     border: 1px solid #d9e4ef;
-    background: #fbfdff;
+    background: var(--color-bg-surface);
     padding: 0.8rem;
   }
 
@@ -159,7 +159,7 @@
   }
 
   .chat-answer-title span {
-    color: #102036;
+    color: var(--color-text-primary);
     font-size: 0.84rem;
     font-weight: 950;
     line-height: 1.15;
@@ -167,7 +167,7 @@
 
   .chat-answer-title small {
     overflow: hidden;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.7rem;
     font-weight: 750;
     line-height: 1.2;
@@ -190,8 +190,8 @@
     align-items: center;
     border: 1px solid #d8e2ef;
     border-radius: 999px;
-    background: #f4f7fb;
-    color: #475569;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     padding: 0.18rem 0.45rem;
     font-size: 0.66rem;
     font-weight: 900;

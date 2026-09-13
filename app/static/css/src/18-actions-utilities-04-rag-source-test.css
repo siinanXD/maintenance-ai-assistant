@@ -33,7 +33,7 @@
     height: 1.1rem;
     border-radius: 999px;
     background: #16a34a;
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 0.48rem;
     font-weight: 950;
   }
@@ -66,7 +66,7 @@
     white-space: pre-wrap;
     border: 1px solid #e2eaf4;
     border-radius: 0.5rem;
-    background: #f8fbfd;
+    background: var(--color-bg-canvas);
     padding: 0.85rem;
     color: var(--ui-text);
     font-size: 0.88rem;
@@ -102,7 +102,7 @@
   .rag-effectiveness-strip {
     grid-column: 1 / -1;
     border-top: 1px solid #dbe4ee;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 1rem 1.25rem 1.25rem;
   }
 
@@ -117,7 +117,7 @@
     min-height: 7.5rem;
     border: 1px solid #dbe4ee;
     border-radius: 0.55rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.95rem;
   }
 
@@ -149,7 +149,7 @@
     border: 1px solid #e2eaf4;
     border-left: 4px solid var(--ui-teal);
     border-radius: 0.5rem;
-    background: #fff;
+    background: var(--color-bg-surface);
     padding: 0.65rem;
   }
 

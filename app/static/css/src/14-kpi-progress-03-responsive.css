@@ -30,9 +30,9 @@
   .record-card-meta span {
     display: grid;
     gap: 0.15rem;
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-radius: var(--ui-radius-sm);
-    background: #f4f8fc;
+    background: var(--color-bg-canvas);
     padding: 0.55rem;
     min-width: 0;
   }
@@ -106,7 +106,7 @@
     border: 1px solid var(--ui-border);
     border-top: 4px solid var(--ui-primary);
     border-radius: var(--ui-radius);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.85rem;
     box-shadow: var(--ui-shadow-xs);
   }
@@ -177,7 +177,7 @@
     gap: 0.9rem;
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 1rem;
     box-shadow: var(--ui-shadow-xs);
   }

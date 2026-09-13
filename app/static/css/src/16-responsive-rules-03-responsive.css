@@ -63,7 +63,7 @@
   border: 1px solid var(--ui-border);
   border-top: 4px solid var(--ui-primary);
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   padding: 0.85rem;
   box-shadow: var(--ui-shadow-xs);
 }
@@ -118,7 +118,7 @@
 .incident-catalog-shell {
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius);
-  background: #ffffff;
+  background: var(--color-bg-surface);
   box-shadow: var(--ui-shadow-xs);
 }
 

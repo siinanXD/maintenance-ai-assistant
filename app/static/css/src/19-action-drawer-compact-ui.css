@@ -26,7 +26,7 @@
     width: min(42rem, 100vw);
     height: 100vh;
     border-left: 1px solid var(--ui-border, #dbe6f0);
-    background: #f8fbff;
+    background: var(--color-bg-canvas);
     box-shadow: -24px 0 48px rgba(15, 23, 42, 0.18);
   }
 
@@ -36,7 +36,7 @@
     justify-content: space-between;
     gap: 1rem;
     border-bottom: 1px solid var(--ui-border, #dbe6f0);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 1rem 1.15rem;
   }
 
@@ -152,7 +152,7 @@
     gap: 0.75rem;
     border: 1px solid var(--ops-border, #dfe5ee);
     border-radius: 0.45rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.58rem 0.78rem;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
   }
@@ -163,7 +163,7 @@
 
   .control-center-topbar .page-kicker {
     margin: 0 0 0.12rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 900;
     letter-spacing: 0;
@@ -172,7 +172,7 @@
 
   .control-center-topbar .page-title {
     margin: 0;
-    color: #111827;
+    color: var(--color-text-primary);
     font-size: clamp(1.12rem, 1.55vw, 1.5rem);
     font-weight: 950;
     letter-spacing: 0;
@@ -185,7 +185,7 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.35rem 0.5rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.76rem;
     font-weight: 750;
   }
@@ -203,9 +203,9 @@
     min-height: 2.55rem;
     align-content: center;
     gap: 0.02rem;
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.45rem;
-    background: #f8fafc;
+    background: var(--color-bg-canvas);
     padding: 0.32rem 0.42rem;
   }
 
@@ -218,21 +218,21 @@
   }
 
   .dashboard-status-chip strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.9rem;
     font-weight: 950;
     line-height: 1;
   }
 
   .dashboard-status-chip span {
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 0.66rem;
     font-weight: 850;
     line-height: 1.1;
   }
 
   .dashboard-status-chip small {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.6rem;
     line-height: 1.05;
   }
@@ -265,12 +265,12 @@
     gap: 0.22rem 0.58rem;
     min-width: 0;
     min-height: 4.25rem;
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-left-width: 4px;
     border-radius: 0.45rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.56rem 0.68rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     text-align: left;
     text-decoration: none;
     box-shadow: 0 3px 10px rgba(15, 23, 42, 0.035);
@@ -293,8 +293,8 @@
     min-height: 2.35rem;
     place-items: center;
     border-radius: 0.4rem;
-    background: #f1f5f9;
-    color: #17223b;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-primary);
     font-size: 0.78rem;
     font-weight: 950;
     line-height: 1;
@@ -314,7 +314,7 @@
   }
 
   .situation-copy small {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.66rem;
     font-weight: 900;
     line-height: 1;
@@ -326,14 +326,14 @@
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-    color: #111827;
+    color: var(--color-text-primary);
     font-size: 0.88rem;
     font-weight: 950;
     line-height: 1.12;
   }
 
   .situation-copy em {
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 0.7rem;
     font-style: normal;
     font-weight: 750;
@@ -369,7 +369,7 @@
 
   .situation-card.is-muted,
   .cockpit-focus-card.is-muted {
-    border-left-color: #94a3b8;
+    border-left-color: var(--color-border-strong);
   }
 
   .dashboard-cockpit-grid {
@@ -418,7 +418,7 @@
 
   .cockpit-action-row {
     width: 100%;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border-default);
     text-align: left;
   }
 
@@ -434,12 +434,12 @@
     gap: 0.2rem 0.62rem;
     min-width: 0;
     min-height: 5.4rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border-default);
     border-left-width: 4px;
     border-radius: 0.45rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.7rem 0.75rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     text-align: left;
     text-decoration: none;
   }
@@ -462,8 +462,8 @@
     min-height: 2.6rem;
     place-items: center;
     border-radius: 0.42rem;
-    background: #f1f5f9;
-    color: #17223b;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-primary);
     font-size: 0.7rem;
     font-weight: 950;
     line-height: 1;
@@ -483,7 +483,7 @@
   }
 
   .cockpit-focus-copy small {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 900;
     line-height: 1;
@@ -495,14 +495,14 @@
     overflow: hidden;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
-    color: #111827;
+    color: var(--color-text-primary);
     font-size: 0.98rem;
     font-weight: 950;
     line-height: 1.14;
   }
 
   .cockpit-focus-copy em {
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 0.74rem;
     font-style: normal;
     font-weight: 750;
@@ -522,12 +522,12 @@
     align-content: center;
     gap: 0.25rem;
     min-height: 5.4rem;
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-left: 4px solid #22b455;
     border-radius: 0.45rem;
     background: #fbfffd;
     padding: 0.75rem;
-    color: #17223b;
+    color: var(--color-text-primary);
   }
 
   .cockpit-steady-card strong {
@@ -537,7 +537,7 @@
   }
 
   .cockpit-steady-card span {
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 0.76rem;
     font-weight: 750;
     line-height: 1.25;
@@ -551,7 +551,7 @@
   }
 
   .cockpit-section-label {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.66rem;
     font-weight: 900;
     line-height: 1;
@@ -582,18 +582,18 @@
   .asset-health-strip span {
     display: grid;
     gap: 0.08rem;
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.45rem;
-    background: #f8fafc;
+    background: var(--color-bg-canvas);
     padding: 0.36rem 0.45rem;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 800;
     line-height: 1.1;
   }
 
   .asset-health-strip strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 1rem;
     font-weight: 950;
     line-height: 1;
@@ -610,7 +610,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.6rem;
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 0.72rem;
     font-weight: 900;
     line-height: 1.1;
@@ -631,12 +631,12 @@
     gap: 0.75rem;
     min-width: 0;
     min-height: 2.38rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border-default);
     border-left-width: 3px;
     border-radius: 0.45rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.38rem 0.52rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     text-decoration: none;
   }
 
@@ -652,14 +652,14 @@
   }
 
   .cockpit-mini-row strong {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.78rem;
     font-weight: 850;
     line-height: 1.15;
   }
 
   .cockpit-mini-row small {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.68rem;
     font-weight: 700;
     line-height: 1.1;
@@ -668,8 +668,8 @@
   .cockpit-mini-row em {
     flex: 0 0 auto;
     border-radius: 0.35rem;
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     padding: 0.2rem 0.35rem;
     font-size: 0.65rem;
     font-style: normal;
@@ -696,14 +696,14 @@
   }
 
   .cockpit-mini-row.is-muted {
-    border-left-color: #94a3b8;
+    border-left-color: var(--color-border-strong);
   }
 
   .shift-status-line {
-    border: 1px solid #dbe6f0;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.45rem;
-    background: #f8fafc;
-    color: #334155;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
     padding: 0.42rem 0.52rem;
     font-size: 0.76rem;
     font-weight: 800;
@@ -712,9 +712,9 @@
 
   .cockpit-briefing-summary {
     margin: 0;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--color-border-default);
     padding-top: 0.45rem;
-    color: #475569;
+    color: var(--color-text-secondary);
     font-size: 0.75rem;
     font-weight: 750;
     line-height: 1.35;
@@ -728,14 +728,14 @@
   .cockpit-briefing-links a {
     display: grid;
     gap: 0.1rem;
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.74rem;
     font-weight: 850;
     text-decoration: none;
   }
 
   .cockpit-briefing-links small {
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 0.66rem;
     font-weight: 700;
   }

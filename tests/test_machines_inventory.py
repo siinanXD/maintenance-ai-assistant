@@ -1401,3 +1401,43 @@ def test_machine_assistant_falls_back_when_ai_provider_fails(
     assert response.status_code == 200
     assert payload["diagnostics"]["status"] == "fallback_used"
     assert "Anlage Fallback" in payload["answer"]
+
+
+def test_machine_list_reports_visible_task_and_error_signals(
+    client,
+    make_user,
+    make_machine,
+    make_task,
+    make_error_entry,
+    auth_headers,
+):
+    """Verify machine cards get open task, active error and last error signals."""
+    admin = make_user(
+        username="machine_signal_admin",
+        role=Role.MASTER_ADMIN,
+        department_name="Instandhaltung",
+    )
+    signal_machine_id = make_machine(name="Presse Signal 7")
+    quiet_machine_id = make_machine(name="Presse Ruhig 2")
+    make_task(
+        "Presse Signal 7 Hydraulik pruefen",
+        creator_username=admin["username"],
+        department_name="Instandhaltung",
+    )
+    make_error_entry(
+        "Presse Signal 7",
+        "PS700",
+        "Druckverlust Hauptzylinder",
+        department_name="Instandhaltung",
+    )
+
+    response = client.get("/api/v1/machines", headers=auth_headers(admin["username"]))
+
+    assert response.status_code == 200
+    machines = {item["id"]: item for item in response.get_json()}
+    assert machines[signal_machine_id]["open_tasks"] == 1
+    assert machines[signal_machine_id]["active_errors"] == 1
+    assert machines[signal_machine_id]["last_error"] == "Druckverlust Hauptzylinder"
+    assert machines[quiet_machine_id]["open_tasks"] == 0
+    assert machines[quiet_machine_id]["active_errors"] == 0
+    assert machines[quiet_machine_id]["last_error"] == ""

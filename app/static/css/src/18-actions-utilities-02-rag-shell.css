@@ -18,14 +18,14 @@
     border: 1px solid #dbe4ee;
     border-top: 0;
     border-radius: 0 0 var(--ui-radius) var(--ui-radius);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     box-shadow: var(--ui-shadow-sm);
   }
 
   .rag-health-rail,
   .rag-test-arena {
     min-width: 0;
-    background: #fbfdff;
+    background: var(--color-bg-surface);
     padding: 1rem;
   }
 
@@ -100,7 +100,7 @@
     overflow: hidden;
     border: 1px solid #dbe4ee;
     border-radius: 0.55rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
   }
 
   .rag-health-item {
@@ -151,7 +151,7 @@
     align-items: center;
     border: 1px solid #dbe4ee;
     border-radius: 0.55rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.75rem;
   }
 
@@ -162,7 +162,7 @@
     height: 2rem;
     border-radius: 999px;
     background: #0f766e;
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 0.72rem;
     font-weight: 950;
   }

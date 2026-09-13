@@ -104,7 +104,7 @@
 
   .knowledge-side-nav a.is-active {
     border-color: #bdd8f2;
-    background: #eef7ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-primary-dark);
   }
 
@@ -140,7 +140,7 @@
     border: 1px solid var(--ui-border);
     border-left: 4px solid var(--ui-teal);
     border-radius: var(--ui-radius);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.9rem;
   }
 
@@ -187,7 +187,7 @@
     max-width: 92%;
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
-    background: #f7fbff;
+    background: var(--color-bg-canvas);
     color: var(--ui-text-soft);
     padding: 0.7rem;
     font-size: 0.82rem;
@@ -198,7 +198,7 @@
     justify-self: end;
     border-color: #bfc9d5;
     background: #2d3748;
-    color: #ffffff;
+    color: var(--color-text-inverse);
   }
 
   .chat-test-input {

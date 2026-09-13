@@ -215,6 +215,21 @@
     color: var(--color-status-info-text);
   }
 
+  /*
+   * Abschnitts-Kicker ("Heute zuerst", "Anlagen", "Maintenance Control Center") waren
+   * ueber --ui-primary orange. Sie ordnen, sie handeln nicht: Typenschild-Label in
+   * gedaempftem Grau, wie im Werkbank-Brief.
+   */
+  .page-kicker,
+  .section-kicker,
+  .eyebrow-label,
+  .control-center-topbar .page-kicker {
+    /* !important nur, weil eine Legacy-Regel die Farbe bereits mit !important auf --ui-primary setzt. */
+    color: var(--color-text-muted) !important;
+    font-family: var(--font-label);
+    letter-spacing: 0.08em;
+  }
+
   .vacation-control-stat.is-info {
     border-top-color: var(--color-border-strong);
   }
@@ -322,4 +337,58 @@
   border-color: var(--color-status-info-border);
   background: var(--color-status-info-bg);
   color: var(--color-status-info-text);
+}
+
+/* Chat: eigene Frage in Tinte statt Himmelblau, Antwort-Metadaten ruhig. */
+.chat-message.is-user {
+  border-color: var(--color-bg-inverse);
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.chat-answer-meta span,
+.chat-answer-meta span:first-child {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-surface-sunken);
+  color: var(--color-text-secondary);
+}
+
+.chat-answer-meta span:first-child {
+  color: var(--color-text-primary);
+}
+
+.help-disclosure summary {
+  color: var(--color-text-secondary);
+}
+
+/* Kennzahl-Beschriftungen (Nutzerverwaltung) waren Marineblau. */
+.kpi-label {
+  color: var(--color-text-muted);
+}
+
+/* Hilfe-Disclosures und Chat-Kopf: Flaeche statt kuehlem Verlauf. */
+.help-disclosure.context-help,
+.chat-panel-header {
+  background: var(--color-bg-surface);
+}
+
+/* Karten-Kennzahlen: lange Beschriftungen (PRODUKTIONSVERLUST) brechen statt ueberzulaufen. */
+.incident-card-metrics small,
+.handover-record-metrics small,
+.machine-profile-record-metrics small,
+.record-card-meta small {
+  hyphens: auto;
+  overflow-wrap: break-word;
+  letter-spacing: 0.02em;
+}
+
+/* Status-Badges in Kartenkoepfen behalten ihre Hoehe statt sich zu strecken. */
+.incident-card-badges {
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+/* Topbar-Schichtchip: alte Regel machte die Schichtzeit zum Grid und brach die Datumszeile um. */
+#maintenance-shell-topbar-root .shift-select small span {
+  display: inline;
 }

@@ -80,7 +80,7 @@
     place-items: center;
     border-radius: 0.65rem;
     background: #1084ff;
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 0.8rem;
     font-weight: 900;
     box-shadow: 0 10px 22px rgba(0, 94, 255, 0.28);
@@ -138,13 +138,13 @@
 
   .nav-link:hover {
     background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
+    color: var(--color-text-inverse);
     text-decoration: none;
   }
 
   .nav-link.is-active {
     background: linear-gradient(135deg, #1785ff, #0068ea);
-    color: #ffffff;
+    color: var(--color-text-inverse);
     box-shadow: 0 10px 24px rgba(0, 104, 234, 0.24);
   }
 
@@ -171,7 +171,7 @@
     border-radius: 0.45rem;
     padding: 0.22rem 0.35rem;
     background: #1984ff;
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 0.72rem;
     font-weight: 900;
     line-height: 1;

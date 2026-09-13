@@ -55,7 +55,7 @@
     min-width: 0;
     border: 1px solid #e2eaf4;
     border-radius: 0.5rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.8rem;
   }
 
@@ -91,7 +91,7 @@
     position: relative;
     border: 1px solid #dbe4ee;
     border-radius: 0.55rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.95rem;
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
   }

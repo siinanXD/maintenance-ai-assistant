@@ -124,14 +124,11 @@ export function LoginForm({ onLogin }: LoginFormProps): ReactNode {
   }
 
   return (
-    <form className="card app-card" method="post" action="/api/v1/auth/login" data-login-form onSubmit={handleSubmit}>
-      <div className="card-body">
-        <div className="panel-header">
-          <div>
-            <h2 className="panel-title">Benutzerzugang</h2>
-            <p className="panel-meta">E-Mail oder Benutzername plus Passwort</p>
-          </div>
-        </div>
+    <form className="login-card" method="post" action="/api/v1/auth/login" data-login-form onSubmit={handleSubmit}>
+      <p className="page-kicker">Anmelden</p>
+      <h2 className="login-card-title">Willkommen zurück</h2>
+      <p className="login-card-meta">Mit Benutzername oder E-Mail und Passwort.</p>
+      <div className="login-fields">
         <div className="field">
           <label htmlFor="react-login">Benutzername oder E-Mail</label>
           <input
@@ -141,7 +138,8 @@ export function LoginForm({ onLogin }: LoginFormProps): ReactNode {
             id="react-login"
             name="login"
             onChange={(event) => updateField("login", event.target.value)}
-            placeholder="admin@example.com"
+            autoComplete="username"
+            placeholder="name@firma.de"
             value={values.login}
           />
         </div>
@@ -154,21 +152,20 @@ export function LoginForm({ onLogin }: LoginFormProps): ReactNode {
             id="react-password"
             name="password"
             onChange={(event) => updateField("password", event.target.value)}
+            autoComplete="current-password"
             placeholder="Passwort"
             type="password"
             value={values.password}
           />
         </div>
-        <div className="toolbar">
-          <button className="btn btn-primary" disabled={busy} type="submit">
-            {busy ? "Anmelden..." : "Anmelden"}
-          </button>
-          <a className="btn btn-ghost" href="/api-docs">API-Protokoll</a>
-        </div>
-        <p className={`panel-meta${message.variant ? ` is-${message.variant}` : ""}`} data-login-message>
-          {message.text}
-        </p>
       </div>
+      <button className="btn btn-primary login-submit" disabled={busy} type="submit">
+        {busy ? "Anmelden..." : "Anmelden"}
+      </button>
+      <p className={`panel-meta login-message${message.variant ? ` is-${message.variant}` : ""}`} data-login-message role="status">
+        {message.text}
+      </p>
+      <a className="login-secondary-link" href="/api-docs">API-Protokoll ansehen</a>
     </form>
   );
 }

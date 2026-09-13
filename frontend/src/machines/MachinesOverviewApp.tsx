@@ -44,6 +44,7 @@ export function MachinesOverviewApp(): ReactNode {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [message, setMessage] = useState<MessageState>({ text: "", error: false });
   const [recommendations, setRecommendations] = useState<MachineRecommendation[]>([]);
+  const issueCount = machines.reduce((total, machine) => total + (machine.active_errors || 0), 0);
 
   /**
    * Refresh overview data.
@@ -112,12 +113,12 @@ export function MachinesOverviewApp(): ReactNode {
   return (
     <>
       <MachinesHeader
-        issueCount={0}
+        issueCount={issueCount}
         onAssistantFocus={focusAssistant}
         onCreateMachine={() => setIsCreateDrawerOpen(true)}
         writable={writable}
       />
-      <MachineStats issueCount={0} machines={machines} />
+      <MachineStats issueCount={issueCount} machines={machines} />
       {message.text ? (
         <section className="card app-card" role="alert">
           <div className="card-body">

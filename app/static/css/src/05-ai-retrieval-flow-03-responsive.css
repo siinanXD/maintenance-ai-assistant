@@ -30,7 +30,7 @@
     z-index: 80;
     transform: translateY(-160%);
     border-radius: var(--ui-radius-sm, 0.5rem);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     color: var(--ui-blue, #0a67d8);
     font-weight: 800;
     padding: 0.7rem 1rem;
@@ -59,7 +59,7 @@
   }
 
   .nav-link[aria-current="page"] {
-    background: #ffffff;
+    background: var(--color-bg-surface);
     color: #0c2441;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
   }
@@ -122,9 +122,9 @@
   .chat-sources span {
     display: grid;
     gap: 0.15rem;
-    border: 1px solid #dbe4ef;
+    border: 1px solid var(--color-border-default);
     border-radius: 0.45rem;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.5rem 0.6rem;
     text-decoration: none;
   }
@@ -173,7 +173,7 @@
   .table-wrap {
     border-radius: var(--ui-radius-md, 0.65rem);
     border-color: rgba(219, 228, 239, 0.95);
-    background: #ffffff;
+    background: var(--color-bg-surface);
     box-shadow: var(--ui-shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.05));
     transition:
       border-color 160ms ease,
@@ -190,7 +190,7 @@
   }
 
   .data-table thead th {
-    background: #f8fbff;
+    background: var(--color-bg-canvas);
     color: #42526a;
     font-size: 0.72rem;
     font-weight: 850;

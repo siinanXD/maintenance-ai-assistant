@@ -5,7 +5,7 @@
 
   .kpi-value {
     margin: 0.45rem 0 0;
-    color: #102036;
+    color: var(--color-text-primary);
     font-size: 1.75rem;
     font-weight: 900;
     line-height: 1;
@@ -70,7 +70,7 @@
 
   .ops-panel-header h2 {
     margin: 0;
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 1rem;
     font-weight: 850;
     letter-spacing: 0;
@@ -102,7 +102,7 @@
     border: 0;
     border-right: 1px solid var(--ops-border);
     border-radius: 0;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0;
   }
 
@@ -113,7 +113,7 @@
   .cockpit-column.is-urgent,
   .cockpit-column.is-today,
   .cockpit-column.is-progress {
-    background: #ffffff;
+    background: var(--color-bg-surface);
   }
 
   .cockpit-column-title {
@@ -125,8 +125,8 @@
     margin: 0;
     padding: 0.8rem 0.85rem;
     border-bottom: 1px solid var(--ops-border);
-    background: #f7f9fc;
-    color: #17223b;
+    background: var(--color-bg-canvas);
+    color: var(--color-text-primary);
     font-size: 0.85rem;
     font-weight: 850;
     letter-spacing: 0;
@@ -144,7 +144,7 @@
     place-items: center;
     border-radius: 0.35rem;
     background: #ef3f4d;
-    color: #ffffff;
+    color: var(--color-text-inverse);
     font-size: 0.68rem;
     font-weight: 900;
   }
@@ -167,7 +167,7 @@
     border-left: 3px solid #ef3f4d;
     border-bottom: 1px solid #edf1f6;
     border-radius: 0;
-    background: #ffffff;
+    background: var(--color-bg-surface);
     padding: 0.85rem 0.8rem 0.8rem;
     box-shadow: none;
   }
@@ -186,11 +186,11 @@
     min-height: 5.25rem;
     border-left-style: solid;
     background: #fbfcfe;
-    color: #64748b;
+    color: var(--color-text-muted);
   }
 
   .cockpit-task-title {
-    color: #17223b;
+    color: var(--color-text-primary);
     font-size: 0.86rem;
     font-weight: 850;
     line-height: 1.25;

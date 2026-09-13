@@ -1651,9 +1651,12 @@ def test_react_app_shell_preserves_global_shell_hooks():
     assert "shellShiftState" in topbar_sources
     assert "Frühschicht" in topbar_sources
     assert "Spätschicht" in topbar_sources
-    assert "data-topbar-work" in topbar
+    # The worksite button only showed "not configured"; it was removed from the topbar.
+    assert "data-topbar-work" not in topbar
     assert "data-topbar-date" in topbar
-    assert "handleWorksiteClick" in topbar
+    assert "handleWorksiteClick" not in topbar
+    assert "userRoleLabel" in topbar
+    assert "userInitials" in topbar
     assert "handleShiftplansClick" in topbar
     assert "data-current-date" in topbar
     assert "data-current-shift" in topbar
