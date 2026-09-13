@@ -116,6 +116,29 @@ function errorMessageFromPayload(payload: unknown, fallback: string): string {
 }
 
 /**
+ * Download a protected file as a Blob. Images and PDFs behind the API cannot be
+ * loaded through a plain `src`, because the browser would not send the token.
+ */
+export async function fetchAuthorizedBlob(path: string): Promise<Blob> {
+  if (!path.startsWith("/api/")) {
+    throw new Error(`API paths must start with /api/: ${path}`);
+  }
+
+  const response = await fetch(path, { headers: buildHeaders(undefined, undefined) });
+
+  if (!response.ok) {
+    const payload = await parseJsonResponse(response).catch(() => null);
+    throw new ApiRequestError(
+      errorMessageFromPayload(payload, "Die Datei konnte nicht geladen werden."),
+      response.status,
+      isRecord(payload) ? payload : null
+    );
+  }
+
+  return response.blob();
+}
+
+/**
  * Call an existing `/api/v1/...` endpoint using the shared auth storage contract.
  */
 export async function apiRequest<TResponse>(

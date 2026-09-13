@@ -16,6 +16,7 @@ from app.domain_models.ai import (
     KnowledgeGap,
     RetrievalEvaluationRun,
 )
+from app.domain_models.attachments import Attachment
 from app.domain_models.common import Priority, Role, TaskStatus, utc_now
 from app.domain_models.documents import (
     DocumentApprovalEvent,
@@ -44,6 +45,7 @@ from app.domain_models.workforce import (
 )
 
 __all__ = [
+    "Attachment",
     "AIAuditEvent",
     "AIAnswerTrace",
     "AIFeedback",

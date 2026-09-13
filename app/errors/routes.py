@@ -10,6 +10,7 @@ from app.security import (
     dashboard_permission_required,
     same_department_or_admin,
 )
+from app.services.attachment_service import delete_attachments_for
 from app.services.error_service import (
     ERROR_STATUSES,
     analyze_error_description,
@@ -184,6 +185,7 @@ def delete_error(error_id):
         description=f"Stoerung geloescht: {entry.error_code}",
     )
     delete_source_knowledge_document("error_entry", entry.id)
+    delete_attachments_for("error", entry.id)
     db.session.delete(entry)
     db.session.commit()
     return "", 204

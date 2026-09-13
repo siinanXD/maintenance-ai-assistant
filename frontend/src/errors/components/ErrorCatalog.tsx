@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { AttachmentPanel } from "../../components/attachments/AttachmentPanel";
 import { closeErrorEntry, deleteErrorEntry, loadSimilarErrors } from "../errorApi";
 import type { ErrorEntry, ErrorFilters, MessageState, SimilarErrorResult } from "../errorTypes";
 import {
@@ -128,7 +129,7 @@ function ErrorCard(props: ErrorCatalogProps & { readonly entry: ErrorEntry }): R
           ["Stillstand", formatIncidentMinutes(props.entry.downtime_minutes)],
           ["Verlust", formatIncidentMinutes(props.entry.production_loss_minutes)],
           ["Wiederholt", String(Number(props.entry.repeat_count || 0))],
-          [status === "closed" ? "Geschlossen" : "Zuletzt",incidentDate(props.entry.closed_at || props.entry.last_seen_at || props.entry.created_at)]
+          [status === "closed" ? "Geschlossen" : "Zuletzt", incidentDate(props.entry.closed_at || props.entry.last_seen_at || props.entry.created_at)]
         ].map(([label, value]) => (
           <span key={label}>
             <small>{label}</small>
@@ -142,6 +143,7 @@ function ErrorCard(props: ErrorCatalogProps & { readonly entry: ErrorEntry }): R
         <HighlightedBlock label="Lösung" value={props.entry.solution} variant="is-solution" />
         <HighlightedBlock label="Auswirkung" value={props.entry.impact} variant="is-impact" />
       </div>
+      <AttachmentPanel entityId={props.entry.id} entityType="error" writable={props.writable} />
       <ErrorCardActions {...props} />
     </article>
   );

@@ -109,6 +109,8 @@ export function ErrorsApp(): ReactNode {
       setMessage({ text: errorMessage(error), error: true });
     });
     if (window.location.hash === "#incident-create") {
+      const machine = new URLSearchParams(window.location.search).get("machine");
+      if (machine) setCreateDraft((draft) => ({ ...draft, machine }));
       setActiveDrawer("create");
     }
   }, []);

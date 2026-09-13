@@ -17,6 +17,7 @@ BASE_OPENAPI_SPEC = {
         {"name": "Auth", "description": "Login and user registration"},
         {"name": "Tasks", "description": "Task lifecycle and prioritization"},
         {"name": "Errors", "description": "Error catalog and AI suggestions"},
+        {"name": "Attachments", "description": "Photos and PDFs on incidents and tasks"},
         {"name": "AI", "description": "Daily briefing and AI assistant endpoints"},
         {"name": "Machines", "description": "Machine records and assistant"},
         {"name": "Inventory", "description": "Inventory and spare-part forecasts"},

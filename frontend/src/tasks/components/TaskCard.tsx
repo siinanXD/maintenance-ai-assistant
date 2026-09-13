@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 
+import { AttachmentPanel } from "../../components/attachments/AttachmentPanel";
 import { deleteTask, runTaskAction } from "../taskApi";
 import type { MessageState, Task } from "../taskTypes";
 import {
@@ -145,6 +146,8 @@ export function TaskCard({
           </span>
         ) : null}
       </div>
+
+      <AttachmentPanel entityId={task.id} entityType="task" writable={writable} />
 
       <div className="task-card-actions">
         {writable && task.status === "open" ? (

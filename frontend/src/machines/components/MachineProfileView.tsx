@@ -21,6 +21,7 @@ import {
   taskRecord,
   timelineRecord
 } from "./MachineProfileRecords";
+import { MachineQrLabel } from "./MachineQrLabel";
 
 type MachineProfileViewProps = {
   readonly message: string;
@@ -109,10 +110,11 @@ export function MachineProfileView({ message, profile }: MachineProfileViewProps
           </div>
         </div>
         <div className="machine-profile-actions">
-          <a className="btn btn-outline btn-sm" href="/machines">Zur Übersicht</a>
-          <a className="btn btn-primary btn-sm" data-machine-profile-task-link href={`/tasks?search=${query}`}>Aufgabe planen</a>
+          <a className="btn btn-primary btn-sm" data-machine-profile-report-link href={`/errors?machine=${query}#incident-create`}>Störung melden</a>
+          <a className="btn btn-outline btn-sm" data-machine-profile-task-link href={`/tasks?search=${query}`}>Aufgabe planen</a>
           <a className="btn btn-outline btn-sm" data-machine-profile-error-link href={`/errors?search=${query}`}>Störungen prüfen</a>
           <a className="btn btn-outline btn-sm" data-machine-profile-document-link href={`/documents?search=${query}`}>Dokumente</a>
+          {machine?.id ? <MachineQrLabel machineId={machine.id} machineName={machine.name || "Maschine"} /> : null}
         </div>
       </section>
 

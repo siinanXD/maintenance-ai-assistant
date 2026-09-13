@@ -779,6 +779,47 @@ Response:
 204 No Content
 ```
 
+## Fotos und Dateien
+
+Fotos (JPG, PNG, WebP) und PDFs haengen an einer Stoerung (`entity_type=error`)
+oder einem Task (`entity_type=task`). Sichtbarkeit und Rechte folgen dem
+Eintrag: Lesen braucht `view`, Hochladen und Loeschen `write` auf dem
+jeweiligen Dashboard. Eintraege anderer Abteilungen antworten mit `404`.
+
+```http
+POST /api/v1/attachments
+Authorization: Bearer <access_token>
+Content-Type: multipart/form-data
+
+entity_type=error
+entity_id=81
+file=<leckage.jpg>
+```
+
+Der Dateityp wird aus dem Inhalt erkannt, nicht aus Name oder MIME-Header.
+Antworten: `201` mit dem Anhang, `413` ueber `ATTACHMENT_MAX_BYTES`
+(Standard 10 MB), `415` bei anderem Dateityp, `409` ab 20 Dateien je Eintrag.
+
+```http
+GET    /api/v1/attachments?entity_type=error&entity_id=81
+GET    /api/v1/attachments/{id}/file
+DELETE /api/v1/attachments/{id}
+```
+
+Wird die Stoerung oder der Task geloescht, verschwinden die Anhaenge mit.
+
+## QR-Etikett je Maschine
+
+```http
+GET /api/v1/machines/{machine_id}/qr.svg
+Authorization: Bearer <access_token>
+```
+
+Liefert ein SVG, das `PUBLIC_BASE_URL/m/{machine_id}` kodiert (ohne
+`PUBLIC_BASE_URL` den aufrufenden Host). `/m/{machine_id}` leitet auf die
+Maschinenseite weiter; von dort startet "Stoerung melden" das Formular mit
+vorausgefuellter Maschine.
+
 ## KI-Assistent
 
 ### Chat-Anfrage senden
