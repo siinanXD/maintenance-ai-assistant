@@ -9,6 +9,7 @@ from app.machines.maintenance_services import (
     generate_due_maintenance_tasks,
     get_visible_maintenance_plan,
     recommend_preventive_maintenance,
+    record_maintenance,
     update_maintenance_plan,
     visible_maintenance_plans_query,
 )
@@ -222,6 +223,44 @@ def edit_maintenance_plan(plan_id):
     if error:
         return service_error_response(error, status)
     return success_response(updated.to_dict(), status, "Maintenance plan updated")
+
+
+@machines_bp.get("/maintenance-plans/<int:plan_id>/records")
+@dashboard_permission_required("machines", "view")
+def list_maintenance_records(plan_id):
+    """Return the documented executions of a visible plan, newest first."""
+    plan = get_visible_maintenance_plan(plan_id, current_user())
+    if not plan:
+        return error_response("Maintenance plan not found", 404)
+    return success_response(
+        [record.to_dict() for record in plan.records], message="Maintenance records loaded"
+    )
+
+
+@machines_bp.post("/maintenance-plans/<int:plan_id>/records")
+@dashboard_permission_required("machines", "write")
+def add_maintenance_record(plan_id):
+    """Document an execution of a visible plan."""
+    user = current_user()
+    plan = get_visible_maintenance_plan(plan_id, user)
+    if not plan:
+        return error_response("Maintenance plan not found", 404)
+    record, error, status = record_maintenance(plan, request.get_json(silent=True) or {}, user)
+    if error:
+        return service_error_response(error, status)
+    record_event(
+        "maintenance.recorded",
+        "machines",
+        entity_type="maintenance_plan",
+        entity_id=plan.id,
+        user=user,
+        machine_id=plan.machine_id,
+        metadata={"kind": plan.kind, "result": record.result},
+        commit=True,
+    )
+    return success_response(
+        {"record": record.to_dict(), "plan": plan.to_dict()}, status, "Maintenance recorded"
+    )
 
 
 @machines_bp.delete("/maintenance-plans/<int:plan_id>")

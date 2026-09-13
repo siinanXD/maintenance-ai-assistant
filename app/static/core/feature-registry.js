@@ -47,6 +47,15 @@
       moduleUrl: "/static/pages/machines-island.js",
     },
     {
+      key: "maintenance",
+      permissionKey: "machines",
+      label: "Prüfungen & Wartung",
+      route: "/maintenance",
+      group: "Arbeit",
+      module: "page",
+      moduleUrl: "/static/pages/maintenance-island.js",
+    },
+    {
       key: "inventory",
       permissionKey: "inventory",
       label: "Lager",

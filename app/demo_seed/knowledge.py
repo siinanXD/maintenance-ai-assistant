@@ -58,6 +58,51 @@ MAINTENANCE_PLAN_DEFINITIONS = [
     ),
 ]
 
+# (title, legal basis, scope, interval days, due in days, department, machine key,
+#  last execution: (days ago, performed by, result, notes) or None)
+INSPECTION_PLAN_DEFINITIONS = [
+    (
+        "Prüfung elektrischer Anlagen und Betriebsmittel",
+        "DGUV Vorschrift 3",
+        "Isolationswiderstand, Schutzleiter und RCD-Auslösezeit messen; Prüfplakette erneuern.",
+        365,
+        -6,
+        "Instandhaltung",
+        "hydraulikpresse-03",
+        (371, "Elektro Brandt GmbH", "passed", "Prüfprotokoll E-2025-0412"),
+    ),
+    (
+        "Druckbehälterprüfung Kompressor",
+        "BetrSichV § 16",
+        "Äußere Prüfung Druckbehälter, Sicherheitsventil anlüften, Kondensatablass prüfen.",
+        730,
+        21,
+        "Instandhaltung",
+        "kompressorstation-07",
+        (709, "TÜV Süd Industrie Service", "defects", "Kondensatableiter undicht, getauscht"),
+    ),
+    (
+        "Sicherheitsfunktionen Roboterzelle",
+        "DIN EN ISO 10218-2",
+        "Schutztür-Verriegelung, Lichtvorhang und Not-Halt unter Last testen.",
+        182,
+        48,
+        "Produktion",
+        "roboterzelle-09",
+        (134, "Sicherheitsfachkraft Keller", "passed", "Alle Funktionen i. O."),
+    ),
+    (
+        "Leitern und Tritte",
+        "DGUV Information 208-016",
+        "Sichtprüfung Holme, Sprossen, Gelenke und Spreizsicherung; Prüfliste aktualisieren.",
+        365,
+        140,
+        "Instandhaltung",
+        None,
+        (225, "Meister Wagner", "passed", "12 Leitern geprüft, 1 ausgesondert"),
+    ),
+]
+
 ACTIVE_ERROR_STATES = {
     ("Instandhaltung", "E-101"): {
         "status": "open",

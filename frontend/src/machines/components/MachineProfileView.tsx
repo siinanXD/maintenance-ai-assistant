@@ -58,12 +58,12 @@ function FactGrid({ profile }: { readonly profile: MachineProfile | null }): Rea
 function ProfileKpis({ profile }: { readonly profile: MachineProfile | null }): ReactNode {
   const kpis = profile?.kpis || {};
   const kpiRows: ReadonlyArray<readonly [string, unknown, string, string]> = [
-    ["Offene Aufgaben", kpis.open_tasks || 0, "Aktive Arbeit zur Maschine", "is-work"],
-    ["Aktive Störungen", kpis.active_errors || 0, "Offen oder in Bearbeitung", "is-risk"],
-    ["Kritisch", kpis.critical_errors || 0, "Hohe Dringlichkeit", "is-critical"],
-    ["Wartung fällig", kpis.maintenance_due || 0, "Aktive Wartungspläne", "is-maintenance"],
-    ["Dokumente", kpis.documents || 0, "Berichte und Handbücher", "is-knowledge"],
-    ["Stillstand", minutesLabel(kpis.downtime_minutes), "Erfasste Ausfallzeit", "is-downtime"]
+    ["Verfügbarkeit", kpis.availability_percent == null ? "–" : `${String(kpis.availability_percent).replace(".", ",")} %`, "Letzte 90 Tage", "is-work"],
+    ["MTBF", kpis.mtbf_hours == null ? "keine Ausfälle" : `${Math.round(Number(kpis.mtbf_hours))} h`, `${kpis.failure_count || 0} Ausfälle in 90 Tagen`, "is-maintenance"],
+    ["MTTR", kpis.mttr_minutes == null ? "–" : minutesLabel(kpis.mttr_minutes), "Mittlere Reparaturzeit", "is-downtime"],
+    ["Aktive Störungen", kpis.active_errors || 0, `${kpis.critical_errors || 0} davon kritisch`, "is-risk"],
+    ["Offene Aufgaben", kpis.open_tasks || 0, "Aktive Arbeit zur Maschine", "is-critical"],
+    ["Pläne fällig", kpis.maintenance_due || 0, "Prüfungen und Wartungen", "is-knowledge"]
   ];
 
   return (
@@ -154,8 +154,8 @@ export function MachineProfileView({ message, profile }: MachineProfileViewProps
           <ProfilePanel selector="data-machine-profile-error-history" kicker="Historie" title="Fehlerhistorie">
             {permissions.errors === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyText="Noch keine Fehlerhistorie vorhanden." items={profile?.error_history} mapper={errorRecord} />}
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-maintenance" kicker="Wartung" title="Letzte und fällige Wartungen" actionHref="/machines" actionLabel="Wartungspläne">
-            <ProfileRecordList emptyHref="/machines" emptyLabel="Wartungsplan prüfen" emptyText="Keine Wartungspläne für diese Maschine." items={profile?.maintenance_plans} mapper={maintenanceRecord} />
+          <ProfilePanel selector="data-machine-profile-maintenance" kicker="Wartung" title="Prüfungen und Wartungen" actionHref="/maintenance" actionLabel="Alle Pläne">
+            <ProfileRecordList emptyHref="/maintenance" emptyLabel="Plan anlegen" emptyText="Keine Wartungspläne für diese Maschine." items={profile?.maintenance_plans} mapper={maintenanceRecord} />
           </ProfilePanel>
           <ProfilePanel selector="data-machine-profile-documents" kicker="Wissen" title="Dokumente und Handbücher" actionHref="/documents" actionLabel="Knowledge Base">
             {permissions.documents === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyHref="/documents" emptyLabel="Dokument hochladen" emptyText="Keine Dokumente oder Handbücher zugeordnet." items={documentRows.map((entry) => entry.item)} mapper={(item) => documentRecord(item, documentRows.find((entry) => entry.item === item)?.type || "Dokument")} />}

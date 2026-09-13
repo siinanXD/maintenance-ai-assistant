@@ -1,5 +1,7 @@
 """SQLAlchemy domain models for this bounded area."""
 
+from datetime import date, timedelta
+
 from app.domain_models.common import Priority, utc_now
 from app.extensions import db
 
@@ -137,11 +139,23 @@ class InventoryMovement(db.Model):
         }
 
 
+PLAN_KIND_MAINTENANCE = "maintenance"
+PLAN_KIND_INSPECTION = "inspection"
+DUE_SOON_DAYS = 30
+
+
 class MaintenancePlan(db.Model):
-    """Recurring maintenance plan that can generate scheduled tasks."""
+    """Recurring maintenance or legally required inspection for a machine.
+
+    ``kind="inspection"`` marks obligations such as DGUV V3 or pressure vessel
+    checks; ``legal_basis`` names the regulation. Each execution is documented
+    as a ``MaintenanceRecord`` and moves ``next_due_date`` forward.
+    """
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(160), nullable=False)
+    kind = db.Column(db.String(20), nullable=False, default=PLAN_KIND_MAINTENANCE)
+    legal_basis = db.Column(db.String(120), nullable=False, default="")
     description = db.Column(db.Text, nullable=False, default="")
     interval_days = db.Column(db.Integer, nullable=False)
     next_due_date = db.Column(db.Date, nullable=False)
@@ -167,6 +181,21 @@ class MaintenancePlan(db.Model):
     department = db.relationship("Department")
     creator = db.relationship("User", foreign_keys=[created_by])
     last_generated_task = db.relationship("Task", foreign_keys=[last_generated_task_id])
+    records = db.relationship(
+        "MaintenanceRecord",
+        back_populates="plan",
+        cascade="all, delete-orphan",
+        order_by="MaintenanceRecord.performed_on.desc(), MaintenanceRecord.id.desc()",
+    )
+
+    def due_state(self, today=None):
+        """Return ``overdue``, ``due_soon`` (within 30 days) or ``ok``."""
+        today = today or date.today()
+        if self.next_due_date < today:
+            return "overdue"
+        if self.next_due_date <= today + timedelta(days=DUE_SOON_DAYS):
+            return "due_soon"
+        return "ok"
 
     __table_args__ = (
         db.Index(
@@ -183,8 +212,12 @@ class MaintenancePlan(db.Model):
         return {
             "id": self.id,
             "title": self.title,
+            "kind": self.kind,
+            "legal_basis": self.legal_basis,
             "description": self.description,
             "interval_days": self.interval_days,
+            "due_state": self.due_state() if self.is_active else "inactive",
+            "last_record": self.records[0].to_dict() if self.records else None,
             "next_due_date": self.next_due_date.isoformat(),
             "priority": self.priority.value,
             "is_active": self.is_active,
@@ -198,4 +231,43 @@ class MaintenancePlan(db.Model):
             ),
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
+        }
+
+
+RECORD_RESULTS = ("passed", "defects", "failed")
+
+
+class MaintenanceRecord(db.Model):
+    """Proof that a maintenance or inspection was carried out, with its result."""
+
+    id = db.Column(db.Integer, primary_key=True)
+    plan_id = db.Column(
+        db.Integer, db.ForeignKey("maintenance_plan.id", ondelete="CASCADE"), nullable=False
+    )
+    performed_on = db.Column(db.Date, nullable=False)
+    performed_by = db.Column(db.String(120), nullable=False)
+    result = db.Column(db.String(20), nullable=False)
+    notes = db.Column(db.Text, nullable=False, default="")
+    follow_up_task_id = db.Column(db.Integer, db.ForeignKey("task.id", ondelete="SET NULL"))
+    recorded_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
+
+    plan = db.relationship("MaintenancePlan", back_populates="records")
+    follow_up_task = db.relationship("Task")
+    recorder = db.relationship("User")
+
+    __table_args__ = (db.Index("ix_maintenance_record_plan_performed", "plan_id", "performed_on"),)
+
+    def to_dict(self):
+        """Return a JSON-serializable representation of the record."""
+        return {
+            "id": self.id,
+            "plan_id": self.plan_id,
+            "performed_on": self.performed_on.isoformat(),
+            "performed_by": self.performed_by,
+            "result": self.result,
+            "notes": self.notes,
+            "follow_up_task_id": self.follow_up_task_id,
+            "recorded_by": self.recorder.public_dict() if self.recorder else None,
+            "created_at": self.created_at.isoformat(),
         }

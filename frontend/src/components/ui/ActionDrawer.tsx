@@ -54,7 +54,7 @@ export function ActionDrawer({
   return (
     <div className="action-drawer-layer" role="presentation">
       <button
-        aria-label="Aktionsbereich schliessen"
+        aria-label="Aktionsbereich schließen"
         className="action-drawer-backdrop"
         onClick={onClose}
         type="button"
@@ -73,7 +73,7 @@ export function ActionDrawer({
             {drawerDescription ? <p id={descriptionId}>{drawerDescription}</p> : null}
           </div>
           <button className="btn btn-ghost btn-sm" onClick={onClose} type="button">
-            Schliessen
+            Schließen
           </button>
         </header>
         <div className="action-drawer-body">

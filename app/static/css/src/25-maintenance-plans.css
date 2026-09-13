@@ -1,0 +1,344 @@
+/*
+ * Seite "Prüfungen & Wartung" (frontend/src/maintenance). Eine Liste nach
+ * Fälligkeit: die Datumsspalte links trägt den Zustand, rechts stehen Nachweis
+ * und Aktionen. Bewusst ohne Kennzahl-Kacheln, die Zähler sind Sprungmarken.
+ */
+
+@layer components {
+  .page-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .page-intro .page-title {
+    margin: 0;
+  }
+
+  .page-intro .page-description {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-secondary);
+  }
+
+  .plan-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+  }
+
+  .plan-summary-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border: 1px solid var(--color-border-default);
+    border-left-width: 3px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+  }
+
+  .plan-summary-item strong {
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .plan-summary-item.is-overdue {
+    border-left-color: var(--color-status-danger-solid);
+  }
+
+  .plan-summary-item.is-due_soon {
+    border-left-color: var(--color-status-warning-solid);
+  }
+
+  .plan-summary-item.is-ok {
+    border-left-color: var(--color-status-success-solid);
+  }
+
+  .plan-filter {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: auto;
+  }
+
+  .plan-group {
+    margin-bottom: var(--space-8);
+  }
+
+  .plan-group > h2 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-4);
+    color: var(--color-text-muted);
+    font-family: var(--font-label);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .plan-group > h2 span {
+    font-family: var(--font-mono);
+  }
+
+  .plan-list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-surface);
+    list-style: none;
+  }
+
+  .plan-row {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr) auto;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border-left: 3px solid transparent;
+  }
+
+  .plan-row + .plan-row {
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .plan-row.is-overdue {
+    border-left-color: var(--color-status-danger-solid);
+  }
+
+  .plan-row.is-due_soon {
+    border-left-color: var(--color-status-warning-solid);
+  }
+
+  .plan-row-due {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+  }
+
+  .plan-row-due strong {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .plan-row-due small {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  .plan-row.is-overdue .plan-row-due small {
+    color: var(--color-status-danger-text);
+    font-weight: 600;
+  }
+
+  .plan-row-main {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .plan-row-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .plan-row-title h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .plan-kind {
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-family: var(--font-label);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .plan-kind.is-inspection {
+    border-color: var(--color-text-primary);
+    color: var(--color-text-primary);
+  }
+
+  .plan-row-meta,
+  .plan-row-last {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  .plan-result {
+    font-weight: 600;
+  }
+
+  .plan-result.is-passed {
+    color: var(--color-status-success-text);
+  }
+
+  .plan-result.is-defects {
+    color: var(--color-status-warning-text);
+  }
+
+  .plan-result.is-failed {
+    color: var(--color-status-danger-text);
+  }
+
+  .plan-row-actions {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .plan-history {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+  }
+
+  .plan-history li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .plan-history-date {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .plan-form {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .plan-form .field {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .plan-form .field > span,
+  .plan-kind-toggle legend {
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .plan-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--space-4);
+  }
+
+  .plan-form-context {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-canvas);
+  }
+
+  .plan-form-context span {
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+  }
+
+  .plan-kind-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .plan-kind-toggle legend {
+    width: 100%;
+    margin-bottom: var(--space-3);
+  }
+
+  .plan-kind-toggle label {
+    position: relative;
+  }
+
+  .plan-kind-toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .plan-kind-toggle span {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-control-height-md);
+    padding: 0 var(--space-6);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    font-size: 0.875rem;
+  }
+
+  .plan-kind-toggle input:checked + span {
+    border-color: var(--color-text-primary);
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+  }
+
+  .plan-kind-toggle.is-result .is-failed input:checked + span {
+    border-color: var(--color-status-danger-solid);
+    background: var(--color-status-danger-solid);
+  }
+
+  .plan-kind-toggle input:focus-visible + span {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  .plan-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: 0.875rem;
+  }
+
+  .workflow-status.is-error {
+    color: var(--color-status-danger-text);
+  }
+
+  @media (max-width: 767px) {
+    .plan-row {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    .plan-filter {
+      margin-left: 0;
+    }
+  }
+}

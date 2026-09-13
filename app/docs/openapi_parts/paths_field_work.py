@@ -286,4 +286,39 @@ PATHS_FIELD_WORK = {
             "responses": {"201": {"description": "Updated material and movement"}, **_ERRORS},
         }
     },
+    "/api/v1/machines/maintenance-plans/{plan_id}/records": {
+        "get": {
+            "tags": ["Machines"],
+            "summary": "Documented executions of a maintenance or inspection plan",
+            "security": _AUTH,
+            "parameters": [_path_id("plan_id")],
+            "responses": {"200": {"description": "Records, newest first"}, **_ERRORS},
+        },
+        "post": {
+            "tags": ["Machines"],
+            "summary": "Document an execution and schedule the next due date",
+            "description": (
+                "passed/defects move next_due_date one interval past performed_on; failed "
+                "schedules a re-test after 7 days. defects/failed create a follow-up task "
+                "unless create_follow_up is false (needs tasks write)."
+            ),
+            "security": _AUTH,
+            "parameters": [_path_id("plan_id")],
+            "requestBody": _json_body(
+                {
+                    "performed_on": {"type": "string", "format": "date"},
+                    "performed_by": {"type": "string", "example": "TÜV Süd Industrie Service"},
+                    "result": {"type": "string", "enum": ["passed", "defects", "failed"]},
+                    "notes": {"type": "string", "example": "Prüfprotokoll E-2026-0412"},
+                    "create_follow_up": {"type": "boolean", "default": True},
+                },
+                required=["performed_by", "result"],
+            ),
+            "responses": {
+                "201": {"description": "Record and updated plan"},
+                "400": {"$ref": "#/components/responses/ValidationError"},
+                **_ERRORS,
+            },
+        },
+    },
 }

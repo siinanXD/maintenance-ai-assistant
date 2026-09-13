@@ -32,6 +32,7 @@ from app.domain_models.machines import (
     InventoryMovement,
     Machine,
     MaintenancePlan,
+    MaintenanceRecord,
 )
 from app.domain_models.notifications import Notification, NotificationDelivery
 from app.domain_models.operations import OperationalEvent, OperationalKpiAggregate
@@ -50,6 +51,7 @@ from app.domain_models.workforce import (
 )
 
 __all__ = [
+    "MaintenanceRecord",
     "InventoryMovement",
     "Attachment",
     "AIAuditEvent",
