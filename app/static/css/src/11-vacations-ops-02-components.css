@@ -245,8 +245,4 @@
 }
 
 @layer components {
-  :root {
-    --sidebar-width: 268px;
-  }
-
   .app-shell-layout {

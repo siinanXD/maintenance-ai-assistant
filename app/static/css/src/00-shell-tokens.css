@@ -1,0 +1,29 @@
+/*
+ * Shell-Token: die einzige Quelle fuer die Masse der App-Huelle.
+ *
+ * Bis Schritt 3 (Figma-Variablen -> Tokens Studio -> Style Dictionary) diese
+ * Werte erzeugt, werden sie hier von Hand gepflegt. Regeln dazu:
+ *
+ *   1. --sidebar-width und Verwandte werden NUR hier deklariert. Frueher lagen
+ *      vier Deklarationen mit drei Werten in zufaelligen Feature-Dateien, und
+ *      die tatsaechliche Breite kam aus zwei !important-Regeln daneben.
+ *   2. Breakpoints sind ausschliesslich die vier unten genannten. Ein neuer
+ *      Wert ist ein Fehler, kein Sonderfall.
+ *
+ * Breakpoints (Custom Properties sind in @media nicht erlaubt, daher als
+ * verbindliche Liste statt als Variablen):
+ *
+ *   bp-sm    640px   Tabellen werden zu Zeilenkarten
+ *   bp-md    768px   Sidebar als Overlay
+ *   bp-lg   1024px   Sidebar fest, Chat als Panel
+ *   bp-xl   1440px   dritte Spalte fuer Detailansichten
+ */
+
+@layer base {
+  :root {
+    --sidebar-width: 264px;
+    --sidebar-width-collapsed: 64px;
+    --topbar-height: 56px;
+    --shell-row-height: 36px;
+  }
+}
