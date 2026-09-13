@@ -229,6 +229,35 @@ def test_task_create_start_complete_workflow(client, make_user, auth_headers):
     assert complete_response.get_json()["completed_by"] == user["id"]
 
 
+def test_task_payload_embeds_only_public_user_references(client, make_user, auth_headers):
+    """Verify tasks do not leak emails, permission matrices or employee data of other users."""
+    worker = make_user(
+        username="task_privacy_worker",
+        role=Role.INSTANDHALTUNG,
+        department_name="Instandhaltung",
+    )
+    headers = auth_headers(worker["username"])
+    task_id = client.post(
+        "/api/v1/tasks",
+        headers=headers,
+        json={"title": "Datenschutz pruefen", "department": "Instandhaltung", "priority": "normal"},
+    ).get_json()["id"]
+    client.post(f"/api/v1/tasks/{task_id}/start", headers=headers)
+    client.post(f"/api/v1/tasks/{task_id}/complete", headers=headers, json={})
+
+    task = client.get(f"/api/v1/tasks/{task_id}", headers=headers).get_json()
+    listed = client.get("/api/v1/tasks?limit=5", headers=headers).get_json()
+
+    for field in ("creator", "current_worker", "completed_by_user"):
+        embedded = task[field]
+        if embedded is None:
+            continue
+        assert set(embedded) == {"id", "username", "role"}
+        assert embedded["username"] == worker["username"]
+    assert "permissions" not in str(listed)
+    assert worker["username"] + "@" not in str(listed)
+
+
 def test_task_workflow_errors_use_consistent_payload(client, make_user, auth_headers):
     """Verify workflow errors expose success, short error code and message."""
     user = make_user(username="workflow_error_shape")

@@ -102,10 +102,23 @@ function settledValue<TValue>(
   return fallback;
 }
 
+export type DashboardCoreData = Pick<
+  DashboardRuntimeData,
+  "employees" | "errors" | "handovers" | "inventorySummary" | "machines" | "operationsSummary" | "tasks" | "vacations"
+> & { readonly loadErrors: readonly string[] };
+
+export type DashboardInsightData = Pick<
+  DashboardRuntimeData,
+  "aiStatus" | "dailyBriefing" | "knowledgeGaps" | "knowledgeStatus" | "retrievalTelemetry"
+> & { readonly loadErrors: readonly string[] };
+
 /**
- * Load the dashboard data that is safe to render directly from React.
+ * Load the operational data the cockpit needs to render its first useful view.
+ *
+ * These endpoints answer in milliseconds. The cockpit renders as soon as they
+ * settle instead of waiting for the AI insight endpoints below.
  */
-export async function loadDashboardRuntimeData(signal?: AbortSignal): Promise<DashboardRuntimeData> {
+export async function loadDashboardCoreData(signal?: AbortSignal): Promise<DashboardCoreData> {
   const [
     tasksResult,
     errorsResult,
@@ -114,12 +127,7 @@ export async function loadDashboardRuntimeData(signal?: AbortSignal): Promise<Da
     vacationsResult,
     handoversResult,
     inventoryResult,
-    aiStatusResult,
-    retrievalResult,
-    knowledgeStatusResult,
-    knowledgeGapsResult,
-    operationsResult,
-    briefingResult
+    operationsResult
   ] = await Promise.allSettled([
     loadDashboardList("/api/v1/tasks?limit=100", signal),
     loadDashboardList("/api/v1/errors?limit=100&active=1", signal),
@@ -128,31 +136,60 @@ export async function loadDashboardRuntimeData(signal?: AbortSignal): Promise<Da
     loadDashboardList("/api/v1/vacations?limit=100", signal),
     loadDashboardList(`/api/v1/handover?date=${todayIsoDate()}`, signal),
     loadDashboardObject("/api/v1/inventory/summary?include_materials=0", signal),
-    loadDashboardObject("/api/v1/ai/status", signal),
-    loadDashboardObject("/api/v1/admin/ai/retrieval-telemetry?days=7&limit=5", signal),
-    loadDashboardObject("/api/v1/admin/ai/knowledge/status", signal),
-    loadDashboardList("/api/v1/admin/ai/knowledge-gaps?status=open&limit=5", signal),
-    loadDashboardObject(`/api/v1/operations/summary?from=${todayIsoDate()}&to=${todayIsoDate()}`, signal),
-    loadDashboardObject("/api/v1/ai/daily-briefing", signal)
+    loadDashboardObject(`/api/v1/operations/summary?from=${todayIsoDate()}&to=${todayIsoDate()}`, signal)
   ]);
   const loadErrors: string[] = [];
 
   return {
-    ...EMPTY_DASHBOARD_DATA,
-    aiStatus: settledValue(aiStatusResult, null, "AI-Status", loadErrors),
     employees: settledValue(employeesResult, [], "Mitarbeiter", loadErrors),
     errors: settledValue(errorsResult, [], "Störungen", loadErrors),
     handovers: settledValue(handoversResult, [], "Übergaben", loadErrors),
     inventorySummary: settledValue(inventoryResult, null, "Lager", loadErrors),
-    knowledgeGaps: settledValue(knowledgeGapsResult, [], "Wissenslücken", loadErrors),
-    knowledgeStatus: settledValue(knowledgeStatusResult, null, "Wissensstatus", loadErrors),
     loadErrors,
     machines: settledValue(machinesResult, [], "Maschinen", loadErrors),
     operationsSummary: settledValue(operationsResult, null, "Operations", loadErrors),
-    dailyBriefing: settledValue(briefingResult, null, "Briefing", loadErrors),
-    retrievalTelemetry: settledValue(retrievalResult, null, "Retrieval", loadErrors),
     tasks: settledValue(tasksResult, [], "Aufgaben", loadErrors),
     vacations: settledValue(vacationsResult, [], "Urlaub", loadErrors)
+  };
+}
+
+/**
+ * Load the AI insight data that may take seconds: briefing, AI and knowledge status.
+ *
+ * The daily briefing runs retrieval and an AI prioritization; it is loaded after
+ * the cockpit is already visible and fills its panels when it arrives.
+ */
+export async function loadDashboardInsightData(signal?: AbortSignal): Promise<DashboardInsightData> {
+  const [aiStatusResult, retrievalResult, knowledgeStatusResult, knowledgeGapsResult, briefingResult] =
+    await Promise.allSettled([
+      loadDashboardObject("/api/v1/ai/status", signal),
+      loadDashboardObject("/api/v1/admin/ai/retrieval-telemetry?days=7&limit=5", signal),
+      loadDashboardObject("/api/v1/admin/ai/knowledge/status", signal),
+      loadDashboardList("/api/v1/admin/ai/knowledge-gaps?status=open&limit=5", signal),
+      loadDashboardObject("/api/v1/ai/daily-briefing", signal)
+    ]);
+  const loadErrors: string[] = [];
+
+  return {
+    aiStatus: settledValue(aiStatusResult, null, "AI-Status", loadErrors),
+    dailyBriefing: settledValue(briefingResult, null, "Briefing", loadErrors),
+    knowledgeGaps: settledValue(knowledgeGapsResult, [], "Wissenslücken", loadErrors),
+    knowledgeStatus: settledValue(knowledgeStatusResult, null, "Wissensstatus", loadErrors),
+    loadErrors,
+    retrievalTelemetry: settledValue(retrievalResult, null, "Retrieval", loadErrors)
+  };
+}
+
+/**
+ * Load all dashboard data at once; used where a single complete snapshot is needed.
+ */
+export async function loadDashboardRuntimeData(signal?: AbortSignal): Promise<DashboardRuntimeData> {
+  const [core, insight] = await Promise.all([loadDashboardCoreData(signal), loadDashboardInsightData(signal)]);
+  return {
+    ...EMPTY_DASHBOARD_DATA,
+    ...core,
+    ...insight,
+    loadErrors: [...core.loadErrors, ...insight.loadErrors]
   };
 }
 

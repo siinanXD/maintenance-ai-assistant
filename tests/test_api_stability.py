@@ -1629,7 +1629,7 @@ def test_react_app_shell_preserves_global_shell_hooks():
     assert "data-dashboard-task-count" in navigation
     assert "useShellNavigationCounts" in navigation_sources
     assert "totalFromPayload" in navigation_sources
-    assert '"/api/v1/tasks?limit=1"' in navigation_sources
+    assert '"/api/v1/tasks?limit=1&status=open"' in navigation_sources
     assert '"/api/v1/errors?limit=1&active=1"' in navigation_sources
     assert "data-nav-root" in navigation
     assert "ShellGlobalSearch" in navigation
@@ -1811,7 +1811,8 @@ def test_dashboard_react_markup_replaces_fallback_clone():
 
     assert "DashboardMarkup" in dashboard_app
     assert "markIslandMounted" in dashboard_app
-    assert "loadDashboardRuntimeData" in dashboard_app
+    assert "loadDashboardCoreData" in dashboard_app
+    assert "loadDashboardInsightData" in dashboard_app
     assert "loadDashboardTask" in dashboard_app
     assert "startDashboardTask" in dashboard_app
     assert "completeDashboardTask" in dashboard_app

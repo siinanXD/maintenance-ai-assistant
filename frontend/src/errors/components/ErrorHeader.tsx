@@ -24,7 +24,7 @@ export function ErrorHeader({
       <div>
         <h1 className="page-title">Störungszentrale & Fehlerkatalog</h1>
         <p className="page-description">
-          Störungen strukturiert erfassen, bekannte Fehler finden und Loesungen als Wissensbasis pflegen.
+          Störungen strukturiert erfassen, bekannte Fehler finden und Lösungen als Wissensbasis pflegen.
         </p>
       </div>
       <PageActionBar

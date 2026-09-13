@@ -21,8 +21,7 @@
 
   const reactMounted = await waitForReactIsland({
     mountedFlag: "maintenanceAdminAiReactMounted",
-    mountEvent: "maintenance-admin-ai-react-mounted",
-    timeoutMs: 900
+    mountEvent: "maintenance-admin-ai-react-mounted"
   });
 
   if (!reactMounted) reportAdminAiMountFailure();

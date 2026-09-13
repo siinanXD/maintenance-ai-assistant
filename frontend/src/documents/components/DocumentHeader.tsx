@@ -22,7 +22,7 @@ export function DocumentHeader({
   return (
     <section className="page-hero is-compact">
       <div>
-        <h1 className="page-title">Dokumentenuebersicht</h1>
+        <h1 className="page-title">Dokumentenübersicht</h1>
         <p className="page-description">
           Berichte und Handbücher als Wissensbasis prüfen, freigeben und herunterladen.
         </p>

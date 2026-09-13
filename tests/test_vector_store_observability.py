@@ -9,6 +9,7 @@ import pytest
 from app.domain_models.common import utc_now
 from app.extensions import db
 from app.models import KnowledgeChunk, KnowledgeDocument, Role
+from app.services import vector_store_service
 from app.services.knowledge_indexing_service import sync_vector_store_document
 from app.services.knowledge_service import knowledge_index_status
 from app.services.vector_store_service import (
@@ -271,6 +272,43 @@ def test_atlas_connection_error_fallback_does_not_leak_secret(app, monkeypatch, 
     assert "secret-password" not in caplog.text
     assert secret_uri not in caplog.text
     assert "connection_failed" in caplog.text
+
+
+def test_unreachable_atlas_is_tried_once_then_skipped_until_cooldown_ends(app, monkeypatch):
+    """Verify one connection failure stops further Atlas pings for the cooldown."""
+    attempts = []
+
+    def failing_client(*_args, **_kwargs):
+        attempts.append(1)
+        raise RuntimeError("server selection timeout")
+
+    _install_fake_pymongo(monkeypatch, client_factory=failing_client)
+    _configure_atlas(app)
+    app.config["MONGODB_ATLAS_RETRY_COOLDOWN_SECONDS"] = 300
+
+    with app.app_context():
+        stores = [get_vector_store() for _ in range(4)]
+
+    assert len(attempts) == 1
+    assert all(store.name == "local_knowledge" for store in stores)
+    assert vector_store_service.atlas_circuit_open() is True
+
+    vector_store_service.reset_atlas_circuit()
+    with app.app_context():
+        get_vector_store()
+
+    assert len(attempts) == 2
+
+
+def test_missing_atlas_config_does_not_open_the_circuit(app):
+    """Verify only connection failures pause Atlas; config errors fail fast anyway."""
+    app.config["RAG_VECTOR_STORE"] = "mongodb_atlas"
+    app.config["MONGODB_ATLAS_URI"] = ""
+
+    with app.app_context():
+        get_vector_store()
+
+    assert vector_store_service.atlas_circuit_open() is False
 
 
 def test_atlas_upsert_contains_safe_payload_and_existing_embedding(app, monkeypatch):

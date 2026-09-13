@@ -5,7 +5,8 @@ import { safeErrorMessage } from "../utils/errors";
 import {
   completeDashboardTask,
   createDashboardTask,
-  loadDashboardRuntimeData,
+  loadDashboardCoreData,
+  loadDashboardInsightData,
   loadDashboardTask,
   startDashboardTask,
   suggestDashboardTask,
@@ -54,12 +55,36 @@ export function DashboardApp(): ReactNode {
   const [suggestText, setSuggestText] = useState("");
 
   const refreshDashboardData = useCallback(async (signal?: AbortSignal): Promise<void> => {
-    setDashboardState((currentState) => ({ ...currentState, errorMessage: "", isLoading: true }));
-    const data = await loadDashboardRuntimeData(signal);
-    setDashboardState({
-      data,
-      errorMessage: data.loadErrors.join(" | "),
+    setDashboardState((currentState) => ({
+      ...currentState,
+      errorMessage: "",
+      isInsightLoading: true,
+      isLoading: true
+    }));
+
+    // Operational data first: the cockpit becomes usable in well under a second.
+    // AI insights (briefing with retrieval and AI prioritization) follow and may
+    // take several seconds; they must never hold back the rest of the page.
+    const insightPromise = loadDashboardInsightData(signal);
+    const core = await loadDashboardCoreData(signal);
+    if (signal?.aborted) return;
+    setDashboardState((currentState) => ({
+      data: { ...currentState.data, ...core, loadErrors: core.loadErrors },
+      errorMessage: core.loadErrors.join(" | "),
+      isInsightLoading: true,
       isLoading: false
+    }));
+
+    const insight = await insightPromise;
+    if (signal?.aborted) return;
+    setDashboardState((currentState) => {
+      const loadErrors = [...currentState.data.loadErrors, ...insight.loadErrors];
+      return {
+        data: { ...currentState.data, ...insight, loadErrors },
+        errorMessage: loadErrors.join(" | "),
+        isInsightLoading: false,
+        isLoading: false
+      };
     });
   }, []);
 
@@ -85,6 +110,7 @@ export function DashboardApp(): ReactNode {
       setDashboardState((currentState) => ({
         ...currentState,
         errorMessage: safeErrorMessage(error, "Dashboard-Daten konnten nicht geladen werden."),
+        isInsightLoading: false,
         isLoading: false
       }));
     });

@@ -302,8 +302,8 @@ function AdminAiApiRoleNotice(): ReactNode {
             <span className="section-kicker">AI Admin Zugriff</span>
             <h3>AI Admin ist für Master Admin freigegeben</h3>
             <p className="panel-meta">
-              Die Admin-AI-API ist im Backend mit Master-Admin-Rechten geschuetzt. Deshalb blendet
-              das Frontend API-abhaengige AI-Admin-Bereiche für andere Rollen aus, statt nicht
+              Die Admin-AI-API ist im Backend mit Master-Admin-Rechten geschützt. Deshalb blendet
+              das Frontend API-abhängige AI-Admin-Bereiche für andere Rollen aus, statt nicht
               nutzbare Panels zu laden.
             </p>
           </div>

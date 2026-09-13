@@ -65,8 +65,10 @@ export function useShellNavigationCounts(user: MaintenanceUser | null): ShellNav
       const canViewErrors = canViewStoredDashboard(user, "errors");
 
       const [tasksResult, errorsResult] = await Promise.allSettled([
+        // Same definition as the cockpit KPI "Offene Aufgaben": only status open,
+        // not every task ever created (which counted completed work as well).
         canViewTasks
-          ? apiRequest<unknown>("/api/v1/tasks?limit=1", { signal: controller.signal })
+          ? apiRequest<unknown>("/api/v1/tasks?limit=1&status=open", { signal: controller.signal })
           : Promise.resolve([]),
         canViewErrors
           ? apiRequest<unknown>("/api/v1/errors?limit=1&active=1", { signal: controller.signal })

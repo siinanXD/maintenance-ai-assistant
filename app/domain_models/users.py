@@ -55,6 +55,20 @@ class User(db.Model):
         """Return whether the user has the master administrator role."""
         return self.role == Role.MASTER_ADMIN
 
+    def public_dict(self):
+        """Return the user reference other records may embed.
+
+        Records such as tasks are readable by everyone with the matching
+        dashboard permission. They must not carry the referenced user's email,
+        permission matrix or linked employee record; to_dict() stays reserved
+        for the user themself and for user administration.
+        """
+        return {
+            "id": self.id,
+            "username": self.username,
+            "role": self.role.value,
+        }
+
     def to_dict(self):
         """Return a JSON-serializable representation of the user."""
         from app.permissions import serialize_permissions

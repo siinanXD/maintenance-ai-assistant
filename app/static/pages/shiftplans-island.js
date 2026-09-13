@@ -21,8 +21,7 @@
 
   const reactMounted = await waitForReactIsland({
     mountedFlag: "maintenanceShiftplansReactMounted",
-    mountEvent: "maintenance-shiftplans-react-mounted",
-    timeoutMs: 900
+    mountEvent: "maintenance-shiftplans-react-mounted"
   });
 
   if (!reactMounted) reportShiftplansMountFailure();

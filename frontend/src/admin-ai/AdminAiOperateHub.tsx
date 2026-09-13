@@ -61,7 +61,7 @@ export function AdminAiOperateHub({ overviewState }: AdminAiOperateHubProps): Re
           </div>
           <span className={`status-pill ${statusBadge.tone}`}>{statusBadge.label}</span>
         </div>
-        <ul className="action-hint-list" aria-label="Offene Betriebsmassnahmen">
+        <ul className="action-hint-list" aria-label="Offene Betriebsmaßnahmen">
           {actionItems.map((item) => (
             <li className={`action-hint-item ${item.tone}`} key={item.key}>
               <div className="action-hint-copy">
@@ -106,7 +106,7 @@ export function AdminAiOperateHub({ overviewState }: AdminAiOperateHubProps): Re
         <div className="help-disclosure-body">
           <div className="table-wrap bounded-table-wrap">
             <table className="data-table">
-              <caption>Audit-Events fuer Logging und Ursachenanalyse</caption>
+              <caption>Audit-Events für Logging und Ursachenanalyse</caption>
               <thead>
                 <tr>
                   <th scope="col">Zeit</th>
@@ -134,7 +134,7 @@ export function AdminAiOperateHub({ overviewState }: AdminAiOperateHubProps): Re
             </table>
           </div>
           <a className="btn btn-ghost btn-sm" href={ADMIN_AI_VIEW_META.technical.href}>
-            Observability oeffnen
+            Observability öffnen
           </a>
         </div>
       </details>

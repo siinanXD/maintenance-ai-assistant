@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "re
 import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { hasStoredToken } from "../auth/session";
+import { subscribeToSessionChange } from "../auth/sessionChange";
 import {
   completeHandover,
   createHandover,
@@ -218,23 +219,15 @@ export function HandoverApp(): ReactNode {
     }
   }, []);
 
-  useEffect(() => {
-    /**
-     * Refresh handover data when the global auth runtime announces a login change.
-     */
-    function handleAuthReady(): void {
-      loadInitialData().catch((error: unknown) => {
-        setListMessage({ text: handoverErrorMessage(error), isError: true });
-      });
-    }
-
-    window.addEventListener("maintenance-auth-ready", handleAuthReady);
-    window.addEventListener("maintenance-auth-changed", handleAuthReady);
-    return () => {
-      window.removeEventListener("maintenance-auth-ready", handleAuthReady);
-      window.removeEventListener("maintenance-auth-changed", handleAuthReady);
-    };
-  }, []);
+  useEffect(
+    () =>
+      subscribeToSessionChange(() => {
+        loadInitialData().catch((error: unknown) => {
+          setListMessage({ text: handoverErrorMessage(error), isError: true });
+        });
+      }),
+    []
+  );
 
   return (
     <div data-handover-react-shell>

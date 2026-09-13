@@ -23,14 +23,14 @@ export function VacationHeader({ onRequestOpen }: VacationHeroProps): ReactNode 
       <div>
         <h1 className="page-title">Urlaubsplanung</h1>
         <p className="page-description">
-          Antraege, Vertreter, Schichtbezug und Auswirkungen auf den Betrieb in einer gemeinsamen Planungsansicht.
+          Anträge, Vertreter, Schichtbezug und Auswirkungen auf den Betrieb in einer gemeinsamen Planungsansicht.
         </p>
       </div>
       <PageActionBar
         label="Urlaubsplanung Aktionen"
         actions={[
           { onClick: onRequestOpen, schema: createActionDefinition("vacationRequest"), variant: "primary" },
-          { href: "#vacation-decisions", label: "Offene Antraege", variant: "outline" }
+          { href: "#vacation-decisions", label: "Offene Anträge", variant: "outline" }
         ]}
       />
     </section>
@@ -51,7 +51,7 @@ export function VacationStats({ requests, selectedBalance, summaries }: Vacation
       <article className="vacation-control-stat is-warning">
         <span>Ausstehend</span>
         <strong data-vac-pending-count>{pendingRequests.length}</strong>
-        <small>Antraege zur Entscheidung</small>
+        <small>Anträge zur Entscheidung</small>
       </article>
       <article className="vacation-control-stat is-risk">
         <span>Konflikte</span>
@@ -59,7 +59,7 @@ export function VacationStats({ requests, selectedBalance, summaries }: Vacation
         <small>Unterbesetzung oder Schichttreffer</small>
       </article>
       <article className="vacation-control-stat is-good">
-        <span>Verfuegbar</span>
+        <span>Verfügbar</span>
         <strong data-vac-selected-available>{selectedBalance ? String(selectedBalance.available || 0) : "-"}</strong>
         <small>für ausgewählte Person</small>
       </article>
@@ -71,7 +71,7 @@ export function VacationStats({ requests, selectedBalance, summaries }: Vacation
       <article className="vacation-control-stat is-muted">
         <span>Reserviert</span>
         <strong data-vac-pending-total>{pendingTotal || "-"}</strong>
-        <small>durch offene Antraege</small>
+        <small>durch offene Anträge</small>
       </article>
     </section>
   );

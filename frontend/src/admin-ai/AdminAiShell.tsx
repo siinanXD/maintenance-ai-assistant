@@ -143,7 +143,7 @@ function adminAiHeroStatus({
     );
   }
   if (view === "source_check") {
-    if (sourceCheckState.isRunning) return { label: "Test laeuft", tone: "is-muted" };
+    if (sourceCheckState.isRunning) return { label: "Test läuft", tone: "is-muted" };
     if (sourceCheckState.isSaving) return { label: "Speichert", tone: "is-stale" };
     if (sourceCheckState.errorMessage) return { label: "Fehler", tone: "is-error" };
     return {
@@ -155,7 +155,7 @@ function adminAiHeroStatus({
     return loadingStatus(
       technicalState.isLoading,
       technicalState.errorMessage,
-      technicalState.isSaving ? "Aktion laeuft" : technicalState.statusMessage
+      technicalState.isSaving ? "Aktion läuft" : technicalState.statusMessage
     );
   }
   return { label: "Bereit", tone: "is-muted" };

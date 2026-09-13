@@ -16,13 +16,13 @@ export function HandoverHero({ onCreateOpen, onFocusList, writable }: HandoverHe
   return (
     <section className="page-hero handover-hero is-compact">
       <div>
-        <h1 className="page-title">Schichtuebergabe</h1>
+        <h1 className="page-title">Schichtübergabe</h1>
         <p className="page-description">
-          Strukturierte Uebergabe für Produktion, Instandhaltung, Sicherheit, Material und offene Folgearbeiten.
+          Strukturierte Übergabe für Produktion, Instandhaltung, Sicherheit, Material und offene Folgearbeiten.
         </p>
       </div>
       <PageActionBar
-        label="Schichtuebergabe Aktionen"
+        label="Schichtübergabe-Aktionen"
         actions={[
           { hidden: !writable, onClick: onCreateOpen, schema: createActionDefinition("handoverCreate"), variant: "primary" },
           { label: "Verlauf prüfen", onClick: onFocusList, variant: "outline" }

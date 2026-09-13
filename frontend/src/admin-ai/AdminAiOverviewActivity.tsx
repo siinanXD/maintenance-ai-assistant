@@ -18,7 +18,7 @@ export function AdminAiOverviewActivity({
       <div className="panel-header">
         <div>
           <h3>Letzte AI-Anfragen</h3>
-          <p className="panel-meta">Kurzuebersicht der juengsten Chat-Nutzung ohne Antworttext.</p>
+          <p className="panel-meta">Kurzübersicht der jüngsten Chat-Nutzung ohne Antworttext.</p>
         </div>
         <div className="admin-ai-overview-actions">
           <input
@@ -45,7 +45,7 @@ export function AdminAiOverviewActivity({
             </small>
           </article>
         )) : (
-          <p className="empty-state">Keine juengsten AI-Anfragen geladen.</p>
+          <p className="empty-state">Keine jüngsten AI-Anfragen geladen.</p>
         )}
       </div>
     </section>

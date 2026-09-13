@@ -83,7 +83,10 @@ export function VacationsApp(): ReactNode {
   }
 
   /**
-   * Load initial user, employee and vacation data.
+   * Load the initial user and employee data.
+   *
+   * Vacation summary and requests are loaded by the selectedYear effect, which also
+   * runs on mount; loading them here as well fetched both lists twice per visit.
    */
   async function loadInitialData(): Promise<void> {
     const [loadedUser, loadedEmployees] = await Promise.all([
@@ -92,7 +95,6 @@ export function VacationsApp(): ReactNode {
     ]);
     setUser(loadedUser);
     setEmployees(loadedEmployees);
-    await refreshVacationData(selectedYear);
   }
 
   /**

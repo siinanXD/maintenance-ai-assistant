@@ -47,18 +47,18 @@ const EMPTY_SOURCE_KPIS: AdminAiSourceTestKpis = {
 
 export const EMPTY_ADMIN_AI_SOURCE_CHECK_STATE: AdminAiSourceCheckState = {
   actionsVisible: false,
-  answerText: "Waehle Dry-run für Prompt/Kosten-Naehe oder Live-Test für echte Antwort mit Quellen.",
+  answerText: "Wähle Dry-run für Prompt/Kosten-Nähe oder Live-Test für echte Antwort mit Quellen.",
   errorMessage: "",
   isRunning: false,
   isSaving: false,
   kpis: EMPTY_SOURCE_KPIS,
   latestTest: null,
   promptMeta: "Noch kein Dry-run",
-  promptPreview: "Waehle Workflow und Frage.",
+  promptPreview: "Wähle Workflow und Frage.",
   reportedSourceCount: 0,
   sources: [],
   stateClassName: "status-pill is-muted",
   stateLabel: "Bereit",
   statusMessage: "",
-  testMeta: "Noch keine Testfrage ausgefuehrt"
+  testMeta: "Noch keine Testfrage ausgeführt"
 };

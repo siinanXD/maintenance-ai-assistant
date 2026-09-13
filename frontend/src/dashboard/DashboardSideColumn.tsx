@@ -53,17 +53,17 @@ function DailyBriefingCard({ dashboardState }: DashboardSideColumnProps): ReactN
         <span className="ai-label">AI</span>
       </header>
       <p className="briefing-summary" data-daily-briefing-summary="">
-        {briefingSummary(dashboardState.data)}
+        {briefingSummary(dashboardState.data, dashboardState.isInsightLoading)}
       </p>
       <div className="briefing-list" data-daily-briefing-list="">
-        {dashboardState.isLoading ? (
+        {dashboardState.isInsightLoading ? (
           <div className="briefing-item is-warning">
             <span>AI</span>
-            <strong>Kurzlage wird geladen</strong>
-            <small>Bitte kurz warten.</small>
+            <strong>Kurzlage wird erstellt</strong>
+            <small>Die übrigen Daten sind bereits aktuell.</small>
           </div>
         ) : null}
-        {!dashboardState.isLoading && items.length === 0 ? (
+        {!dashboardState.isInsightLoading && items.length === 0 ? (
           <div className="stat-row">
             <span>Status</span>
             <strong>Keine Hinweise</strong>
@@ -172,7 +172,7 @@ function InventoryHintsCard({ dashboardState }: DashboardSideColumnProps): React
  */
 export function DashboardSideColumn({ dashboardState }: DashboardSideColumnProps): ReactNode {
   return (
-    <aside className="control-center-side-column" aria-label="Briefing und Aktivitaet">
+    <aside className="control-center-side-column" aria-label="Briefing und Aktivität">
       <DailyBriefingCard dashboardState={dashboardState} />
       <ActivityFeedCard dashboardState={dashboardState} />
       <InventoryHintsCard dashboardState={dashboardState} />

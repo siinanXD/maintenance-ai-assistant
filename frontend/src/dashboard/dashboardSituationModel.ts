@@ -119,11 +119,11 @@ function taskFocusItem(task: DashboardPayload): DashboardFocusItem {
   const relativeDate = taskRelativeDateLabel(task);
 
   return {
-    actionLabel: "Aufgabe oeffnen",
+    actionLabel: "Aufgabe öffnen",
     detail: taskIsOverdue(task) ? "überfällig" : taskPriorityLabel(task.priority),
     id: `task-${dashboardPayloadKey(task, "task")}`,
     marker: "TASK",
-    meta: [taskDepartmentName(task), relativeDate].filter(Boolean).join(" | ") || "Verantwortung klaeren",
+    meta: [taskDepartmentName(task), relativeDate].filter(Boolean).join(" | ") || "Verantwortung klären",
     taskId: taskId(task),
     title: taskText(task, "title", "Aufgabe"),
     tone: taskIsOverdue(task) || taskText(task, "priority") === "urgent" ? "critical" : "warning"
@@ -265,11 +265,11 @@ export function dashboardSituationCards(data: DashboardRuntimeData): readonly Da
     {
       actionLabel: vacations.length ? "Urlaub prüfen" : "Schicht prüfen",
       detail: vacations.length
-        ? `${vacations.length} offene Antraege`
+        ? `${vacations.length} offene Anträge`
         : absent.length
           ? absent.slice(0, 2).map((employee) => peopleText(employee, "name", "Abwesend")).join(", ")
           : shortageCount
-            ? `${shortageCount} Materialengpaesse`
+            ? `${shortageCount} Materialengpässe`
             : `${data.employees.length || "--"} Mitarbeitende im Blick`,
       href: vacations.length ? "/vacations" : absent.length ? "/employees" : shortageCount ? "/inventory" : "/handover",
       id: "people",
@@ -279,7 +279,7 @@ export function dashboardSituationCards(data: DashboardRuntimeData): readonly Da
         : absent.length
           ? `${absent.length} abwesend markiert`
           : shortageCount
-            ? "Material klaeren"
+            ? "Material klären"
             : "Schichtlage ohne Warnung",
       tone: vacations.length || absent.length || shortageCount ? "warning" : "good",
       value: vacations.length || absent.length || shortageCount ? "!" : "OK"

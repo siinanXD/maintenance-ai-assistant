@@ -78,7 +78,7 @@ export function GeneratedDocumentList(props: GeneratedDocumentListProps): ReactN
           <summary>Hinweis zum Prüfstatus</summary>
           <div className="help-disclosure-body">
             <p className="panel-meta">
-              Schwache oder unvollständige Berichte sollten nachgearbeitet werden, bevor sie als verlaessliche
+              Schwache oder unvollständige Berichte sollten nachgearbeitet werden, bevor sie als verlässliche
               Wissensquelle dienen.
             </p>
           </div>
@@ -160,10 +160,10 @@ export function ManualList(props: ManualListProps): ReactNode {
           <span className="badge badge-status is-open" data-manual-count>{props.manuals.length} Handbücher</span>
         </div>
         <details className="help-disclosure ui-secondary-panel document-list-help">
-          <summary>Hinweis zu Maschinenhandbuechern</summary>
+          <summary>Hinweis zu Maschinenhandbüchern</summary>
           <div className="help-disclosure-body">
             <p className="panel-meta">
-              Maschinenhandbuecher liefern technische Details. Je klarer Maschine und Bereich gesetzt sind, desto
+              Maschinenhandbücher liefern technische Details. Je klarer Maschine und Bereich gesetzt sind, desto
               besser werden Treffer und Quellenangaben.
             </p>
           </div>

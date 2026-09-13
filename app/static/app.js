@@ -1,5 +1,5 @@
 (function () {
-  const STATIC_VERSION = "20260521-task-priority1";
+  const STATIC_VERSION = "20260913-island-timeout1";
   window.maintenanceStaticVersion = STATIC_VERSION;
   const pageImportPromises = new Map();
 
