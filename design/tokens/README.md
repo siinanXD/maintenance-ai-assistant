@@ -1,39 +1,42 @@
 # Design-Token
 
-Quelle der Wahrheit für Farben, Masse und Breakpoints der Anwendung. Wer einen
-Wert ändern will, ändert ihn hier — nicht in `tailwind.config.js`, nicht in den
-60 CSS-Quelldateien.
+`tokens.json` ist die Quelle, aus der die Anwendung Farben, Masse und
+Breakpoints bezieht. Werte ändert man hier oder in Figma, nie in
+`tailwind.config.js` oder in den 60 CSS-Quelldateien.
+
+## Woher die Werte kommen
+
+Gestalterische Quelle ist die Figma-Datei **„Maintenance AI — Design System &
+Redesign"**. Dort werden Farben, Radien und Schriften entworfen und auf allen
+14 Screens hell und dunkel geprüft.
+
+Übertragen werden die Werte über die Figma-MCP-Anbindung von Claude Code, die
+die Variablen direkt aus der Datei liest. Dafür ist kein Figma-Plugin, kein
+GitHub-Token und kein eigener Sync-Branch nötig.
+
+Stand 13.09.2026: Die Figma-Datei zeigt bereits die Werkbank-Palette,
+`tokens.json` noch die alte. Die Übernahme ist der nächste Schritt.
 
 ## Eine Datei, zwei Ebenen
 
-Alle Token liegen in `tokens.json`, im Single-File-Format von Tokens Studio.
-Jedes Token-Set ist ein Schlüssel auf oberster Ebene:
+Jedes Token-Set ist ein Schlüssel auf oberster Ebene von `tokens.json`:
 
 | Set | Inhalt | Wer verweist darauf |
 | --- | --- | --- |
 | `core` | Primitive Farbwerte, nach Farbton benannt (`color.blue.600`) | nur `semantic` |
 | `semantic` | Rollen (`color.action.default`), Masse, Breakpoints | die Anwendung |
 
-Daneben stehen `$themes` und `$metadata`. Das sind Verwaltungsdaten des Plugins
-(Theme-Liste, Reihenfolge der Sets), keine Token.
+Schlüssel mit `$` am Anfang (`$themes`, `$metadata`) sind Metadaten, keine
+Token.
 
-Die Trennung in zwei Sets hat einen Zweck: Ein Rollenname wie
-`color.status.critical` bleibt stabil, während sich der Farbwert dahinter
-ändert. Der Palettentausch aus Schritt 4 des Werkbank-Briefs ist deshalb eine
-Änderung am Set `core` allein.
+Die Trennung hat einen Zweck: Ein Rollenname wie `color.status.critical` bleibt
+stabil, während sich der Farbwert dahinter ändert.
 
 Aliase nennen den Set-Namen nicht (`{color.blue.600}`, nicht
-`{core.color.blue.600}`), weil Tokens Studio die Sets zusammenführt. Der
-Generator entpackt die Sets deshalb vor dem Build.
+`{core.color.blue.600}`), weil beide Sets gemeinsam aufgelöst werden. Der
+Generator entpackt sie deshalb vor dem Build in einzelne Dateien.
 
 Format ist [DTCG](https://tr.designtokens.org/format/) (`$value`, `$type`).
-
-## Warum eine Datei und nicht ein Ordner
-
-Tokens Studio kann Sets auch als einzelne Dateien in einem Ordner synchronisieren.
-Das ist aber ein [Pro-Feature](https://docs.tokens.studio/token-storage/remote-multi-file-sync):
-Mit der Free-Version sind so gesyncte Token nur lesbar. Eine einzelne Datei
-funktioniert mit Free und mit Pro gleichermassen.
 
 ## Erzeugte Dateien
 
@@ -73,35 +76,3 @@ Schritt 4 bis 6 die 295 Freihand-Radien und 140 Freihand-Schatten ab.
 
 `space` ist deckungsgleich mit Tailwinds Standardskala (Basis 4 px) und braucht
 deshalb keinen Override.
-
-## Anschluss an Tokens Studio
-
-Plugins laufen in der Figma-Datei, nicht in den Team-Einstellungen auf figma.com.
-
-1. Die Datei „Maintenance AI — Design System & Redesign" öffnen.
-2. Rechtsklick auf die Zeichenfläche → *Plugins* → *Tokens Studio for Figma*.
-3. Im Plugin *Settings → Sync providers → Add new → GitHub*.
-4. Eintragen:
-
-   | Feld | Wert |
-   | --- | --- |
-   | Personal Access Token | selbst erzeugen, siehe unten |
-   | Repository (owner/repo) | `siinanXD/maintenance-ai-assistant` |
-   | Branch | `design/tokens-sync` |
-   | Token storage location | `design/tokens/tokens.json` |
-   | Base URL | leer lassen |
-
-   Bei *Token storage location* muss der **Dateiname** stehen. Ein reiner
-   Ordnerpfad schaltet auf Multi-File-Sync, und der ist Pro.
-
-5. *Save*, danach *Pull from GitHub*. Die Sets `core` und `semantic` erscheinen
-   links in der Set-Liste.
-
-**Personal Access Token:** auf github.com unter *Settings → Developer settings →
-Personal access tokens → Fine-grained tokens*. Repository access auf dieses eine
-Repository beschränken, Berechtigungen *Contents: Read and write* und
-*Pull requests: Read and write*. Das Token wird nur im Plugin eingetragen.
-
-Änderungen aus Figma landen per Push auf `design/tokens-sync` und gehen von dort
-als Pull Request nach `master`. Vor dem Merge `npm run build:tokens` — der
-Drift-Wächter erzwingt es, sonst wird die CI rot.
