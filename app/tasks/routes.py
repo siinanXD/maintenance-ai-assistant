@@ -12,6 +12,7 @@ from app.security import (
     dashboard_permission_required,
     same_department_or_admin,
 )
+from app.services.attachment_service import delete_attachments_for
 from app.services.maintenance_tag_service import suggest_tags_for_task_payload
 from app.services.operations_tracking_service import record_event
 from app.services.task_service import (
@@ -218,6 +219,7 @@ def delete_task_endpoint(task_id):
         department=task.department,
         metadata={"title": task.title, "status": task.status.value},
     )
+    delete_attachments_for("task", task.id)
     _, error, status = delete_task(task)
     if error:
         return service_error_response(error, status)

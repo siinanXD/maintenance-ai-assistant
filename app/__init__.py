@@ -11,6 +11,7 @@ from app.admin.commands import register_admin_commands
 from app.admin.routes import admin_bp
 from app.agent.commands import register_agent_commands
 from app.ai.routes import ai_bp
+from app.attachments.routes import attachments_bp
 from app.auth.routes import auth_bp
 from app.config import Config, validate_runtime_config
 from app.core.logging import configure_logging
@@ -99,6 +100,7 @@ def create_app(config_class=Config):
     app.register_blueprint(departments_bp, url_prefix="/api/v1/departments")
     app.register_blueprint(tasks_bp, url_prefix="/api/v1/tasks")
     app.register_blueprint(errors_bp, url_prefix="/api/v1/errors")
+    app.register_blueprint(attachments_bp, url_prefix="/api/v1/attachments")
     app.register_blueprint(documents_bp, url_prefix="/api/v1/documents")
 
     # Workforce & production

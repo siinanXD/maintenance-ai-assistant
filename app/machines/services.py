@@ -1,9 +1,12 @@
 """Machine service helpers."""
 
+import io
 import logging
 from datetime import date
 from urllib.parse import quote_plus
 
+import segno
+from flask import current_app
 from sqlalchemy import or_, select
 
 from app.handover.services import visible_handovers_query
@@ -30,6 +33,19 @@ from app.services.task_service import visible_tasks_query
 logger = logging.getLogger(__name__)
 ACTIVE_ERROR_STATUSES = {"open", "in_progress"}
 COMPLETED_TASK_STATUSES = {TaskStatus.DONE.value, TaskStatus.CANCELLED.value}
+
+
+def machine_qr_svg(machine, host_url):
+    """Return an SVG QR code pointing at the machine's short link.
+
+    ``PUBLIC_BASE_URL`` wins over the request host so labels printed from a
+    reverse-proxied or local session still open the production address.
+    """
+    base_url = (current_app.config.get("PUBLIC_BASE_URL") or host_url).rstrip("/")
+    qr = segno.make(f"{base_url}/m/{machine.id}", error="m")
+    buffer = io.BytesIO()
+    qr.save(buffer, kind="svg", scale=8, border=2, xmldecl=False, dark="#141715")
+    return buffer.getvalue()
 
 
 def machine_list_signals(machines, user):

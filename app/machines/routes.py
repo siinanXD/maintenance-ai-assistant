@@ -1,6 +1,6 @@
 """Machine API routes."""
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, Response, jsonify, request
 
 from app.extensions import db
 from app.machines.maintenance_services import (
@@ -17,6 +17,7 @@ from app.machines.services import (
     build_machine_history,
     build_machine_profile,
     machine_list_signals,
+    machine_qr_svg,
 )
 from app.models import InventoryMaterial, Machine, MaintenancePlan, ShiftPlanEntry, Site
 from app.responses import (
@@ -245,6 +246,14 @@ def machine_history(machine_id):
         build_machine_history(machine, current_user()),
         message="Machine history loaded",
     )
+
+
+@machines_bp.get("/<int:machine_id>/qr.svg")
+@dashboard_permission_required("machines", "view")
+def machine_qr_code(machine_id):
+    """Return an SVG QR code that opens the machine page on a phone."""
+    machine = db.get_or_404(Machine, machine_id)
+    return Response(machine_qr_svg(machine, request.host_url), mimetype="image/svg+xml")
 
 
 @machines_bp.get("/<int:machine_id>/profile")

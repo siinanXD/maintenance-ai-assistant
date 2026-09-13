@@ -384,3 +384,8 @@
 #maintenance-shell-topbar-root .shift-select small span {
   display: inline;
 }
+
+/* Störungskarten im Raster: Inhalt oben ausrichten statt Zeilen auf Kartenhöhe zu strecken. */
+.incident-card {
+  align-content: start;
+}
