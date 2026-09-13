@@ -1,6 +1,6 @@
 import type { MaintenanceAuthRuntime } from "../auth/permissions";
 
-export type MaintenanceFeature = {
+type MaintenanceFeature = {
   readonly key: string;
   readonly label?: string;
   readonly permissionKey?: string;
@@ -31,13 +31,13 @@ export type MaintenanceDialogOptions = {
   readonly title?: string;
 };
 
-export type MaintenanceDialogsRuntime = {
+type MaintenanceDialogsRuntime = {
   readonly confirmAction?: (options: MaintenanceDialogOptions) => Promise<boolean>;
   readonly requestText?: (options: MaintenanceDialogOptions) => Promise<string | null>;
   readonly showInfoDialog?: (options: MaintenanceDialogOptions) => Promise<boolean>;
 };
 
-export type MaintenanceFrontendRuntime = {
+type MaintenanceFrontendRuntime = {
   readonly setWorkflowStatus?: (message: string, variant?: string) => void;
   readonly showInterfaceToast?: (message: string, options?: string | { readonly variant?: string; readonly duration?: number }) => void;
 };

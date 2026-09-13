@@ -9,8 +9,6 @@ from app.shiftplans.rules import validate_candidate_assignment
 from app.shiftplans.scoring import (
     CandidateScore,
     explain_selection,
-    is_backward_rotation,
-    is_forward_rotation,
     score_candidate,
 )
 from app.shiftplans.templates import ShiftTemplate, ShiftWindow, resolve_shift_template
@@ -314,13 +312,3 @@ def undercoverage_slots_from_warnings(
             int(slot.get("machine_id") or 0),
         ),
     )
-
-
-def forward_rotation_allowed(previous_shift: str, next_shift: str) -> bool:
-    """Return whether a shift transition follows German forward rotation."""
-    return is_forward_rotation(previous_shift, next_shift)
-
-
-def backward_rotation_detected(previous_shift: str, next_shift: str) -> bool:
-    """Return whether a shift transition moves against forward rotation."""
-    return is_backward_rotation(previous_shift, next_shift)

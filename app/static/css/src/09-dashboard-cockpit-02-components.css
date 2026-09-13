@@ -147,8 +147,7 @@
     white-space: nowrap;
   }
 
-  .user-avatar,
-  .mini-avatar {
+  .user-avatar {
     display: inline-grid;
     place-items: center;
     border-radius: 999px;
@@ -221,27 +220,6 @@
   .kpi-card::before {
     display: none;
   }
-
-  .kpi-icon {
-    display: grid;
-    width: 2.8rem;
-    height: 2.8rem;
-    flex: 0 0 auto;
-    place-items: center;
-    border-radius: 0.65rem;
-    color: var(--color-text-inverse);
-    font-size: 1.2rem;
-    font-weight: 900;
-    line-height: 1;
-    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
-  }
-
-  .kpi-card-open .kpi-icon { background: linear-gradient(135deg, #1c8cff, #075ee7); }
-  .kpi-card-progress .kpi-icon { background: linear-gradient(135deg, #f9aa1d, #ea7900); }
-  .kpi-card-done .kpi-icon { background: linear-gradient(135deg, #34c96d, #13a64d); }
-  .kpi-card-critical .kpi-icon { background: linear-gradient(135deg, #ff5864, #dd2639); }
-  .kpi-card-machine .kpi-icon { background: linear-gradient(135deg, #ff8d37, #ed5f16); }
-  .kpi-card-ai .kpi-icon { background: linear-gradient(135deg, #12bac7, #078fa3); }
 
   .kpi-label {
     margin: 0;

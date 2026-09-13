@@ -50,7 +50,6 @@ from app.services.knowledge_service import reindex_stale_knowledge
 from app.services.maintenance_tag_service import seed_maintenance_tag_library
 
 DEMO_PASSWORD = "Demo1234!"
-COMPANY_DOMAIN = "fertigungs-gmbh.de"
 
 
 def seed_demo_data():

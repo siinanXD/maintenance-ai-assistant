@@ -70,11 +70,6 @@ def chunk_fingerprint(value):
     return " ".join(sorted(tokenize_text(normalized, min_length=2, expand_synonyms=False)))
 
 
-def is_low_quality_chunk(value):
-    """Return whether a chunk is too weak to persist as retrieval evidence."""
-    return bool(chunk_quality_reasons(value))
-
-
 def chunk_quality_reasons(value):
     """Return concrete quality rejection reasons for a chunk."""
     normalized = normalize_chunk_text(value)

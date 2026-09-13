@@ -12,21 +12,6 @@
     background: var(--color-bg-canvas);
   }
 
-  .catalog-card-table .data-table tbody tr,
-  .document-card-table .data-table tbody tr {
-    box-shadow: inset 4px 0 var(--ui-primary);
-  }
-
-  .catalog-card-table .data-table tbody tr:nth-child(3n + 1),
-  .document-card-table .data-table tbody tr:nth-child(3n + 1) {
-    box-shadow: inset 4px 0 var(--ui-teal);
-  }
-
-  .catalog-card-table .data-table tbody tr:nth-child(3n + 2),
-  .document-card-table .data-table tbody tr:nth-child(3n + 2) {
-    box-shadow: inset 4px 0 var(--ui-amber);
-  }
-
   .task-card-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -38,8 +23,7 @@
     padding: 1rem;
   }
 
-  .task-card-title,
-  .cockpit-task-title {
+  .task-card-title {
     color: var(--ui-text);
     font-weight: 930;
   }
@@ -48,40 +32,11 @@
     color: var(--ui-muted);
   }
 
-  .task-card-meta span,
-  .cockpit-task-meta span {
+  .task-card-meta span {
     border: 1px solid var(--color-border-default);
     border-radius: var(--ui-radius-sm);
     background: var(--color-bg-canvas);
     color: var(--ui-text-soft);
-  }
-
-  .ai-action-grid,
-  .page-command-bar {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.85rem;
-    margin-bottom: 1rem;
-  }
-
-  .quick-action-row,
-  .ai-action-card {
-    min-height: 5.7rem;
-    border-color: var(--ui-border);
-    border-left: 4px solid var(--ui-primary);
-    border-radius: var(--ui-radius);
-    background: var(--color-bg-surface);
-    box-shadow: var(--ui-shadow-xs);
-  }
-
-  .ai-action-card {
-    border-left-color: var(--ui-teal);
-  }
-
-  .quick-action-row strong {
-    border-radius: var(--ui-radius-sm);
-    background: var(--color-bg-canvas);
-    color: var(--ui-primary-dark);
   }
 
   .global-search {

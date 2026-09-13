@@ -857,8 +857,7 @@ Moegliche Diagnosewerte:
 
 `diagnostics` enthaelt zusaetzlich `provider` und `model`, aber niemals den API-Key. Die Chat-Bubble zeigt diese Werte als kleine Statuszeile pro Antwort.
 
-Rate-Limit: `POST /api/v1/ai/chat`, `POST /api/v1/ai/error-assistant` und
-`POST /api/v1/ai/order-plan` sind pro Nutzer auf
+Rate-Limit: `POST /api/v1/ai/chat` und `POST /api/v1/ai/error-assistant` sind pro Nutzer auf
 `AI_CHAT_RATE_LIMIT_PER_MINUTE` Anfragen begrenzt. Bei Ueberschreitung:
 
 ```http
@@ -897,7 +896,7 @@ und traegt `answer_category` (`structured_data`, `rag`,
 ### Agent
 
 ```http
-POST /api/v1/ai/agent
+POST /api/v1/ai/chat
 Authorization: Bearer <access_token>
 Content-Type: application/json
 ```
@@ -946,8 +945,7 @@ GET /api/v1/ai/agent/tools
 Authorization: Bearer <access_token>
 ```
 
-liefert den nach Berechtigung gefilterten Tool-Katalog. `POST /api/v1/ai/chat`
-und `POST /api/v1/ai/agent` sind identisch. Details: `docs/AI_AGENT.md`.
+liefert den nach Berechtigung gefilterten Tool-Katalog. Details: `docs/AI_AGENT.md`.
 
 ### Chat-Historie
 

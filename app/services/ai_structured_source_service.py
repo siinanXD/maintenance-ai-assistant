@@ -67,11 +67,6 @@ def incident_source_cards_from_payloads(incidents, limit=SOURCE_CARD_LIMIT):
     ]
 
 
-def machine_source_cards(machines, limit=SOURCE_CARD_LIMIT):
-    """Return compact source cards for already-visible machine rows."""
-    return [_machine_source_card(machine) for machine in list(machines or [])[:limit]]
-
-
 def machine_source_card(machine):
     """Return one compact source card for an already-visible machine row."""
     return _machine_source_card(machine) if machine else None
@@ -121,11 +116,6 @@ def document_source_cards(documents, limit=SOURCE_CARD_LIMIT):
 def manual_source_cards(manuals, limit=SOURCE_CARD_LIMIT):
     """Return compact source cards for already-visible machine manuals."""
     return [_manual_source_card(manual) for manual in list(manuals or [])[:limit]]
-
-
-def shiftplan_source_cards(plans, limit=SOURCE_CARD_LIMIT):
-    """Return compact source cards for already-visible shift plans."""
-    return [_shiftplan_source_card(plan) for plan in list(plans or [])[:limit]]
 
 
 def shiftplan_entry_source_cards(entries, user=None, limit=SOURCE_CARD_LIMIT):
@@ -391,31 +381,6 @@ def _manual_source_card(manual):
         "department": department,
         "machine": str(getattr(machine, "name", "") or "")[:160],
         "machine_id": getattr(manual, "machine_id", None),
-    }
-
-
-def _shiftplan_source_card(plan):
-    """Return one prompt-safe shift-plan source card."""
-    department = str(getattr(plan, "department", "") or "")[:120]
-    return {
-        "type": "shiftplan",
-        "id": plan.id,
-        "title": str(getattr(plan, "title", "") or "")[:160],
-        "module": "shiftplans",
-        "url": "/shiftplans",
-        "source_type": "shiftplan",
-        "source_id": plan.id,
-        "source_record_id": plan.id,
-        "source_kind": "structured",
-        "role_visibility": _role_visibility(department),
-        "created_at": _isoformat(plan.created_at),
-        "department": department,
-        "start_date": plan.start_date.isoformat() if plan.start_date else "",
-        "days": plan.days,
-        "status": str(getattr(plan, "status", "") or "")[:20],
-        "coverage_percent": plan.coverage_percent,
-        "conflict_count": plan.conflict_count,
-        "critical_conflict_count": plan.critical_conflict_count,
     }
 
 

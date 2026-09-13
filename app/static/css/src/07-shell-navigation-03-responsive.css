@@ -5,18 +5,15 @@
     @apply text-sm leading-6 text-slate-600 sm:min-h-12;
   }
 
-  .task-card-meta,
-  .cockpit-task-meta {
+  .task-card-meta {
     @apply mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-500 sm:mt-4;
   }
 
-  .task-card-meta span,
-  .cockpit-task-meta span {
+  .task-card-meta span {
     @apply rounded-full bg-slate-100 px-2.5 py-1;
   }
 
-  .task-card-actions,
-  .cockpit-task-actions {
+  .task-card-actions {
     @apply mt-auto flex flex-wrap gap-2 pt-3 sm:pt-4;
   }
 
@@ -59,105 +56,12 @@
     @apply flex max-w-full flex-wrap gap-2;
   }
 
-  .priority-strip {
-    @apply mb-4 grid grid-cols-1 gap-3 md:grid-cols-3;
-  }
-
-  .priority-insight {
-    @apply rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm;
-  }
-
-  .priority-insight span {
-    @apply block truncate font-semibold text-slate-600;
-  }
-
-  .priority-insight strong {
-    @apply mt-1 block text-base font-black text-slate-950;
-  }
-
-  .priority-insight.is-critical {
-    @apply border-red-200 bg-red-50;
-  }
-
-  .priority-insight.is-muted {
-    @apply border-dashed;
-  }
-
-  .cockpit-board {
-    @apply grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3;
-  }
-
-  .cockpit-column {
-    @apply min-h-24 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:min-h-32 sm:p-4;
-  }
-
-  .cockpit-column-title {
-    @apply mb-3 text-xs font-black uppercase tracking-wide text-slate-600 sm:mb-4 sm:text-sm;
-  }
-
-  .cockpit-task-list {
-    @apply flex flex-col gap-3;
-  }
-
-  .cockpit-task-card.is-empty {
-    @apply border-dashed bg-white/70 text-sm text-slate-500;
-  }
-
   .shift-calendar {
     @apply grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-7;
   }
 
-  .shift-calendar-day {
-    @apply min-h-32 rounded-2xl border p-3 shadow-sm;
-  }
-
-  .shift-calendar-day.is-green {
-    @apply border-green-200 bg-green-50 text-green-950;
-  }
-
-  .shift-calendar-day.is-blue {
-    @apply border-blue-200 bg-blue-50 text-blue-950;
-  }
-
-  .shift-calendar-day.is-red {
-    @apply border-red-200 bg-red-50 text-red-950;
-  }
-
-  .shift-calendar-day.is-violet {
-    @apply border-violet-200 bg-violet-50 text-violet-950;
-  }
-
-  .shift-calendar-day.is-amber {
-    @apply border-amber-200 bg-amber-50 text-amber-950;
-  }
-
-  .shift-calendar-day.is-slate {
-    @apply border-slate-200 bg-slate-50 text-slate-950;
-  }
-
-  .shift-calendar-date {
-    @apply block text-xs font-black uppercase;
-  }
-
-  .shift-calendar-shift {
-    @apply mt-2 block text-base font-black;
-  }
-
-  .shift-calendar-time,
-  .shift-calendar-meta {
-    @apply mt-1 block text-xs font-semibold opacity-80;
-  }
-
   .forecast-unmatched-list {
     @apply mt-4 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4;
-  }
-
-  .filter-toolbar {
-    @apply mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-3;
-  }
-
-  .filter-field {
-    @apply min-w-full sm:min-w-80 sm:flex-1;
   }
 
   .knowledge-block {
@@ -186,10 +90,6 @@
 
   .rag-source-panel {
     @apply mt-4 rounded-2xl border border-cyan-100 bg-white p-3;
-  }
-
-  .rag-source-title {
-    @apply block text-xs font-black uppercase tracking-wide text-slate-500;
   }
 
   .rag-source-list {

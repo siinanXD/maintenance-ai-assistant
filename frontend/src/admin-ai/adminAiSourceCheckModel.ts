@@ -84,7 +84,7 @@ export function sourceCheckQuestion(payload: Record<string, unknown>): string {
 /**
  * Return a readable answer from an AI Source Check result.
  */
-export function sourceTestAnswerText(result: AdminAiPayload): string {
+function sourceTestAnswerText(result: AdminAiPayload): string {
   return (
     stringField(result, "answer")
     || stringField(result, "response")

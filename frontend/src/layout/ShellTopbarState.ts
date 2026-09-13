@@ -7,7 +7,7 @@ import {
   writeHighContrastPreference
 } from "./shellPreferences";
 
-export type ShellShiftState = {
+type ShellShiftState = {
   readonly dateTitle: string;
   readonly dateValue: string;
   readonly key: "early" | "late" | "night";

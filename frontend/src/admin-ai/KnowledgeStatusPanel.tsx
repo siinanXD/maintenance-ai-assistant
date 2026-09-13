@@ -133,13 +133,6 @@ export function RagIndexTrack({ state }: { readonly state: AdminAiRagBoardState 
 }
 
 /**
- * @deprecated Use RagHealthRail in the RAG board shell.
- */
-export function RagHealthStrip({ state }: { readonly state: AdminAiRagBoardState }): ReactNode {
-  return <RagHealthRail state={state} />;
-}
-
-/**
  * Render source health cards from the knowledge status payload.
  */
 export function SourceHealthBoard({

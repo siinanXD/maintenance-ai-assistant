@@ -18,7 +18,7 @@ export type LoginResponse = LoginData | {
 /**
  * Return true when a value has the login payload shape returned by the API.
  */
-export function isLoginData(value: unknown): value is LoginData {
+function isLoginData(value: unknown): value is LoginData {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return false;
   }

@@ -69,7 +69,6 @@
   .ops-panel,
   .metric-card,
   .kpi-card,
-  .cockpit-column,
   .task-card,
   .resource-card,
   .modal-box,
@@ -104,7 +103,6 @@
     border: 0;
   }
 
-  .topbar-control-icon svg,
   .notification-button svg {
     width: 1rem;
     height: 1rem;

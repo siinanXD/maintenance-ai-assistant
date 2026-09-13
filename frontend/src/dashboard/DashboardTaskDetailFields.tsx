@@ -41,7 +41,7 @@ export const REPORT_FIELDS: readonly ReportFieldConfig[] = [
   }
 ] as const;
 
-export const TASK_DETAIL_ROWS = [
+const TASK_DETAIL_ROWS = [
   ["Titel", "title"],
   ["Beschreibung", "description"],
   ["Priorität", "priority"],
@@ -85,7 +85,7 @@ export function editStateFromTask(task: DashboardPayload | null): EditState {
 /**
  * Render one detail row in the dashboard task modal.
  */
-export function DetailRow({
+function DetailRow({
   label,
   value
 }: {

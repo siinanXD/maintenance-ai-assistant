@@ -62,14 +62,6 @@ def normalize_shift_type(value):
     return shift_type
 
 
-def date_range_days(start_date, end_date):
-    """Yield all dates in the inclusive date range."""
-    current = start_date
-    while current <= end_date:
-        yield current
-        current += timedelta(days=1)
-
-
 def employee_in_user_department(user, employee):
     """Return whether an employee belongs to the current user's department."""
     if not user or not employee or not user.department:

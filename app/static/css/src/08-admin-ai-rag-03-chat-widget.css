@@ -50,18 +50,6 @@
     }
   }
 
-  .document-cell {
-    @apply flex min-w-56 flex-col gap-2;
-  }
-
-  .document-links {
-    @apply flex flex-col gap-1;
-  }
-
-  .document-links a {
-    @apply text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline;
-  }
-
   .code-block {
     @apply overflow-x-auto rounded-2xl bg-slate-950 p-4 font-mono text-sm leading-6 text-cyan-100;
   }

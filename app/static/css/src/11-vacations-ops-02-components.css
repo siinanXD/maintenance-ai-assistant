@@ -22,8 +22,6 @@
       flex-direction: column;
     }
 
-    .vacation-hero-actions,
-    .vacation-hero-actions .btn,
     .vacation-history-controls,
     .vacation-history-controls .btn,
     .vacation-history-controls .select {
@@ -85,18 +83,10 @@
   }
 
   @media (max-width: 1180px) {
-    .ops-dashboard-grid,
-    .ops-lower-grid {
+    .ops-dashboard-grid {
       grid-template-columns: 1fr;
     }
 
-    .ops-side-column {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .inventory-panel {
-      grid-column: 1 / -1;
-    }
   }
 
   @media (max-width: 900px) {
@@ -112,41 +102,13 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .cockpit-board,
-    .ops-side-column {
-      grid-template-columns: 1fr;
-    }
-
-    .task-cockpit-panel .cockpit-board {
-      height: auto;
-      overflow: visible;
-    }
-
-    .task-cockpit-panel .cockpit-task-list {
-      max-height: none;
-      overflow: visible;
-    }
-
-    .cockpit-column {
-      border-right: 0;
-      border-bottom: 1px solid var(--ops-border);
-    }
-
-    .cockpit-column:last-child {
-      border-bottom: 0;
-    }
-
-    .incident-row,
-    .employee-row {
+    .incident-row {
       grid-template-columns: 1fr;
       gap: 0.25rem;
       align-items: start;
       padding: 0.7rem 0;
     }
 
-    .inventory-stats {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (max-width: 560px) {
@@ -158,25 +120,6 @@
       min-height: 5.6rem;
     }
 
-    .timeline-axis {
-      left: 4.6rem;
-    }
-
-    .timeline-row {
-      grid-template-columns: 4.6rem minmax(0, 1fr);
-    }
-
-    .timeline-row::after {
-      left: 4.6rem;
-    }
-
-    .now-marker-track {
-      left: 4.6rem;
-    }
-
-    .timeline-status {
-      margin-left: 4.6rem;
-    }
   }
 }
 
@@ -222,19 +165,9 @@
     padding: 0.75rem;
   }
 
-  .knowledge-center-shell {
-    grid-template-columns: minmax(13rem, 0.72fr) minmax(0, 2.2fr) minmax(16rem, 0.88fr);
-    align-items: start;
-  }
-
-  .knowledge-test-chat {
-    min-height: 20rem;
-  }
-
   @media (max-width: 1100px) {
     .task-workflow-grid,
-    .ai-admin-hero,
-    .knowledge-center-shell {
+    .ai-admin-hero {
       grid-template-columns: 1fr;
     }
 

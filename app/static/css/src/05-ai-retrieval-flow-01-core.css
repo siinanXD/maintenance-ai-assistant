@@ -1,7 +1,6 @@
     gap: 0.75rem;
   }
 
-  .retrieval-flow-question,
   .retrieval-flow-source-map,
   .retrieval-flow-answer {
     display: grid;
@@ -13,148 +12,9 @@
     padding: 0.85rem;
   }
 
-  .retrieval-flow-question span,
-  .retrieval-flow-card-header span {
-    color: var(--ui-muted);
-    font-size: 0.7rem;
-    font-weight: 900;
-  }
-
-  .retrieval-flow-question strong,
-  .retrieval-flow-card-header strong {
-    color: var(--ui-text);
-    font-size: 0.9rem;
-    font-weight: 950;
-    line-height: 1.25;
-  }
-
-  .retrieval-flow-meta {
-    display: grid;
-    gap: 0.45rem;
-  }
-
   .retrieval-flow-timeline {
     display: grid;
     gap: 0.65rem;
-  }
-
-  .retrieval-flow-step {
-    border: 1px solid #dbe7f3;
-    border-radius: 0.55rem;
-    background: var(--color-bg-surface);
-    overflow: hidden;
-  }
-
-  .retrieval-flow-step.is-active {
-    border-color: #b7e2c6;
-  }
-
-  .retrieval-flow-step.is-stale {
-    border-color: #ffd89a;
-  }
-
-  .retrieval-flow-step.is-error {
-    border-color: #fecaca;
-  }
-
-  .retrieval-flow-step summary {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 0.7rem;
-    align-items: center;
-    cursor: pointer;
-    list-style: none;
-    padding: 0.75rem 0.85rem;
-  }
-
-  .retrieval-flow-step summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .retrieval-flow-step-marker {
-    display: grid;
-    width: 2rem;
-    height: 2rem;
-    place-items: center;
-    border-radius: 999px;
-    background: var(--color-bg-canvas);
-    color: var(--ui-blue);
-    font-size: 0.72rem;
-    font-weight: 950;
-  }
-
-  .retrieval-flow-step-body {
-    display: grid;
-    min-width: 0;
-    gap: 0.12rem;
-  }
-
-  .retrieval-flow-step-body strong {
-    color: var(--ui-text);
-    font-size: 0.88rem;
-    font-weight: 950;
-    line-height: 1.2;
-  }
-
-  .retrieval-flow-step-body small {
-    color: var(--ui-muted);
-    font-size: 0.76rem;
-    font-weight: 750;
-    line-height: 1.3;
-  }
-
-  .retrieval-flow-metrics {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.45rem;
-    border-top: 1px solid var(--color-border-subtle);
-    padding: 0.7rem 0.85rem 0.85rem;
-  }
-
-  .retrieval-flow-source-list {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .retrieval-flow-source {
-    display: grid;
-    gap: 0.22rem;
-    border: 1px solid #e2eaf4;
-    border-radius: 0.5rem;
-    background: var(--color-bg-canvas);
-    padding: 0.65rem;
-  }
-
-  .retrieval-flow-source strong {
-    overflow: hidden;
-    color: var(--ui-text);
-    font-size: 0.82rem;
-    font-weight: 900;
-    line-height: 1.2;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .retrieval-flow-source small {
-    color: var(--ui-muted);
-    font-size: 0.7rem;
-    font-weight: 800;
-  }
-
-  .retrieval-flow-answer-preview {
-    margin: 0;
-    border-left: 3px solid var(--ui-cyan);
-    background: var(--color-bg-canvas);
-    color: #26364d;
-    padding: 0.65rem 0.75rem;
-    font-size: 0.82rem;
-    font-weight: 750;
-    line-height: 1.45;
-  }
-
-  .retrieval-flow-checks {
-    display: grid;
-    gap: 0.45rem;
   }
 
   .data-table tbody tr.is-selected {

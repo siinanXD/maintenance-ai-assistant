@@ -113,7 +113,7 @@ export function permissionSummary(schema: PermissionSchema | null, permission: A
 /**
  * Return whether two permissions differ.
  */
-export function permissionChanged(left: AdminPermission, right: AdminPermission): boolean {
+function permissionChanged(left: AdminPermission, right: AdminPermission): boolean {
   return Boolean(left.can_view) !== Boolean(right.can_view)
     || Boolean(left.can_write) !== Boolean(right.can_write)
     || (left.employee_access_level || "none") !== (right.employee_access_level || "none");

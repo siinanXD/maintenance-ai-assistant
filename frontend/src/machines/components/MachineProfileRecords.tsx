@@ -16,7 +16,7 @@ import {
   valueText
 } from "../machineUtils";
 
-export type ProfileCardData = {
+type ProfileCardData = {
   readonly title: string;
   readonly subtitle?: string;
   readonly summary?: string;
@@ -63,7 +63,7 @@ export function ProfilePanel({
 /**
  * Render an empty profile panel state.
  */
-export function ProfileEmpty({ text, href, label }: { readonly text: string; readonly href?: string; readonly label?: string }): ReactNode {
+function ProfileEmpty({ text, href, label }: { readonly text: string; readonly href?: string; readonly label?: string }): ReactNode {
   return (
     <div className="machine-profile-empty">
       <strong>{text}</strong>
@@ -75,7 +75,7 @@ export function ProfileEmpty({ text, href, label }: { readonly text: string; rea
 /**
  * Render one profile record card.
  */
-export function ProfileRecordCard({ data }: { readonly data: ProfileCardData }): ReactNode {
+function ProfileRecordCard({ data }: { readonly data: ProfileCardData }): ReactNode {
   return (
     <article className="machine-profile-record">
       <div className="machine-profile-record-header">

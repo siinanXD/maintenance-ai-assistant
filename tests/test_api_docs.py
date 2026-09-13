@@ -27,8 +27,6 @@ def test_openapi_json_documents_core_endpoints(client):
     assert "/api/v1/errors/search" in paths
     assert "/api/v1/errors/similar" in paths
     assert "/api/v1/ai/daily-briefing" in paths
-    assert "/api/v1/ai/incident-timeline" in paths
-    assert "/api/v1/ai/order-plan" in paths
     assert "/api/v1/ai/error-assistant" in paths
     assert "/api/v1/ai/feedback" in paths
     assert "/api/v1/ai/status" in paths

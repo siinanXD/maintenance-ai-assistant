@@ -161,18 +161,7 @@
     line-height: 1.25;
   }
 
-  .knowledge-network-edge {
-    cursor: pointer;
-  }
-
-  .knowledge-network-edge.is-selected line:last-of-type {
-    stroke: #020617;
-    stroke-opacity: 0.95;
-    stroke-width: 5;
-  }
-
-  .retrieval-flow-header,
-  .retrieval-flow-card-header {
+  .retrieval-flow-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -187,8 +176,7 @@
     line-height: 1.1;
   }
 
-  .retrieval-flow-header-actions,
-  .retrieval-flow-badges {
+  .retrieval-flow-header-actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;

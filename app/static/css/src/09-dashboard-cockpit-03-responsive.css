@@ -27,27 +27,11 @@
     text-decoration: none;
   }
 
-  .trend-up { color: #0e9e47; }
-  .trend-danger { color: #e02638; }
-
   .ops-dashboard-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 33.5%;
     gap: 0.9rem;
     align-items: start;
-  }
-
-  .ops-main-column,
-  .ops-side-column {
-    display: grid;
-    gap: 0.9rem;
-    min-width: 0;
-  }
-
-  .ops-lower-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
   }
 
   .ops-panel {
@@ -84,116 +68,6 @@
 
   .task-cockpit-panel {
     overflow: hidden;
-  }
-
-  .cockpit-board {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-  }
-
-  .task-cockpit-panel .cockpit-board {
-    height: 22.1rem;
-    overflow: hidden;
-  }
-
-  .cockpit-column {
-    min-height: 0;
-    border: 0;
-    border-right: 1px solid var(--ops-border);
-    border-radius: 0;
-    background: var(--color-bg-surface);
-    padding: 0;
-  }
-
-  .cockpit-column:last-child {
-    border-right: 0;
-  }
-
-  .cockpit-column.is-urgent,
-  .cockpit-column.is-today,
-  .cockpit-column.is-progress {
-    background: var(--color-bg-surface);
-  }
-
-  .cockpit-column-title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.65rem;
-    min-height: 2.65rem;
-    margin: 0;
-    padding: 0.8rem 0.85rem;
-    border-bottom: 1px solid var(--ops-border);
-    background: var(--color-bg-canvas);
-    color: var(--color-text-primary);
-    font-size: 0.85rem;
-    font-weight: 850;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
-  .cockpit-column-title::before {
-    display: none !important;
-  }
-
-  .cockpit-column-title span {
-    display: inline-grid;
-    min-width: 1.25rem;
-    height: 1.25rem;
-    place-items: center;
-    border-radius: 0.35rem;
-    background: #ef3f4d;
-    color: var(--color-text-inverse);
-    font-size: 0.68rem;
-    font-weight: 900;
-  }
-
-  .cockpit-column.is-today .cockpit-column-title span { background: #f47b20; }
-  .cockpit-column.is-progress .cockpit-column-title span { background: #0b7cff; }
-
-  .cockpit-task-list {
-    display: grid;
-    gap: 0;
-    max-height: 19.45rem;
-    overflow: hidden;
-  }
-
-  .cockpit-task-card {
-    display: grid;
-    min-height: 5.25rem;
-    gap: 0.3rem;
-    border: 0;
-    border-left: 3px solid #ef3f4d;
-    border-bottom: 1px solid #edf1f6;
-    border-radius: 0;
-    background: var(--color-bg-surface);
-    padding: 0.85rem 0.8rem 0.8rem;
-    box-shadow: none;
-  }
-
-  .cockpit-column.is-today .cockpit-task-card { border-left-color: #f47b20; }
-  .cockpit-column.is-progress .cockpit-task-card { border-left-color: #0b7cff; }
-
-  .cockpit-task-card:hover {
-    transform: none;
-    border-color: #edf1f6;
-    border-left-color: inherit;
-    box-shadow: none;
-  }
-
-  .cockpit-task-card.is-empty {
-    min-height: 5.25rem;
-    border-left-style: solid;
-    background: #fbfcfe;
-    color: var(--color-text-muted);
-  }
-
-  .cockpit-task-title {
-    color: var(--color-text-primary);
-    font-size: 0.86rem;
-    font-weight: 850;
-    line-height: 1.25;
   }
 
   .cockpit-task-meta {

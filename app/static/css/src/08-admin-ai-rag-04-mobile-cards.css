@@ -149,80 +149,9 @@
 
   /* ── KPI icon badges ───────────────────────────────────────────────────── */
 
-  .kpi-icon {
-    @apply mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-xl;
-  }
-
-  .kpi-card-open .kpi-icon {
-    @apply bg-cyan-50 text-cyan-600;
-  }
-
-  .kpi-card-progress .kpi-icon {
-    @apply bg-blue-50 text-blue-600;
-  }
-
-  .kpi-card-done .kpi-icon {
-    @apply bg-green-50 text-green-600;
-  }
-
-  .kpi-card-critical .kpi-icon {
-    @apply bg-red-50 text-red-600;
-  }
-
-  .kpi-card-machine .kpi-icon {
-    @apply bg-amber-50 text-amber-600;
-  }
-
-  .kpi-card-ai .kpi-icon {
-    @apply bg-purple-50 text-purple-600;
-  }
-
   /* ── Cockpit-Spalten farbig differenziert ─────────────────────────────── */
 
-  .cockpit-column.is-urgent {
-    @apply border-red-100 bg-red-50/70;
-  }
-
-  .cockpit-column.is-today {
-    @apply border-amber-100 bg-amber-50/70;
-  }
-
-  .cockpit-column.is-progress {
-    @apply border-blue-100 bg-blue-50/70;
-  }
-
-  .cockpit-column.is-urgent .cockpit-column-title {
-    @apply text-red-700;
-  }
-
-  .cockpit-column.is-urgent .cockpit-column-title::before {
-    content: "";
-    @apply mr-2 inline-block h-2 w-2 rounded-full bg-red-500;
-  }
-
-  .cockpit-column.is-today .cockpit-column-title {
-    @apply text-amber-800;
-  }
-
-  .cockpit-column.is-today .cockpit-column-title::before {
-    content: "";
-    @apply mr-2 inline-block h-2 w-2 rounded-full bg-amber-500;
-  }
-
-  .cockpit-column.is-progress .cockpit-column-title {
-    @apply text-blue-700;
-  }
-
-  .cockpit-column.is-progress .cockpit-column-title::before {
-    content: "";
-    @apply mr-2 inline-block h-2 w-2 rounded-full bg-blue-600;
-  }
-
   /* ── Verbesserte page-hero Variante mit Gradient ──────────────────────── */
-
-  .page-hero-gradient {
-    @apply bg-gradient-to-br from-white via-blue-50/30 to-slate-50;
-  }
 
   .app-body {
     @apply bg-slate-100 text-slate-900;

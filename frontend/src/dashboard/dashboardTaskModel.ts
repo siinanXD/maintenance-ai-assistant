@@ -1,16 +1,6 @@
 import { formatGermanDateTime, todayIsoDate } from "../utils/date";
 import { type DashboardPayload, type DashboardRuntimeData } from "./dashboardApi";
 
-export type DashboardTaskGroupKey = "urgent" | "today" | "progress";
-
-export type DashboardTaskGroups = Record<DashboardTaskGroupKey, readonly DashboardPayload[]>;
-
-const GROUP_EMPTY_TEXT: Record<DashboardTaskGroupKey, string> = {
-  progress: "Keine Aufgaben in Arbeit. Starte offene Aufgaben, sobald Verantwortung und Material klar sind.",
-  today: "Keine Aufgaben für heute. Neue Arbeit kannst du direkt aus dem Cockpit anlegen.",
-  urgent: "Keine kritischen Aufgaben. Beobachte neue Störungen und überfällige Arbeit."
-};
-
 const TASK_STATUS_LABELS: Record<string, string> = {
   cancelled: "Abgebrochen",
   done: "Erledigt",
@@ -58,7 +48,7 @@ export function taskDepartmentName(task: DashboardPayload | null | undefined): s
 /**
  * Return a nested user label from a task payload.
  */
-export function taskUserLabel(value: unknown): string {
+function taskUserLabel(value: unknown): string {
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const user = value as Record<string, unknown>;
     return taskText(user, "username") || taskText(user, "email") || `User #${String(user.id || "-")}`;
@@ -70,7 +60,7 @@ export function taskUserLabel(value: unknown): string {
 /**
  * Return a localized task status label.
  */
-export function taskStatusLabel(status: unknown): string {
+function taskStatusLabel(status: unknown): string {
   const key = String(status || "open");
   return TASK_STATUS_LABELS[key] || key;
 }
@@ -81,28 +71,6 @@ export function taskStatusLabel(status: unknown): string {
 export function taskPriorityLabel(priority: unknown): string {
   const key = String(priority || "normal");
   return TASK_PRIORITY_LABELS[key] || key;
-}
-
-/**
- * Return the dashboard badge class for a task status.
- */
-export function taskStatusBadgeClass(status: unknown): string {
-  const key = String(status || "open");
-  if (key === "done") return "badge badge-status is-done";
-  if (key === "in_progress") return "badge badge-status is-progress";
-  if (key === "cancelled") return "badge badge-status is-neutral";
-  return "badge badge-status is-open";
-}
-
-/**
- * Return the dashboard badge class for a task priority.
- */
-export function taskPriorityBadgeClass(priority: unknown): string {
-  const key = String(priority || "normal");
-  if (key === "urgent") return "badge badge-priority is-urgent";
-  if (key === "soon") return "badge badge-priority is-soon";
-  if (key === "low") return "badge badge-priority is-low";
-  return "badge badge-priority is-normal";
 }
 
 /**
@@ -133,42 +101,12 @@ export function taskRelativeDateLabel(task: DashboardPayload): string {
 }
 
 /**
- * Group active dashboard tasks for the cockpit board.
- */
-export function dashboardTaskGroups(tasks: readonly DashboardPayload[]): DashboardTaskGroups {
-  const groups: Record<DashboardTaskGroupKey, DashboardPayload[]> = {
-    progress: [],
-    today: [],
-    urgent: []
-  };
-
-  tasks.filter(taskIsActive).forEach((task) => {
-    if (taskText(task, "status") === "in_progress") {
-      groups.progress.push(task);
-    } else if (taskText(task, "priority") === "urgent" || taskIsOverdue(task)) {
-      groups.urgent.push(task);
-    } else if (taskText(task, "due_date") === todayIsoDate()) {
-      groups.today.push(task);
-    }
-  });
-
-  return groups;
-}
-
-/**
  * Return tasks that belong in the critical-today panel.
  */
 export function dashboardCriticalTasks(data: DashboardRuntimeData): readonly DashboardPayload[] {
   return data.tasks
     .filter((task) => taskIsActive(task) && (taskText(task, "priority") === "urgent" || taskIsOverdue(task)))
     .slice(0, 5);
-}
-
-/**
- * Return a user-facing empty text for one cockpit group.
- */
-export function dashboardTaskGroupEmptyText(groupKey: DashboardTaskGroupKey): string {
-  return GROUP_EMPTY_TEXT[groupKey];
 }
 
 /**

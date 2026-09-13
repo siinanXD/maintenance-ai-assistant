@@ -6,27 +6,6 @@
     gap: 1rem;
   }
 
-  .page-section-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem;
-    border: 1px solid var(--ui-border);
-    border-radius: 0.65rem;
-    background: var(--ui-surface);
-    padding: 1rem;
-    box-shadow: var(--ui-shadow-sm);
-  }
-
-  .page-section-header h2 {
-    margin: 0;
-    color: var(--ui-text);
-    font-size: 1.35rem;
-    font-weight: 900;
-    line-height: 1.1;
-  }
-
   .panel,
   .metric-card,
   .ops-panel,
@@ -138,14 +117,6 @@
     transform: translateY(-1px);
   }
 
-  .kpi-icon {
-    width: 2.45rem;
-    height: 2.45rem;
-    border-radius: 0.55rem;
-    font-size: 0.7rem;
-    box-shadow: none;
-  }
-
   .kpi-label {
     font-size: 0.76rem;
   }
@@ -159,40 +130,13 @@
     gap: 1rem;
   }
 
-  .ops-main-column,
-  .ops-side-column,
-  .ops-lower-grid {
-    gap: 1rem;
-  }
-
   .ops-panel-header {
     min-height: 3rem;
     padding: 0.8rem 0.95rem;
     background: var(--color-bg-surface);
   }
 
-  .task-cockpit-panel .cockpit-board {
-    height: auto;
-    min-height: 21rem;
-  }
-
-  .cockpit-task-list {
-    max-height: 18.5rem;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
-  }
-
-  .cockpit-task-meta span + span::before {
-    content: "/";
-    margin-right: 0.55rem;
-    color: #9aa8ba;
-  }
-
-  .incident-list,
-  .employee-table,
-  .briefing-list,
-  .inventory-stats,
-  .shortage-tags {
+  .incident-list {
     padding-inline: 0.9rem;
   }
 

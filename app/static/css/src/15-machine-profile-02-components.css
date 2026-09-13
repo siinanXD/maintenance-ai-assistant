@@ -1,7 +1,6 @@
     box-shadow: var(--ui-shadow-sm);
   }
 
-  .action-card,
   .section-card {
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius);
@@ -138,43 +137,20 @@
     font-weight: 820;
   }
 
-  .search-command-panel {
-    display: grid;
-    gap: 0.75rem;
-    margin: 1rem 0;
-    border: 1px solid var(--ui-border);
-    border-radius: var(--ui-radius);
-    background: var(--color-bg-canvas);
-    padding: 0.9rem;
-  }
-
-  .search-hero-field {
-    display: grid;
-    gap: 0.4rem;
-  }
-
-  .search-hero-field span,
   .chat-test-input span {
     color: var(--ui-text-soft);
     font-size: 0.75rem;
     font-weight: 900;
   }
 
-  .search-hero-field .input {
-    min-height: 3.1rem;
-    font-size: 1rem;
-  }
-
-  .filter-chip-row,
-  .source-chip-row {
+  .filter-chip-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.45rem;
   }
 
-  .filter-chip,
-  .source-chip {
+  .filter-chip {
     min-height: 2rem;
     border: 1px solid var(--ui-border);
     border-radius: var(--ui-radius-sm);
@@ -185,8 +161,7 @@
     font-weight: 850;
   }
 
-  .filter-chip.is-active,
-  .source-chip {
+  .filter-chip.is-active {
     border-color: #bdd8f2;
     background: var(--color-bg-canvas);
     color: var(--ui-primary-dark);

@@ -101,21 +101,13 @@
   }
 
   @media (max-width: 1180px) {
-    .ai-admin-map {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .ai-admin-hero,
-    .ai-section-guide,
-    .ai-setting-flow,
     .ai-capability-grid,
-    .ai-info-box-grid,
     .ai-safety-grid,
     .ops-dashboard-grid,
     .admin-training-workflow,
     .knowledge-network-layout,
     .retrieval-flow-summary,
-    .retrieval-flow-metrics,
     .content-grid.two-columns {
       grid-template-columns: 1fr;
     }
@@ -143,19 +135,11 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .ai-clarity-grid,
-    .ai-clarity-detail-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
   }
 
   @media (max-width: 900px) {
     .app-main {
       padding: 1rem 0.85rem 5.5rem;
-    }
-
-    .page-section-header {
-      border-radius: 0.55rem;
     }
 
     .chat-widget {
@@ -165,14 +149,9 @@
   }
 
   @media (max-width: 640px) {
-    .ai-admin-map {
-      grid-template-columns: 1fr;
-    }
-
     .ai-admin-hero,
     .ai-admin-area,
-    .panel,
-    .page-section-header {
+    .panel {
       padding: 0.85rem;
     }
 
@@ -182,27 +161,12 @@
       grid-template-columns: 1fr 1fr;
     }
 
-    .ai-section-guide {
-      padding: 0.65rem;
-    }
-
-    .ai-section-guide article {
-      padding: 0.6rem;
-    }
-
     .ai-status-overview {
       grid-template-columns: 1fr;
     }
 
-    .ai-status-overview-card,
-    .ai-clarity-card,
-    .ai-info-box {
+    .ai-status-overview-card {
       padding: 0.75rem;
-    }
-
-    .ai-clarity-grid,
-    .ai-clarity-detail-grid {
-      grid-template-columns: 1fr;
     }
 
     .ai-admin-nav a {
@@ -222,14 +186,6 @@
 
     .ai-source-stats {
       grid-template-columns: 1fr;
-    }
-
-    .ai-monitor-row {
-      grid-template-columns: 1fr;
-    }
-
-    .ai-monitor-row > span {
-      white-space: normal;
     }
 
     .dashboard-kpi-grid {

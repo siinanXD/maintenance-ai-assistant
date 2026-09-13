@@ -1,5 +1,5 @@
-export const SIDEBAR_COLLAPSED_STORAGE_KEY = "maintenance_sidebar_collapsed";
-export const HIGH_CONTRAST_STORAGE_KEY = "maintenance_high_contrast";
+const SIDEBAR_COLLAPSED_STORAGE_KEY = "maintenance_sidebar_collapsed";
+const HIGH_CONTRAST_STORAGE_KEY = "maintenance_high_contrast";
 
 /**
  * Read the persisted sidebar collapse preference.

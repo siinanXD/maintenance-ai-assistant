@@ -113,12 +113,6 @@ def select_mock_tool_call(messages, tools):
     ]
 
 
-def _choose_tool(text, available, registry_names=None, structured_hint=None):
-    """Return the first tool name and arguments for a user message."""
-    calls = _choose_tool_calls(text, available, registry_names, structured_hint)
-    return calls[0] if calls else ("", {})
-
-
 def _choose_tool_calls(text, available, registry_names=None, structured_hint=None):
     """Return ``[(tool_name, arguments)]`` for a user message (may be empty)."""
     registry = set(registry_names or []) | set(available)

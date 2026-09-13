@@ -159,12 +159,10 @@
     grid-template-columns: 1fr;
   }
 
-  .handover-hero-actions,
   .handover-record-badges {
     justify-content: flex-start;
   }
 
-  .handover-hero-actions .btn,
   .handover-confirmation .btn {
     width: 100%;
   }

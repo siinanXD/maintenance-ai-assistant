@@ -11,17 +11,11 @@ to prevent duplicate retrieval paths from reappearing.
   `build_rag_context(...)`, the `search_<scope>` tools call
   `retrieve_ai_context(...)`, and the `list_*`/`count_records` tools query
   the permission-aware SQL services directly (`app/agent/queries/`).
-- `app/services/rag_service.py` is the stable RAG facade with:
-  - `build_rag_context(...)`
-  - `answer_with_rag(...)`
-
-## Orchestration
-
-- `app/services/langgraph_rag_workflow.py` owns the RAG workflow nodes.
-- LangGraph is optional at runtime. If graph compilation is unavailable, the
-  same node functions run in deterministic fallback order.
-- The facade does not expose a second pipeline-step constant. The authoritative
-  node list is `LANGGRAPH_RAG_PIPELINE_STEPS` in the workflow module.
+- `app/services/rag_service.py` is the retrieval pipeline behind
+  `search_knowledge`: question -> intent classification -> retrieval ->
+  context assembly. `build_rag_context(...)` returns context, sources and the
+  `rag` diagnostics; `rag.pipeline_trace` lists the completed steps. Answers are
+  generated only in the agent loop.
 
 ## Retrieval
 

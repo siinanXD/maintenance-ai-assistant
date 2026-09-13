@@ -100,18 +100,6 @@
     transform: rotate(45deg) translateY(-1px);
   }
 
-  .topbar-control-icon {
-    display: inline-grid;
-    width: 1.45rem;
-    height: 1.45rem;
-    place-items: center;
-    border-radius: 0.35rem;
-    background: var(--color-bg-canvas);
-    color: var(--ui-blue, #0b72e7);
-    font-size: 0.62rem;
-    font-weight: 900;
-  }
-
   .dashboard-kpi-grid {
     grid-template-columns: repeat(auto-fit, minmax(12.2rem, 1fr));
     gap: 0.75rem;
@@ -130,34 +118,9 @@
     transform: translateY(-1px);
   }
 
-  .kpi-icon {
-    width: 2.45rem;
-    height: 2.45rem;
-    border-radius: 0.55rem;
-    font-size: 0.7rem;
-    box-shadow: none;
-  }
-
   .ops-dashboard-grid {
     grid-template-columns: minmax(0, 1.42fr) minmax(21rem, 0.58fr);
     gap: 1rem;
-  }
-
-  .task-cockpit-panel .cockpit-board {
-    height: auto;
-    min-height: 21rem;
-  }
-
-  .cockpit-task-list {
-    max-height: 18.5rem;
-    overflow-y: auto;
-    scrollbar-gutter: stable;
-  }
-
-  .cockpit-task-meta span + span::before {
-    content: "/";
-    margin-right: 0.55rem;
-    color: #9aa8ba;
   }
 
   .chat-widget {

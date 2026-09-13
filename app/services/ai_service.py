@@ -771,23 +771,6 @@ def get_ai_provider():
     return MockAIProvider()
 
 
-def ai_provider_fallback_reason(config=None):
-    """Return why the configured provider would fall back to mock, if any."""
-    config = config or current_app.config
-    provider_name = _configured_provider_name(config)
-    if provider_name == "mock":
-        return ""
-    if provider_name == "openai":
-        return "" if ai_api_key_configured(config) else "api_key_missing"
-    if provider_name == "openai_compatible":
-        if not ai_api_key_configured(config):
-            return "api_key_missing"
-        if not _configured_base_url(config):
-            return "base_url_missing"
-        return ""
-    return "unsupported_provider"
-
-
 def ai_provider_catalog():
     """Return redacted chat-provider capabilities for admin status payloads."""
     return [dict(item) for item in CHAT_PROVIDER_CATALOG]
@@ -869,15 +852,6 @@ def _provider_recommended_action(reason):
         "unsupported_provider": ("AI_PROVIDER auf openai, openai_compatible oder mock setzen."),
     }
     return actions.get(str(reason or ""), "AI-Provider-Konfiguration pruefen.")
-
-
-def provider_fallback_error_message(reason):
-    """Return a safe user-facing configuration message for provider fallback."""
-    if reason == "base_url_missing":
-        return "AI_BASE_URL is required for AI_PROVIDER=openai_compatible"
-    if reason == "unsupported_provider":
-        return "AI_PROVIDER is not supported by a dedicated adapter yet"
-    return "OPENAI_API_KEY is not configured in .env"
 
 
 def _configured_provider_name(config=None):

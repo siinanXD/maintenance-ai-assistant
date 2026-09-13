@@ -11,7 +11,7 @@ export type Department = {
   readonly name: string;
 };
 
-export type TaskUser = {
+type TaskUser = {
   readonly id?: number;
   readonly name?: string;
   readonly username?: string;

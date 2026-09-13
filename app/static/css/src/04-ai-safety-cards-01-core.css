@@ -34,33 +34,25 @@
     overflow-x: auto;
   }
 
-  .ai-admin-kpi-grid {
-    align-items: stretch;
-  }
-
   .dashboard-grid.dashboard-grid-4 {
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   }
 
-  .ai-status-card.is-active,
   .metric-card.is-active {
     border-color: #b7e2c6;
     background: #f3fcf5;
   }
 
-  .ai-status-card.is-stale,
   .metric-card.is-stale {
     border-color: #ffd89a;
     background: #fffaf0;
   }
 
-  .ai-status-card.is-error,
   .metric-card.is-error {
     border-color: #fecaca;
     background: #fff5f6;
   }
 
-  .ai-status-card small,
   .metric-card small {
     color: var(--ui-muted);
     font-size: 0.72rem;
@@ -70,7 +62,6 @@
 
   .ai-source-grid,
   .ai-capability-grid,
-  .ai-answer-quality-grid,
   .ai-retrieval-metrics {
     display: grid;
     gap: 0.75rem;
@@ -81,8 +72,7 @@
   }
 
   .ai-source-card,
-  .ai-capability-card,
-  .ai-retrieval-metric {
+  .ai-capability-card {
     display: grid;
     min-width: 0;
     gap: 0.45rem;
@@ -119,8 +109,7 @@
   }
 
   .ai-source-card-header strong,
-  .ai-capability-card strong,
-  .ai-retrieval-metric strong {
+  .ai-capability-card strong {
     color: var(--ui-text);
     font-size: 0.88rem;
     font-weight: 950;
@@ -136,8 +125,7 @@
     line-height: 1.35;
   }
 
-  .ai-source-card > small,
-  .ai-retrieval-metric small {
+  .ai-source-card > small {
     color: var(--ui-muted);
     font-size: 0.68rem;
     font-weight: 760;
@@ -158,8 +146,7 @@
     padding: 0.5rem;
   }
 
-  .ai-source-stats small,
-  .ai-retrieval-metric span {
+  .ai-source-stats small {
     color: var(--color-text-muted);
     font-size: 0.64rem;
     font-weight: 920;
@@ -184,20 +171,6 @@
     grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
   }
 
-  .ai-retrieval-metric {
-    min-height: 5.1rem;
-    align-content: center;
-    border-left-color: var(--ui-blue);
-    background: var(--color-bg-surface);
-  }
-
-  .ai-retrieval-metric strong {
-    overflow: hidden;
-    font-size: 1.1rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   .ai-capability-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
@@ -213,10 +186,6 @@
     background: var(--color-bg-canvas);
   }
 
-  .ai-answer-quality-grid {
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  }
-
   .ai-observability-panel {
     border-left: 4px solid var(--ui-blue);
   }
@@ -229,15 +198,6 @@
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
     padding: 0.75rem;
-  }
-
-  .ai-monitor-list-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    border-bottom: 1px solid var(--color-border-subtle);
-    padding-bottom: 0.45rem;
   }
 
   .ai-monitor-list-header strong,

@@ -24,13 +24,10 @@ from app.services.ai_traceability_service import (
     answer_trace_for_user,
     create_answer_trace,
 )
-from app.services.chat_template_service import chat_templates_for_user
 from app.services.conversation_context_service import normalize_session_id
 from app.services.error_assistant_service import run_error_assistant
-from app.services.incident_timeline_service import incident_timeline
 from app.services.knowledge_gap_service import maybe_track_knowledge_gap
 from app.services.operations_tracking_service import record_event
-from app.services.order_planning_service import plan_order
 
 ai_bp = Blueprint("ai", __name__)
 
@@ -86,13 +83,6 @@ def _run_agent_and_respond(event_type="ai.agent"):
 @jwt_required()
 def chat():
     """Handle authenticated chat requests through the tool-using agent."""
-    return _run_agent_and_respond()
-
-
-@ai_bp.post("/agent")
-@jwt_required()
-def agent_chat():
-    """Answer through the tool-using agent (alias of the chat endpoint)."""
     return _run_agent_and_respond()
 
 
@@ -162,16 +152,6 @@ def chat_history():
     )
 
 
-@ai_bp.get("/chat/templates")
-@jwt_required()
-def chat_templates():
-    """Return permission-aware chat templates for the current user."""
-    return success_response(
-        chat_templates_for_user(current_user()),
-        message="Chat templates loaded",
-    )
-
-
 @ai_bp.get("/status")
 @roles_required(Role.MASTER_ADMIN)
 def status():
@@ -184,42 +164,6 @@ def status():
 def briefing():
     """Return a daily maintenance briefing for the current user."""
     return success_response(daily_briefing(current_user()), message="Daily briefing loaded")
-
-
-@ai_bp.get("/incident-timeline")
-@jwt_required()
-def incident_timeline_view():
-    """Return a permission-aware incident timeline for the current user."""
-    return success_response(
-        incident_timeline(current_user(), request.args),
-        message="Incident timeline loaded",
-    )
-
-
-@ai_bp.post("/order-plan")
-@jwt_required()
-def order_plan():
-    """Return a RAG-supported production order planning preview."""
-    user = current_user()
-    rejected = check_ai_quota(user)
-    if rejected is not None:
-        return rejected
-    result, error, status_code = plan_order(request.get_json(silent=True) or {}, user)
-    if error:
-        return service_error_response(error, status_code)
-    record_event(
-        "ai.order_plan",
-        "ai",
-        entity_type="order_plan",
-        user=user,
-        department=user.department,
-        source="ai",
-        metadata={
-            "source_count": len(result.get("sources") or []) if isinstance(result, dict) else 0,
-        },
-        commit=True,
-    )
-    return success_response(result, message="Order plan generated")
 
 
 @ai_bp.post("/error-assistant")

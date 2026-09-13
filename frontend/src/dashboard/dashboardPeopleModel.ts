@@ -1,4 +1,3 @@
-import { formatGermanDate } from "../utils/date";
 import { type DashboardPayload, type DashboardRuntimeData } from "./dashboardApi";
 
 /**
@@ -10,37 +9,9 @@ export function peopleText(payload: DashboardPayload | null | undefined, key: st
 }
 
 /**
- * Return initials for the compact employee avatar.
- */
-export function employeeInitials(name: unknown): string {
-  return (
-    String(name || "?")
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join("") || "?"
-  );
-}
-
-/**
- * Return the first visible qualification or role text for an employee.
- */
-export function employeeRole(employee: DashboardPayload): string {
-  return (
-    peopleText(employee, "qualifications")
-      .split(/[,\n;]/)
-      .map((part) => part.trim())
-      .filter(Boolean)[0] ||
-    peopleText(employee, "department") ||
-    "Mitarbeiter"
-  );
-}
-
-/**
  * Return the dashboard attendance status for an employee.
  */
-export function employeeStatus(employee: DashboardPayload): string {
+function employeeStatus(employee: DashboardPayload): string {
   const shift = peopleText(employee, "current_shift", peopleText(employee, "shift_model")).toLowerCase();
   if (shift.includes("urlaub") || shift.includes("frei")) return "Abwesend";
   if (!shift) return "Geplant";
@@ -59,30 +30,6 @@ export function relevantVacations(vacations: readonly DashboardPayload[]): reado
  */
 export function absentEmployees(employees: readonly DashboardPayload[]): readonly DashboardPayload[] {
   return employees.filter((employee) => employeeStatus(employee) === "Abwesend");
-}
-
-/**
- * Return a short handover title.
- */
-export function handoverTitle(handover: DashboardPayload): string {
-  return `${peopleText(handover, "shift_type", "Schicht")} · ${peopleText(handover, "department", "Bereich")}`;
-}
-
-/**
- * Return a short handover meta line.
- */
-export function handoverMeta(handover: DashboardPayload): string {
-  return [
-    formatGermanDate(peopleText(handover, "shift_date"), {
-      day: "2-digit",
-      fallback: "-",
-      month: "2-digit"
-    }),
-    handover.open_tasks ? "offene Punkte vorhanden" : "keine offenen Punkte erfasst",
-    handover.machine_notes ? "Maschinenhinweise" : ""
-  ]
-    .filter(Boolean)
-    .join(" · ");
 }
 
 /**

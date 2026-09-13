@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useMemo, type ReactNode } from "react";
 
 import { setLegacyWorkflowStatus, showLegacyToast } from "./runtimeBridge";
 
@@ -21,12 +21,3 @@ export function ToastProvider({ children }: { readonly children: ReactNode }): R
   return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
 }
 
-/**
- * Return global toast helpers from the React shell provider.
- */
-export function useToasts(): ToastProviderValue {
-  return useContext(ToastContext) || {
-    setWorkflowStatus: setLegacyWorkflowStatus,
-    showToast: showLegacyToast
-  };
-}

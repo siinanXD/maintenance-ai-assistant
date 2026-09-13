@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useMemo, type ReactNode } from "react";
 
 import {
   confirmLegacyAction,
@@ -28,13 +28,3 @@ export function DialogProvider({ children }: { readonly children: ReactNode }): 
   return <DialogContext.Provider value={value}>{children}</DialogContext.Provider>;
 }
 
-/**
- * Return dialog helpers from the React shell provider.
- */
-export function useDialogs(): DialogProviderValue {
-  return useContext(DialogContext) || {
-    confirmAction: confirmLegacyAction,
-    requestText: requestLegacyText,
-    showInfoDialog: showLegacyInfoDialog
-  };
-}

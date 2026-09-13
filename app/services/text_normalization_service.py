@@ -70,22 +70,6 @@ def normalize_query(value):
     return " ".join(dict.fromkeys(parts))
 
 
-def normalize_technical_term(value):
-    """Return the canonical form for a known technical term or normalized text."""
-    normalized = normalize_text(value)
-    if not normalized:
-        return ""
-    compact = _compact_term(normalized)
-    for canonical, aliases in TECHNICAL_SYNONYM_GROUPS:
-        if normalized == canonical or compact == _compact_term(canonical):
-            return canonical
-        for alias in aliases:
-            normalized_alias = normalize_text(alias)
-            if normalized == normalized_alias or compact == _compact_term(normalized_alias):
-                return canonical
-    return normalized
-
-
 def expand_german_synonyms(value):
     """Return deterministic technical synonym expansions found in text."""
     normalized = normalize_text(value)

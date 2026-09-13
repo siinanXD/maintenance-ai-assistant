@@ -28,26 +28,12 @@ export type AdminAiStatusCard = {
   readonly tone: "is-active" | "is-stale" | "is-error" | "is-muted";
 };
 
-export type AdminAiHealthCard = {
-  readonly key: string;
-  readonly label: string;
-  readonly detail: string;
-  readonly tone: "is-active" | "is-stale" | "is-error" | "is-muted";
-};
-
-export type AdminAiProviderField = {
-  readonly key: string;
-  readonly label: string;
-  readonly value: string;
-  readonly detail: string;
-};
-
-export type AdminAiStatRow = {
+type AdminAiStatRow = {
   readonly label: string;
   readonly value: string;
 };
 
-export type AdminAiActionItem = {
+type AdminAiActionItem = {
   readonly detail: string;
   readonly key: string;
   readonly label: string;
@@ -135,107 +121,6 @@ export function overviewCriticalCards(state: AdminAiOverviewLoadState): AdminAiS
       tone: failedJobs ? "is-error" : queuedJobs ? "is-stale" : "is-active"
     }
   ];
-}
-
-/**
- * Build the five compact status cards from the overview payloads.
- */
-export function overviewStatusCards(state: AdminAiOverviewLoadState): AdminAiStatusCard[] {
-  const aiReady = state.aiStatus ? state.aiStatus.ready !== false : false;
-  const provider = stringField(state.aiStatus, "provider", "lokal");
-  const model = stringField(state.aiStatus, "model", "lokal");
-  const fallbackRate = numberField(state.summary, "fallback_rate");
-  const operationsJobs = recordField(state.operations, "background_jobs");
-  const queuedJobs = numberField(operationsJobs, "queue_length");
-  const failedJobs = numberField(operationsJobs, "failed");
-
-  return [
-    {
-      key: "ai",
-      label: "AI",
-      value: state.aiStatus ? (aiReady ? "aktiv" : "inaktiv") : "Wird geladen",
-      detail: state.aiStatus ? "Anbieterstatus aus /api/v1/ai/status" : "Status wird geladen",
-      tone: state.aiStatus ? (aiReady ? "is-active" : "is-error") : "is-muted"
-    },
-    {
-      key: "openai",
-      label: "OpenAI",
-      value: provider.toLowerCase().includes("openai") || model.toLowerCase().includes("gpt")
-        ? "konfiguriert"
-        : "nicht konfiguriert",
-      detail: `${provider} / ${model}`,
-      tone: state.aiStatus ? (aiReady ? "is-active" : "is-error") : "is-muted"
-    },
-    {
-      key: "fallback",
-      label: "Lokaler Ausweichbetrieb",
-      value: fallbackRate > 0 || !aiReady ? "aktiv" : "inaktiv",
-      detail: `Fallback-Rate ${percentText(fallbackRate)}`,
-      tone: fallbackRate > 0 || !aiReady ? "is-stale" : "is-active"
-    },
-    {
-      key: "rag",
-      label: "RAG",
-      value: stringField(recordField(state.summary, "readiness"), "status", "wird geladen"),
-      detail: "Bereitschaft aus Admin-AI-Summary",
-      tone: toneForStatus(recordField(state.summary, "readiness").status)
-    },
-    {
-      key: "reindex",
-      label: "Letzter Reindex",
-      value: failedJobs ? "Jobs kritisch" : queuedJobs ? "Jobs laufen" : "Queue ruhig",
-      detail: `${numberText(queuedJobs)} wartend / ${numberText(failedJobs)} fehlgeschlagen`,
-      tone: failedJobs ? "is-error" : queuedJobs ? "is-stale" : "is-active"
-    }
-  ];
-}
-
-/**
- * Build health cards for the status panel.
- */
-export function overviewHealthCards(state: AdminAiOverviewLoadState): AdminAiHealthCard[] {
-  const readiness = recordField(state.summary, "readiness");
-  const operationsJobs = recordField(state.operations, "background_jobs");
-  const provider = stringField(state.aiStatus, "provider", "lokal");
-  const model = stringField(state.aiStatus, "model", "lokal");
-  const ready = state.aiStatus ? state.aiStatus.ready !== false : false;
-  const queuedJobs = numberField(operationsJobs, "queue_length");
-  const failedJobs = numberField(operationsJobs, "failed");
-
-  return [
-    {
-      key: "ai",
-      label: ready ? "bereit" : "checken",
-      detail: `${provider} / ${model}`,
-      tone: state.aiStatus ? (ready ? "is-active" : "is-error") : "is-muted"
-    },
-    {
-      key: "rag",
-      label: stringField(readiness, "status", "offen"),
-      detail: stringField(readiness, "reasons", "Summary geladen"),
-      tone: toneForStatus(readiness.status)
-    },
-    {
-      key: "queue",
-      label: failedJobs ? "kritisch" : queuedJobs ? "aktiv" : "ruhig",
-      detail: `${numberText(queuedJobs)} wartend / ${numberText(failedJobs)} fehlgeschlagen`,
-      tone: failedJobs ? "is-error" : queuedJobs ? "is-stale" : "is-active"
-    }
-  ];
-}
-
-/**
- * Build the model status card from `/api/v1/ai/status`.
- */
-export function modelHealthCard(state: AdminAiOverviewLoadState): AdminAiHealthCard {
-  const ready = state.aiStatus ? state.aiStatus.ready !== false : false;
-  const model = stringField(state.aiStatus, "model", "lokal");
-  return {
-    key: "model",
-    label: ready ? "bereit" : "Fallback / Kontrolle",
-    detail: model,
-    tone: state.aiStatus ? (ready ? "is-active" : "is-stale") : "is-muted"
-  };
 }
 
 /**
@@ -353,75 +238,6 @@ export function adminActionItems(state: AdminAiOverviewLoadState): AdminAiAction
           tone: "is-active"
         }
       ];
-}
-
-/**
- * Build provider field cards from AI status payloads.
- */
-export function providerFields(state: AdminAiOverviewLoadState): AdminAiProviderField[] {
-  const ready = state.aiStatus ? state.aiStatus.ready !== false : false;
-  return [
-    {
-      key: "provider",
-      label: "Anbieter",
-      value: stringField(state.aiStatus, "provider", "lokal"),
-      detail: "Aktiver AI-Backend-Anbieter."
-    },
-    {
-      key: "model",
-      label: "Modell",
-      value: stringField(state.aiStatus, "model", "lokal"),
-      detail: "Modell für generative Antworten."
-    },
-    {
-      key: "mode",
-      label: "Betriebsmodus",
-      value: ready ? "Modellbetrieb" : "Fallback / Kontrolle",
-      detail: "Externes Modell oder lokaler Ausweichbetrieb."
-    },
-    {
-      key: "streaming",
-      label: "Streaming",
-      value: state.aiStatus?.streaming_available ? "aktiv" : "nicht verfügbar",
-      detail: state.aiStatus?.streaming_configured
-        ? "Konfiguriert, API noch nicht freigegeben."
-        : "Derzeit nicht konfiguriert."
-    }
-  ];
-}
-
-/**
- * Build provider diagnostic rows without exposing secrets.
- */
-export function providerDetailRows(state: AdminAiOverviewLoadState): AdminAiStatRow[] {
-  return [
-    { label: "Provider", value: stringField(state.aiStatus, "provider", "lokal") },
-    { label: "Modell", value: stringField(state.aiStatus, "model", "lokal") },
-    {
-      label: "Streaming",
-      value: state.aiStatus?.streaming_available ? "aktiv" : "nicht verfügbar"
-    },
-    {
-      label: "Letzter Fehler",
-      value: stringField(state.aiStatus, "last_error", "kein letzter Fehler")
-    }
-  ];
-}
-
-/**
- * Build provider action rows that point operators to the stable backend contract.
- */
-export function providerActionRows(state: AdminAiOverviewLoadState): AdminAiStatRow[] {
-  const ready = state.aiStatus ? state.aiStatus.ready !== false : false;
-  return [
-    { label: "Aendern", value: ".env / Runtime-Konfiguration" },
-    { label: "Endpoint", value: "/api/v1/ai/status" },
-    { label: "Service", value: "app.ai.services.ai_status" },
-    {
-      label: "Admin-Hinweis",
-      value: ready ? "Keine Aktion erforderlich" : "Key, Modell und Provider kontrollieren"
-    }
-  ];
 }
 
 /**

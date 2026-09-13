@@ -402,25 +402,6 @@ MAINTENANCE_TAG_CATEGORIES = (
 )
 
 
-def maintenance_tag_categories():
-    """Return the central maintenance tag taxonomy as JSON-safe dictionaries."""
-    return [
-        {
-            "key": category["key"],
-            "label": category["label"],
-            "tags": [
-                {
-                    "key": tag["key"],
-                    "label": tag["label"],
-                    "keywords": list(tag["keywords"]),
-                }
-                for tag in category["tags"]
-            ],
-        }
-        for category in MAINTENANCE_TAG_CATEGORIES
-    ]
-
-
 def suggest_tags_for_error_payload(data):
     """Return tag suggestions for an error catalog payload."""
     return suggest_maintenance_tags(

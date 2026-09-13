@@ -255,8 +255,6 @@ def test_new_ai_frontend_routes_exist(app, client):
         ("/api/v1/machines/maintenance-recommendations", "GET"),
         ("/api/v1/ai/status", "GET"),
         ("/api/v1/ai/daily-briefing", "GET"),
-        ("/api/v1/ai/incident-timeline", "GET"),
-        ("/api/v1/ai/chat/templates", "GET"),
         ("/api/v1/ai/error-assistant", "POST"),
         ("/api/v1/admin/ai/training", "GET"),
         ("/api/v1/admin/ai/training", "POST"),
@@ -305,7 +303,6 @@ def test_new_ai_frontend_routes_exist(app, client):
     assert "`/api/v1/errors/${errorId}`" in script
     assert "`/api/v1/errors/${errorId}/close`" in script
     assert "/api/v1/inventory/forecast" in script
-    assert "/api/v1/shiftplans/calendar" in script
     assert "`${SHIFTPLANS_BASE}/models`" in script
     assert "/api/v1/ai/daily-briefing" in script
     assert "/api/v1/ai/error-assistant" in script
@@ -1393,7 +1390,6 @@ def test_admin_ai_react_markup_replaces_fallback_clone():
     assert "KnowledgeDocumentsPanel" in admin_ai_runtime_sources
     assert "TrainingEntriesPanel" in admin_ai_runtime_sources
     assert "KnowledgeNetworkPanel" in admin_ai_runtime_sources
-    assert "ReindexJobsPanel" in admin_ai_runtime_sources
     assert "markIslandMounted" in admin_ai_app
     assert "useFallbackShellIsland" not in admin_ai_app
     assert "cloneFallbackShell" not in admin_ai_app
@@ -1456,7 +1452,6 @@ def test_admin_ai_react_markup_replaces_fallback_clone():
     assert "/api/v1/admin/ai/retrieval-evaluations/run" in admin_ai_runtime_sources
     assert "maintenanceAdminAiReactRuntime" in admin_ai_runtime_sources
     assert "legacy-bridge" not in admin_ai_runtime_sources
-    assert "overviewStatusCards" in admin_ai_runtime_sources
     assert "effectivenessState" in admin_ai_runtime_sources
     assert "data-ai-user-costs-admin" in admin_ai_runtime_sources
     assert "data-ai-effectiveness-risks" in admin_ai_runtime_sources
@@ -1724,9 +1719,6 @@ def test_dashboard_react_markup_replaces_fallback_clone():
     dashboard_people_model = (
         REPO_ROOT / "frontend" / "src" / "dashboard" / "dashboardPeopleModel.ts"
     ).read_text(encoding="utf-8")
-    dashboard_operations_model = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "dashboardOperationsModel.ts"
-    ).read_text(encoding="utf-8")
     dashboard_side_model = (
         REPO_ROOT / "frontend" / "src" / "dashboard" / "dashboardSideModel.ts"
     ).read_text(encoding="utf-8")
@@ -1745,9 +1737,6 @@ def test_dashboard_react_markup_replaces_fallback_clone():
     dashboard_island = (REPO_ROOT / "app" / "static" / "pages" / "dashboard-island.js").read_text(
         encoding="utf-8"
     )
-    dashboard_assets = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardAssetStatus.tsx"
-    ).read_text(encoding="utf-8")
     dashboard_hero = (REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardHero.tsx").read_text(
         encoding="utf-8"
     )
@@ -1757,24 +1746,6 @@ def test_dashboard_react_markup_replaces_fallback_clone():
     dashboard_kpis = (REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardKpis.tsx").read_text(
         encoding="utf-8"
     )
-    dashboard_operations = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardOperations.tsx"
-    ).read_text(encoding="utf-8")
-    dashboard_shift_people = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardShiftPeople.tsx"
-    ).read_text(encoding="utf-8")
-    dashboard_shift_panel = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardShiftPanel.tsx"
-    ).read_text(encoding="utf-8")
-    dashboard_people_panel = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardPeoplePanel.tsx"
-    ).read_text(encoding="utf-8")
-    dashboard_side_column = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardSideColumn.tsx"
-    ).read_text(encoding="utf-8")
-    dashboard_tasks = (
-        REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardTaskOverview.tsx"
-    ).read_text(encoding="utf-8")
     dashboard_task_modal = (
         REPO_ROOT / "frontend" / "src" / "dashboard" / "DashboardTaskDetailModal.tsx"
     ).read_text(encoding="utf-8")
@@ -1790,22 +1761,14 @@ def test_dashboard_react_markup_replaces_fallback_clone():
             dashboard_markup,
             dashboard_asset_model,
             dashboard_model,
-            dashboard_operations_model,
             dashboard_people_model,
             dashboard_side_model,
             dashboard_shift_model,
             dashboard_task_model,
             dashboard_technical_model,
-            dashboard_assets,
             dashboard_hero,
             dashboard_hidden_forms,
             dashboard_kpis,
-            dashboard_operations,
-            dashboard_shift_people,
-            dashboard_shift_panel,
-            dashboard_people_panel,
-            dashboard_side_column,
-            dashboard_tasks,
             dashboard_task_modal,
             dashboard_task_modal_fields,
             dashboard_technical,
@@ -1860,7 +1823,6 @@ def test_dashboard_react_markup_replaces_fallback_clone():
     assert "/api/v1/tasks/${taskId}/start" in dashboard_api
     assert "/api/v1/tasks/${taskId}/complete" in dashboard_api
     assert "/api/v1/tasks/suggest" in dashboard_api
-    assert "/api/v1/shiftplans/calendar?" in dashboard_api
     assert "/api/v1/errors?limit=100&active=1" in dashboard_api
     assert "/api/v1/machines?limit=100" in dashboard_api
     assert "/api/v1/employees?limit=200" in dashboard_api
@@ -1874,29 +1836,21 @@ def test_dashboard_react_markup_replaces_fallback_clone():
     assert "/api/v1/admin/ai/knowledge/status" in dashboard_api
     assert "/api/v1/admin/ai/knowledge-gaps?status=open&limit=5" in dashboard_api
     assert "DashboardOperations" in dashboard_markup or "DashboardCockpitPanels" in dashboard_markup
-    assert "operationCards" in dashboard_react_sources
-    assert "operationDrilldownRows" in dashboard_react_sources
     assert (
         "DashboardShiftPeople" in dashboard_markup or "DashboardCockpitPanels" in dashboard_markup
     )
-    assert "handoverTitle" in dashboard_react_sources
     assert "handoverStatusValue" in dashboard_react_sources
     assert "peopleStatusValue" in dashboard_react_sources
     assert "employeeStatus" in dashboard_react_sources
     assert "employeesToShiftCalendar" in dashboard_react_sources
-    assert "dashboardShiftRows" in dashboard_react_sources
     assert "shiftCalendarMessage" in dashboard_react_sources
     assert "DashboardSideColumn" in dashboard_markup or "DashboardCockpitPanels" in dashboard_markup
     assert "briefingItems" in dashboard_react_sources
-    assert "activityItems" in dashboard_react_sources
-    assert "inventoryMetrics" in dashboard_react_sources
     assert (
         "DashboardTaskOverview" in dashboard_markup or "DashboardSituationStrip" in dashboard_markup
     )
     assert "activeDashboardIncidents" in dashboard_react_sources
-    assert "frequentIncidentCodes" in dashboard_react_sources
     assert "machineStatusSeverity" in dashboard_react_sources
-    assert "dashboardTaskGroups" in dashboard_react_sources
     assert "dashboardCriticalTasks" in dashboard_react_sources
     assert (
         "DashboardAssetStatus" in dashboard_markup or "DashboardCockpitPanels" in dashboard_markup
@@ -1916,32 +1870,6 @@ def test_dashboard_react_markup_replaces_fallback_clone():
     assert "DashboardTaskDetailModal" in dashboard_markup
     assert "data-ai-ops-cockpit" in dashboard_react_sources
     assert "data-dashboard-critical-count" in dashboard_react_sources
-    assert "data-dashboard-critical-today" in dashboard_react_sources
-    assert "data-dashboard-priority-list" in dashboard_react_sources
-    assert "data-dashboard-task-board" in dashboard_react_sources
-    assert "data-dashboard-error-stats" in dashboard_react_sources
-    assert "data-dashboard-frequent-codes" in dashboard_react_sources
-    assert "data-dashboard-machine-strip" in dashboard_react_sources
-    assert "data-dashboard-machine-cards" in dashboard_react_sources
-    assert "data-dashboard-calendar-message" in dashboard_react_sources
-    assert "data-dashboard-calendar-employee" in dashboard_react_sources
-    assert "data-dashboard-shift-timeline" in dashboard_react_sources
-    assert "data-dashboard-shift-calendar" in dashboard_react_sources
-    assert "data-dashboard-handover-list" in dashboard_react_sources
-    assert "data-dashboard-people-hints" in dashboard_react_sources
-    assert "data-dashboard-employee-overview" in dashboard_react_sources
-    assert "data-operations-insights-status" in dashboard_react_sources
-    assert "data-operations-site-filter" in dashboard_react_sources
-    assert "data-operations-range-filter" in dashboard_react_sources
-    assert "data-operations-refresh" in dashboard_react_sources
-    assert "data-operations-kpi-grid" in dashboard_react_sources
-    assert "data-operations-drilldown" in dashboard_react_sources
-    assert "data-daily-briefing-card" in dashboard_react_sources
-    assert "data-daily-briefing-summary" in dashboard_react_sources
-    assert "data-daily-briefing-list" in dashboard_react_sources
-    assert "data-dashboard-activity-feed" in dashboard_react_sources
-    assert "data-dashboard-inventory-stats" in dashboard_react_sources
-    assert "data-dashboard-inventory-shortages" in dashboard_react_sources
     assert "data-ai-ops-priority-rail" in dashboard_react_sources
     assert "data-ai-system-rail" in dashboard_react_sources
     assert "data-ai-risk-radar" in dashboard_react_sources

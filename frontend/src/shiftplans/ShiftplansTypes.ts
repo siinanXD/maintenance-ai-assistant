@@ -21,7 +21,7 @@ export type ShiftModel = {
   readonly recommended_rest_hours?: number;
 };
 
-export type ShiftModelWindow = {
+type ShiftModelWindow = {
   readonly key?: string;
   readonly label?: string;
   readonly name?: string;

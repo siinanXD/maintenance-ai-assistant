@@ -166,18 +166,6 @@
     transform: rotate(45deg) translateY(-1px);
   }
 
-  .topbar-control-icon {
-    display: inline-grid;
-    width: 1.45rem;
-    height: 1.45rem;
-    place-items: center;
-    border-radius: 0.35rem;
-    background: var(--color-bg-canvas);
-    color: var(--ui-blue);
-    font-size: 0.62rem;
-    font-weight: 900;
-  }
-
   .notification-button {
     font-weight: 900;
   }

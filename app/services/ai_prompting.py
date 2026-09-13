@@ -195,15 +195,6 @@ def permission_denied_answer(scope, permission_key=None):
     )
 
 
-def permission_denied_context(scope, permission_key=None):
-    """Return a short context marker for blocked assistant data sources."""
-    permission_text = permission_key or scope
-    return (
-        f"Keine Berechtigung fuer {scope}. "
-        f"Benoetigte Berechtigung beim Admin anfragen: {permission_text}."
-    )
-
-
 def _resolve_runtime_prompt(workflow, fallback_system_prompt, fallback_user_prompt):
     """Return a DB-backed prompt when available, otherwise the supplied fallback."""
     try:

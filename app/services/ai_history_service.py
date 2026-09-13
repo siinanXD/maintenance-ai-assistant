@@ -86,11 +86,6 @@ def chat_history_item(entry, include_user=False):
     return payload
 
 
-def history_answer_quality(item):
-    """Return answer-quality metadata reconstructed from stored chat fields."""
-    return answer_quality_from_history_item(item)
-
-
 def parse_limit_offset(args, default_limit=30, max_limit=200):
     """Parse common limit and offset query parameters."""
     try:

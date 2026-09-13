@@ -1,9 +1,3 @@
-export type SuccessEnvelope<TData> = {
-  readonly success?: boolean;
-  readonly data?: TData;
-  readonly items?: TData extends readonly (infer TItem)[] ? readonly TItem[] : never;
-};
-
 /**
  * Return true when a value is an object payload.
  */

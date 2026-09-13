@@ -89,11 +89,6 @@ def _create_background_job(job_type, payload, user=None):
     return job
 
 
-def existing_active_reindex_job(payload):
-    """Return an already queued or running RAG reindex job for the payload."""
-    return existing_active_job(JOB_RAG_REINDEX, payload)
-
-
 def existing_active_job(job_type, payload):
     """Return an already queued or running background job for the payload."""
     payload_json = json.dumps(payload, sort_keys=True)
@@ -170,15 +165,6 @@ def process_next_background_job():
             "recovered": recovered,
         }
     return process_background_job(job)
-
-
-def next_queued_job():
-    """Return the oldest queued background job, if one exists."""
-    return (
-        BackgroundJob.query.filter(BackgroundJob.status.in_(RETRYING_STATUSES))
-        .order_by(BackgroundJob.created_at.asc(), BackgroundJob.id.asc())
-        .first()
-    )
 
 
 def claim_next_queued_job():

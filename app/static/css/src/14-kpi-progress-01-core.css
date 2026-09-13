@@ -12,9 +12,7 @@
   .panel,
   .ops-panel,
   .table-wrap,
-  .cockpit-column,
   .task-card,
-  .ai-action-card,
   .suggestion-box,
   .upload-check-panel,
   .review-score-card,
@@ -30,8 +28,7 @@
   .app-card:hover,
   .panel:hover,
   .ops-panel:hover,
-  .task-card:hover,
-  .ai-action-card:hover {
+  .task-card:hover {
     border-color: var(--ui-border-strong);
     box-shadow: var(--ui-shadow-sm);
     transform: translateY(-1px);
@@ -140,8 +137,7 @@
   .badge-priority,
   .badge-status,
   .status-pill,
-  .ops-status-pill,
-  .ai-label {
+  .ops-status-pill {
     display: inline-flex;
     align-items: center;
     min-height: 1.55rem;
@@ -157,8 +153,7 @@
     text-transform: none;
   }
 
-  .badge-ai,
-  .ai-label {
+  .badge-ai {
     border-color: #bce3e2;
     background: #e9fbfa;
     color: #087b78;

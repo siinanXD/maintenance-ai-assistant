@@ -18,34 +18,7 @@ from app.shiftplans.rules import (
     validate_vacation_conflict,
 )
 from app.shiftplans.scoring import is_backward_rotation, is_forward_rotation, score_candidate
-from app.shiftplans.templates import (
-    get_shift_model_template,
-    list_shift_model_templates,
-    resolve_shift_model_template,
-)
-
-
-def test_shift_model_catalog_contains_required_templates():
-    """Verify the first supported German shift model templates are registered."""
-    keys = {template.key for template in list_shift_model_templates()}
-
-    assert {
-        "one_shift",
-        "two_shift",
-        "three_shift",
-        "teilkonti",
-        "vollkonti_4",
-        "vollkonti_5",
-    }.issubset(keys)
-
-
-def test_shift_model_resolution_supports_legacy_rhythm_aliases():
-    """Verify legacy rhythm labels resolve to stable template keys."""
-    assert resolve_shift_model_template("2-Schicht").key == "two_shift"
-    assert resolve_shift_model_template("3-Schicht Rhythmus").key == "three_shift"
-    assert resolve_shift_model_template("Teilkonti").key == "teilkonti"
-    assert resolve_shift_model_template("one_shift_day").key == "one_shift"
-    assert resolve_shift_model_template("Vollkonti 5-Schicht").key == "vollkonti_5"
+from app.shiftplans.templates import get_shift_model_template
 
 
 def test_shift_model_active_days_match_model_type():

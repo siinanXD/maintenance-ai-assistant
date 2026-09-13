@@ -58,7 +58,6 @@ DEFAULT_RAG_SCAN_LIMIT = 300
 DEFAULT_RAG_KEYWORD_SCAN_LIMIT = 500
 DEFAULT_RAG_MAX_KEYWORD_TERMS = 8
 DEFAULT_RAG_MIN_SCORE = 1
-ATLAS_EMBEDDING_DIMENSIONS = 1536
 DEFAULT_ATLAS_RETRY_COOLDOWN_SECONDS = 300
 
 # Circuit breaker for unreachable Atlas clusters. Building the client pings the
@@ -1119,17 +1118,6 @@ def _machine_source_filter(machine_id):
             )
         ),
     )
-
-
-def _candidate_chunks(base_query, query_tokens, recent_limit, keyword_limit):
-    """Return de-duplicated recent and keyword-matched chunks for local hybrid search."""
-    keyword_chunks, recent_chunks = _candidate_chunk_sets(
-        base_query=base_query,
-        query_tokens=query_tokens,
-        recent_limit=recent_limit,
-        keyword_limit=keyword_limit,
-    )
-    return _deduplicate_chunks([*keyword_chunks, *recent_chunks])
 
 
 def _candidate_chunk_sets(base_query, query_tokens, recent_limit, keyword_limit):

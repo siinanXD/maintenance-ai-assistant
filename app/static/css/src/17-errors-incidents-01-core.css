@@ -191,13 +191,6 @@
     #ffffff;
 }
 
-.handover-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.55rem;
-}
-
 .handover-control-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

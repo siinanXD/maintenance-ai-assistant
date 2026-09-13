@@ -67,7 +67,7 @@ export function beginnerModelLabel(model: ShiftModel): string {
 /**
  * Format one shift model window for the preview.
  */
-export function formatShiftWindow(shift: { readonly label?: string; readonly name?: string; readonly key?: string; readonly start_time?: string; readonly end_time?: string }): string {
+function formatShiftWindow(shift: { readonly label?: string; readonly name?: string; readonly key?: string; readonly start_time?: string; readonly end_time?: string }): string {
   const name = shift.label || shift.name || shift.key || "-";
   return `${name} ${shift.start_time || ""}-${shift.end_time || ""}`;
 }
@@ -92,7 +92,7 @@ export function rotationLabel(value?: string): string {
 /**
  * Parse vacation text into API vacation rows.
  */
-export function parseVacationLines(text: string): ShiftplanVacationInput[] {
+function parseVacationLines(text: string): ShiftplanVacationInput[] {
   return text.split("\n").flatMap((line) => {
     const parts = line.split(",").map((part) => part.trim());
     const employeeId = Number.parseInt(parts[0] || "", 10);
@@ -192,7 +192,7 @@ export function activePlanShifts(plan: ShiftPlan): ShiftKey[] {
 /**
  * Calculate shift hours across midnight.
  */
-export function shiftHours(start: string, end: string): number {
+function shiftHours(start: string, end: string): number {
   const [startHours, startMinutes] = start.split(":").map(Number);
   const [endHours, endMinutes] = end.split(":").map(Number);
   let duration = endHours * 60 + endMinutes - (startHours * 60 + startMinutes);

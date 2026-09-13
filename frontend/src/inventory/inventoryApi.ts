@@ -10,7 +10,7 @@ export type CreateMaterialPayload = {
   readonly machine_id?: number | null;
 };
 
-export type ForecastPayload = {
+type ForecastPayload = {
   readonly low_stock_threshold: number;
   readonly status: "open";
   readonly limit: number;

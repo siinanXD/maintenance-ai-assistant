@@ -418,29 +418,6 @@ PATHS_TASKS_ERRORS_AI = {
             },
         }
     },
-    "/api/v1/ai/incident-timeline": {
-        "get": {
-            "tags": ["AI"],
-            "summary": "Get a permission-aware incident timeline",
-            "security": [{"bearerAuth": []}],
-            "parameters": [
-                {"name": "days", "in": "query", "schema": {"type": "integer", "default": 30}},
-                {"name": "machine_id", "in": "query", "schema": {"type": "integer"}},
-                {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 60}},
-            ],
-            "responses": {
-                "200": {
-                    "description": "Incident timeline " "loaded",
-                    "content": {
-                        "application/json": {
-                            "schema": {"$ref": "#/components/schemas/IncidentTimeline"}
-                        }
-                    },
-                },
-                "401": {"$ref": "#/components/responses/Unauthorized"},
-            },
-        }
-    },
     "/api/v1/machines/{machine_id}/assistant": {
         "post": {
             "tags": ["AI", "Machines"],

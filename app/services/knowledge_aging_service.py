@@ -217,29 +217,6 @@ def mark_outdated_knowledge_by_age(dry_run=False, limit=None, now=None):
     }
 
 
-def knowledge_review_recommendations(documents=None, limit=10):
-    """Return knowledge documents that should be reviewed because of aging."""
-    states = [
-        (document, knowledge_aging_state(document)) for document in _document_items(documents)
-    ]
-    actionable = [
-        (document, state)
-        for document, state in states
-        if state.should_mark_outdated
-        or state.quality_status == "outdated"
-        or state.retrieval_multiplier < 1.0
-    ]
-    actionable.sort(
-        key=lambda item: (
-            item[1].should_mark_outdated,
-            item[1].unconfirmed_days,
-            item[1].age_days,
-        ),
-        reverse=True,
-    )
-    return [_recommendation_payload(document, state) for document, state in actionable[:limit]]
-
-
 def knowledge_aging_summary(documents=None):
     """Return aggregate aging counters for lifecycle diagnostics."""
     document_states = [
