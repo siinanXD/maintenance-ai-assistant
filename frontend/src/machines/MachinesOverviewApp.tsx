@@ -118,7 +118,7 @@ export function MachinesOverviewApp(): ReactNode {
         onCreateMachine={() => setIsCreateDrawerOpen(true)}
         writable={writable}
       />
-      <MachineStats issueCount={issueCount} machines={machines} />
+      <MachineStats machines={machines} />
       {message.text ? (
         <section className="card app-card" role="alert">
           <div className="card-body">

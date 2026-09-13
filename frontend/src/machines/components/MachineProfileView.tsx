@@ -118,7 +118,7 @@ export function MachineProfileView({ message, profile }: MachineProfileViewProps
         </div>
       </section>
 
-      <p className="workflow-status" role="status" aria-live="polite" data-machine-profile-message>{message}</p>
+      {message ? <p className="workflow-status" role="status" aria-live="polite" data-machine-profile-message>{message}</p> : null}
       <ProfileKpis profile={profile} />
 
       <section className="machine-profile-layout">

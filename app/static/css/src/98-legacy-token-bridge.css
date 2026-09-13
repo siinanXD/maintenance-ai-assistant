@@ -389,3 +389,30 @@
 .incident-card {
   align-content: start;
 }
+
+/* Seitenköpfe: Titel und ein Satz, keine Bühne. Die Topbar nennt die Seite bereits. */
+.page-hero,
+.page-hero.is-compact {
+  margin-bottom: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  border-left-width: 1px;
+  box-shadow: none;
+}
+
+.page-hero .page-title {
+  font-size: clamp(1.5rem, 1.1rem + 1vw, 1.875rem);
+}
+
+.page-hero .page-description {
+  max-width: 70ch;
+  font-size: 0.875rem;
+}
+
+/* Kennzahlenleisten füllen die Breite, egal ob drei oder fünf Werte. */
+.incident-control-strip,
+.task-control-strip,
+.surface-stat-grid,
+.surface-stat-grid.ux-ops-summary-grid {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+

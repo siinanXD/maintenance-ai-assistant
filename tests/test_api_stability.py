@@ -205,8 +205,6 @@ def test_task_prioritization_is_manual_refresh_only():
     react_source = task_react_source()
 
     assert "/api/v1/tasks/prioritize" in react_source
-    assert "Bei Bedarf aktualisieren" in react_source
-    assert "Prioritätslage nicht neu berechnet" in react_source
     assert "priorityRefreshButtons.forEach" not in react_source
     assert "await loadPriorities();" not in react_source
     assert "await refreshTaskData();\n    await refreshPriorities();" not in react_source

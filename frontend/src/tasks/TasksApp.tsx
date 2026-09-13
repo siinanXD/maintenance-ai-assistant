@@ -67,10 +67,6 @@ export function TasksApp(): ReactNode {
   const [formDraft, setFormDraft] = useState<TaskDraft>(createEmptyTaskDraft());
   const [message, setMessage] = useState<MessageState>({ text: "", error: false });
   const [priorityBusy, setPriorityBusy] = useState(false);
-  const [priorityHint, setPriorityHint] = useState({
-    title: "Bei Bedarf aktualisieren",
-    text: "Die Task-Seite lädt ohne automatische AI-Priorisierung. Nutze Aktualisieren, wenn du eine neue Risikoreihenfolge brauchst."
-  });
   const [priorityItems, setPriorityItems] = useState<TaskPriorityItem[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -98,10 +94,6 @@ export function TasksApp(): ReactNode {
    */
   function markPrioritiesStale(): void {
     setPriorityItems([]);
-    setPriorityHint({
-      title: "Prioritätslage nicht neu berechnet",
-      text: "Die Aufgaben wurden geändert. Aktualisiere die Prioritätslage bei Bedarf manuell."
-    });
   }
 
   /**
@@ -109,26 +101,17 @@ export function TasksApp(): ReactNode {
    */
   async function refreshPriorities(): Promise<void> {
     setPriorityBusy(true);
-    setPriorityHint({
-      title: "Priorisierung läuft",
-      text: "Die wichtigsten offenen Aufgaben werden neu bewertet."
-    });
 
     try {
       const priorities = await prioritizeTasks();
       setPriorityItems(priorities);
-      if (!priorities.length) {
-        setPriorityHint({
-          title: "Keine offenen Aufgaben",
-          text: "Wenn Arbeit entsteht, lege eine Aufgabe an oder nutze den AI-Vorschlag aus einer kurzen Beschreibung."
-        });
-      }
+      setMessage({
+        text: priorities.length ? "Prioritätslage aktualisiert." : "Keine offenen Aufgaben zu bewerten.",
+        error: false
+      });
     } catch {
       setPriorityItems([]);
-      setPriorityHint({
-        title: "Priorisierung konnte nicht geladen werden.",
-        text: "Die Aufgabenliste bleibt nutzbar. Prüfe später erneut oder sortiere nach Fälligkeit und Risiko."
-      });
+      setMessage({ text: "Priorisierung konnte nicht geladen werden. Die Liste bleibt nach Fälligkeit sortiert.", error: true });
     } finally {
       setPriorityBusy(false);
     }
@@ -209,14 +192,14 @@ export function TasksApp(): ReactNode {
         writable={writable}
       />
       <TaskStats tasks={tasks} />
-      <section className="task-workflow-grid" aria-label="Aufgaben Workflows">
-        <TaskPriorityPanel
-          busy={priorityBusy}
-          hint={priorityHint}
-          items={priorityItems}
-          onRefresh={refreshPriorities}
-        />
-      </section>
+      {message.text && activeDrawer === null ? (
+        <p className={`workflow-status${message.error ? " is-error" : ""}`} role="status">{message.text}</p>
+      ) : null}
+      {priorityItems.length ? (
+        <section className="task-workflow-grid" aria-label="Aufgaben Workflows">
+          <TaskPriorityPanel busy={priorityBusy} items={priorityItems} onRefresh={refreshPriorities} />
+        </section>
+      ) : null}
       <TaskBoard
         allTasks={tasks}
         departmentOptions={departmentOptions}

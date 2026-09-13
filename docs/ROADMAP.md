@@ -11,8 +11,7 @@ Living notes for maintainers. For product scope see [`FEATURES.md`](FEATURES.md)
 | Small | Datetime usage | Replace remaining `datetime.utcnow()` with timezone-aware UTC |
 | Small | SQLAlchemy access | Prefer `db.session.get()` over legacy query `.get()` |
 | Small | Seeds | Overlap between `seed.py` and `seed_demo.py` |
-| Large | `app/models.py` | Monolithic models file; split only with migration plan |
-| Large | Templates / islands | Further inline JS migration to external modules where useful |
+| Medium | `app/static/css/src/` | Legacy fragments are overridden by `98-legacy-token-bridge.css`; move pages to token-based fragments and delete the overridden rules |
 | Small | `app/agent/mock_policy.py` | Offline keyword policy grows with every tool; keep golden cases in `app/agent/evals.py` in sync and prefer new `list_*` parameters over new keyword branches |
 
 ## New endpoint checklist

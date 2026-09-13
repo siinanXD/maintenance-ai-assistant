@@ -43,6 +43,7 @@ GOLDEN_TOOL_CASES = (
         "expected_tool": "list_inventory",
     },
     {"message": "Welche Materialien sind kritisch?", "expected_tool": "list_inventory"},
+    {"message": "Welche Prüfungen sind überfällig?", "expected_tool": "list_maintenance_plans"},
     {"message": "Was ist der Gesamtwert unseres Lagers?", "expected_tool": "list_inventory"},
     {
         "message": "Gibt es Ersatzteile fuer die Hydraulikpumpe im Lager?",

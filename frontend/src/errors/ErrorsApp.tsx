@@ -14,7 +14,6 @@ import { ErrorCatalog } from "./components/ErrorCatalog";
 import { ErrorCreatePanel } from "./components/ErrorCreatePanel";
 import { ErrorEditDialog } from "./components/ErrorEditDialog";
 import { ErrorHeader } from "./components/ErrorHeader";
-import { ErrorOverviewIntro } from "./components/ErrorOverviewIntro";
 import { ErrorStats } from "./components/ErrorStats";
 import { SimilarErrorsPanel } from "./components/SimilarErrorsPanel";
 import { loadDepartments, loadErrors } from "./errorApi";
@@ -123,7 +122,6 @@ export function ErrorsApp(): ReactNode {
         onSearchFocus={focusSearch}
         writable={writable}
       />
-      <ErrorOverviewIntro />
       <ErrorStats errors={errors} />
       {message.text ? (
         <section className="card app-card" role="alert">

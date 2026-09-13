@@ -1,5 +1,5 @@
 (function () {
-  const STATIC_VERSION = "20260913-island-timeout1";
+  const STATIC_VERSION = document.documentElement.dataset.staticVersion || "dev";
   window.maintenanceStaticVersion = STATIC_VERSION;
   const pageImportPromises = new Map();
 

@@ -242,7 +242,7 @@ def test_observability_dashboard_exposes_atlas_metrics_and_governance(app):
 def test_governance_documentation_is_available():
     """Verify README and env example document governance alert configuration."""
     root = Path(__file__).resolve().parents[1]
-    readme = (root / "README.md").read_text(encoding="utf-8")
+    readme = (root / "docs" / "CONFIGURATION.md").read_text(encoding="utf-8")
     env_example = (root / ".env.example").read_text(encoding="utf-8")
     docs = (root / "docs" / "AI_GOVERNANCE_ALERTING.md").read_text(encoding="utf-8")
 

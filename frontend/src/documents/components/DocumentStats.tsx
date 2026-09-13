@@ -23,16 +23,6 @@ export function DocumentStats({ documents, manuals }: DocumentStatsProps): React
         <strong data-manual-count>{manuals.length} Handbücher</strong>
         <small>Maschinenwissen für Suche, Analyse und Quellenangaben.</small>
       </article>
-      <article className="surface-stat-card is-warning">
-        <span>Quality Gate</span>
-        <strong>Prüfen vor Index</strong>
-        <small>Schwache Dokumente werden sichtbar, bevor sie als Quelle dienen.</small>
-      </article>
-      <article className="surface-stat-card is-neutral">
-        <span>Wissensbasis</span>
-        <strong>Freigabe & Sync</strong>
-        <small>Freigabe- und Quellenstatus bleiben im KI-Administration verknüpft.</small>
-      </article>
     </section>
   );
 }

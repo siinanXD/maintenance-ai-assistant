@@ -79,6 +79,10 @@ COUNT_SCOPE_TERMS = (
     ("admin_users", ("admin", "administrator")),
 )
 SHIFT_TERMS = (("frueh", "early"), ("spaet", "late"), ("nacht", "night"))
+# Whole words only: "Hydraulikpruefung" is a knowledge question, not an inspection plan.
+INSPECTION_PATTERN = re.compile(
+    r"\b(pruefungen|pruefpflicht\w*|wartungsplaene?|dguv|inspektion\w*)\b"
+)
 ENTITY_TOOLS = {
     "tasks": "list_tasks",
     "incidents": "list_incidents",
@@ -88,6 +92,7 @@ ENTITY_TOOLS = {
     "documents": "list_documents",
     "shiftplans": "list_shift_entries",
     "inventory": "list_inventory",
+    "maintenance_plans": "list_maintenance_plans",
     "machines": "machine_incident_report",
 }
 
@@ -222,6 +227,15 @@ def _structured_calls(text, lowered, signals, registry, available):
         )
     if "schicht" in lowered:
         return _registry_call(registry, "list_shift_entries", _shift_arguments(text, lowered))
+    if INSPECTION_PATTERN.search(lowered):
+        arguments = {"count_only": count_only}
+        if _mentions(lowered, ("ueberfaellig", "verpasst", "abgelaufen")):
+            arguments["due_state"] = "overdue"
+        elif _mentions(lowered, ("bald", "demnaechst", "naechste", "diesen monat", "anstehend")):
+            arguments["due_state"] = "due_soon"
+        if "wartungsplan" not in lowered:
+            arguments["kind"] = "inspection"
+        return _registry_call(registry, "list_maintenance_plans", arguments)
     if _mentions(lowered, ("lager", "bestand", "material", "ersatzteil", "artikel")):
         if _mentions(lowered, VALUE_TERMS):
             return _registry_call(registry, "list_inventory", {"filter": "all", "count_only": True})

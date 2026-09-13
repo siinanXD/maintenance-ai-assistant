@@ -1,6 +1,6 @@
 """Server-rendered web page routes."""
 
-from flask import Blueprint, abort, redirect, render_template, request
+from flask import Blueprint, redirect, render_template
 
 from app.shiftplans.templates import list_shift_templates
 
@@ -13,22 +13,6 @@ AI_ADMIN_VIEWS = {
     "prompt_faq": "/admin/ai/prompt-faq",
     "effectiveness": "/admin/ai/effectiveness",
     "technical": "/admin/ai/technical",
-}
-
-# Deprecated legacy Admin-AI page paths kept for old bookmarks and clients.
-# Remove these redirects after a documented deprecation phase.
-AI_ADMIN_LEGACY_REDIRECTS = {
-    "/admin/ai/prompts": "/admin/ai/prompt-faq",
-    "/admin/ai/faq": "/admin/ai/prompt-faq",
-    "/admin/ai/lab": "/admin/ai/source-check",
-    "/admin/ai/costs": "/admin/ai/effectiveness",
-    "/admin/ai/feedback": "/admin/ai/effectiveness",
-    "/admin/ai/models": "/admin/ai#ai-models",
-    "/admin/ai/knowledge": "/admin/ai/rag-board",
-    "/admin/ai/training": "/admin/ai/rag-board",
-    "/admin/ai/retrieval": "/admin/ai/technical",
-    "/admin/ai/diagnostics": "/admin/ai/technical",
-    "/admin/ai/indexing": "/admin/ai/technical",
 }
 
 SHIFT_MODEL_LABELS = {
@@ -80,25 +64,6 @@ def render_ai_admin_page(view_name):
         admin_ai_view=view_name,
         ai_admin_views=AI_ADMIN_VIEWS,
     )
-
-
-@web_bp.get("/admin/ai/prompts")
-@web_bp.get("/admin/ai/faq")
-@web_bp.get("/admin/ai/lab")
-@web_bp.get("/admin/ai/costs")
-@web_bp.get("/admin/ai/feedback")
-@web_bp.get("/admin/ai/models")
-@web_bp.get("/admin/ai/knowledge")
-@web_bp.get("/admin/ai/training")
-@web_bp.get("/admin/ai/retrieval")
-@web_bp.get("/admin/ai/diagnostics")
-@web_bp.get("/admin/ai/indexing")
-def admin_ai_legacy_redirect_page():
-    """Redirect deprecated Admin-AI legacy pages to canonical sections."""
-    target_path = AI_ADMIN_LEGACY_REDIRECTS.get(request.path)
-    if target_path is None:
-        abort(404)
-    return redirect(target_path, code=302)
 
 
 @web_bp.get("/")

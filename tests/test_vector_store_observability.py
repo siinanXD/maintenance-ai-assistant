@@ -490,7 +490,7 @@ def test_atlas_vector_count_diagnostics_detect_mismatch(app, monkeypatch):
 def test_atlas_configuration_is_documented():
     """Verify README, docs and env examples include Atlas setup and reindex notes."""
     root = Path(__file__).resolve().parents[1]
-    readme = (root / "README.md").read_text(encoding="utf-8")
+    readme = (root / "docs" / "CONFIGURATION.md").read_text(encoding="utf-8")
     env_example = (root / ".env.example").read_text(encoding="utf-8")
     env_minimal = (root / ".env.minimal.example").read_text(encoding="utf-8")
     env_production = (root / ".env.production.example").read_text(encoding="utf-8")

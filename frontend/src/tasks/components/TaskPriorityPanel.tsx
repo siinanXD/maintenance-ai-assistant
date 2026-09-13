@@ -6,7 +6,6 @@ import { riskBadgeClass } from "../taskUtils";
 type TaskPriorityPanelProps = {
   readonly busy: boolean;
   readonly items: readonly TaskPriorityItem[];
-  readonly hint: { readonly title: string; readonly text: string };
   readonly onRefresh: () => Promise<void>;
 };
 
@@ -20,12 +19,11 @@ function scoreClassName(riskLevel: string): string {
 }
 
 /**
- * Render manual task prioritization results.
+ * Render the risk ranking after the user requested it.
  */
 export function TaskPriorityPanel({
   busy,
   items,
-  hint,
   onRefresh
 }: TaskPriorityPanelProps): ReactNode {
   return (
@@ -46,8 +44,7 @@ export function TaskPriorityPanel({
         </button>
       </header>
       <div className="priority-score-list" data-task-priority-list>
-        {items.length ? (
-          items.map((item) => (
+        {items.map((item) => (
             <div className="priority-score-card" key={`${item.task.id}-${item.score}`}>
               <div className={scoreClassName(item.risk_level)}>{item.score}</div>
               <div className="priority-score-body">
@@ -59,13 +56,7 @@ export function TaskPriorityPanel({
                 <p className="priority-score-action">{item.recommended_action}</p>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="guided-empty-state">
-            <strong>{hint.title}</strong>
-            <p>{hint.text}</p>
-          </div>
-        )}
+          ))}
       </div>
     </article>
   );

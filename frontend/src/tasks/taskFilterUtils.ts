@@ -10,7 +10,7 @@ export function taskMachineHint(task: Task): string {
   if (typeof explicit === "string" && explicit.trim()) return explicit.trim();
   const text = [task.title, task.description].filter(Boolean).join(" ");
   const match = text.match(/\b(Maschine|Anlage|Presse|Linie|Roboter|CNC|Band)\s*[A-Za-z0-9\-_.]*/i);
-  return match ? match[0] : "Maschine offen";
+  return match ? match[0] : "–";
 }
 
 /**

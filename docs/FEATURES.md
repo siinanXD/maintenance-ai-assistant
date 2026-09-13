@@ -9,11 +9,12 @@ permissions remain in `app/permissions.py`.
 | Feature | Route | Permission | Current boundary |
 | --- | --- | --- | --- |
 | Dashboard | `/` | `dashboard` | Cockpit, KPIs, briefing, calendar preview |
-| Tasks | `/tasks` | `tasks` | Task CRUD, suggestions, priority scoring, workflow reports |
-| Error catalog | `/errors` | `errors` | Error CRUD, similar-error search, AI analysis |
+| Tasks | `/tasks` | `tasks` | Work orders, link to incident, spare-part withdrawals, photos, reports |
+| Error catalog | `/errors` | `errors` | Incidents with photos, similar-error search, work order from incident |
+| Inspections & maintenance | `/maintenance` | `machines` | Maintenance and inspection plans, execution records, follow-up orders |
 | Employees | `/employees` | `employees` | Employee records, access tiers, employee documents |
-| Machines | `/machines` | `machines` | Machine CRUD, history, machine assistant |
-| Inventory | `/inventory` | `inventory` | Materials, summary, spare-parts forecast |
+| Machines | `/machines` | `machines` | Machine CRUD, profile with availability/MTBF, QR label, assistant |
+| Inventory | `/inventory` | `inventory` | Materials, goods receipts, movements, reorder list, forecast |
 | Shift plans | `/shiftplans` | `shiftplans` | Generation, calendar, drag-and-drop, publish, changelog |
 | Shift handover | `/handover` | `shiftplans` | Handover create, edit, complete, filtering |
 | Vacations | `/vacations` | `employees` | Requests, approval, rejection, balance |
@@ -23,8 +24,8 @@ permissions remain in `app/permissions.py`.
 
 ## Cross-Cutting Features
 
-- Global chat bubble: read-only assistant, permission-aware templates, history,
-  sources, diagnostics and feedback.
+- Global chat widget: tool-using agent with sources, confirmed write actions,
+  diagnostics and feedback.
 - RAG knowledge base: uploaded knowledge, generated reports, structured app
   records, manual training entries, source/status filters, department scoping,
   priorities and stale/reindex workflows.

@@ -24,7 +24,7 @@ export function MachinesHeader({
       <div>
         <h1 className="page-title">Maschinen</h1>
         <p className="page-description">
-          Anlagenstatus, offene Arbeit und Wartungshinweise an einem Ort prüfen.
+          Status, offene Arbeit, Kennzahlen und QR-Etikett je Anlage.
         </p>
       </div>
       <PageActionBar

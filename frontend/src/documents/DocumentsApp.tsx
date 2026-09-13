@@ -12,7 +12,6 @@ import { loadGeneratedDocuments, loadMachineManuals, loadMachines } from "./docu
 import { DocumentFilterPanel } from "./components/DocumentFilterPanel";
 import { DocumentHeader } from "./components/DocumentHeader";
 import { DocumentInsightPanels } from "./components/DocumentInsightPanels";
-import { DocumentOverviewIntro } from "./components/DocumentOverviewIntro";
 import { GeneratedDocumentList, ManualList } from "./components/DocumentLists";
 import { DocumentStats } from "./components/DocumentStats";
 import {
@@ -103,7 +102,6 @@ export function DocumentsApp(): ReactNode {
         onUploadCheckOpen={() => setActiveDrawer("upload-check")}
         writable={writable}
       />
-      <DocumentOverviewIntro />
       <DocumentStats documents={documents} manuals={manuals} />
       <DocumentInsightPanels review={review} summary={summary} />
       <section className="dashboard-grid documents-work-grid">
