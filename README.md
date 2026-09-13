@@ -117,7 +117,7 @@ The Jinja shell renders placeholders only, so hydration never swaps one set of
 links for a different one.
 
 Design tokens are the source of truth for colors, shell sizes and breakpoints.
-Edit `design/tokens/*.json`, then run `npm run build:tokens`; the generated
+Edit `design/tokens/tokens.json`, then run `npm run build:tokens`; the generated
 `app/static/css/src/00-shell-tokens.css` and `design/tokens/generated/tailwind.cjs`
 are committed, and `tests/test_design_tokens.py` fails when they drift from the
 source. See `design/tokens/README.md`.
