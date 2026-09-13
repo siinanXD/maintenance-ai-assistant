@@ -10,6 +10,7 @@ export type InventoryMaterial = {
   readonly unit_cost: number;
   readonly quantity: number;
   readonly min_quantity?: number;
+  readonly lead_time_days?: number;
   readonly manufacturer?: string;
   readonly machine_id?: number | null;
   readonly machine?: Machine | null;
@@ -53,4 +54,15 @@ export type InventoryForecast = {
     readonly high?: number;
     readonly medium?: number;
   };
+};
+
+export type ReorderSuggestions = {
+  readonly items: readonly {
+    readonly material: InventoryMaterial;
+    readonly used_last_90_days: number;
+    readonly order_quantity: number;
+    readonly order_value: number;
+  }[];
+  readonly count: number;
+  readonly total_value: number;
 };

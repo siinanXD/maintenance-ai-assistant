@@ -26,6 +26,7 @@ export {
 export {
   consumeTaskActionPreview,
   createEmptyTaskDraft,
+  draftFromIncident,
   draftFromSuggestion,
   draftFromTask,
   EMPTY_TASK_DRAFT,

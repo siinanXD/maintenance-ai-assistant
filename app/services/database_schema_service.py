@@ -36,6 +36,7 @@ REQUIRED_TABLE_COLUMNS = {
         "actual_minutes",
         "blocked_reason",
         "reopened_count",
+        "error_entry_id",
     },
     "machine": {
         "site_id",
@@ -312,6 +313,7 @@ LOCAL_DEV_SCHEMA_COLUMNS = {
         sa.Column("actual_minutes", sa.Integer(), nullable=False, server_default="0"),
         sa.Column("blocked_reason", sa.String(length=220), nullable=False, server_default=""),
         sa.Column("reopened_count", sa.Integer(), nullable=False, server_default="0"),
+        sa.Column("error_entry_id", sa.Integer(), nullable=True),
     ),
     "machine": (
         sa.Column("site_id", sa.Integer(), nullable=True),

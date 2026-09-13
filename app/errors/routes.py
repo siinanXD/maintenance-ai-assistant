@@ -17,6 +17,7 @@ from app.services.error_service import (
     close_error_entry,
     create_error_entry,
     error_event_state,
+    open_work_order_counts,
     search_errors,
     suggest_similar_errors,
     update_error_entry,
@@ -62,7 +63,10 @@ def list_errors():
         )
     else:
         query = query.order_by(ErrorEntry.error_code.asc())
-    return paginate_query(query, lambda e: e.to_dict())
+    open_tasks = open_work_order_counts(user)
+    return paginate_query(
+        query, lambda e: {**e.to_dict(), "open_task_count": open_tasks.get(e.id, 0)}
+    )
 
 
 @errors_bp.post("")

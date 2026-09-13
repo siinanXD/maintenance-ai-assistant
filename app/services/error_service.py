@@ -11,7 +11,8 @@ from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from app.models import Department, ErrorEntry, Machine, Role
+from app.models import Department, ErrorEntry, Machine, Role, Task, TaskStatus
+from app.security import has_dashboard_permission
 from app.services.ai_service import AIServiceError, MockAIProvider, get_ai_provider
 from app.services.knowledge_service import mark_error_entry_knowledge_stale
 from app.services.maintenance_tag_service import suggest_tags_for_error_payload
@@ -355,6 +356,19 @@ def update_error_entry(entry, data, user):
     mark_error_entry_knowledge_stale(entry)
     db.session.commit()
     return entry, None, 200
+
+
+def open_work_order_counts(user):
+    """Return ``{error_entry_id: open work orders}`` for tasks the user can see."""
+    if not has_dashboard_permission(user, "tasks", "view"):
+        return {}
+    query = db.session.query(Task.error_entry_id, func.count(Task.id)).filter(
+        Task.error_entry_id.isnot(None),
+        Task.status.in_((TaskStatus.OPEN, TaskStatus.IN_PROGRESS)),
+    )
+    if not user.is_admin:
+        query = query.filter(Task.department_id == user.department_id)
+    return dict(query.group_by(Task.error_entry_id).all())
 
 
 def close_error_entry(entry, user):

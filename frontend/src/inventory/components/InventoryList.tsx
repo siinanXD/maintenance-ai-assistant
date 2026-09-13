@@ -1,6 +1,6 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
-import { deleteInventoryMaterial } from "../inventoryApi";
+import { bookGoodsReceipt, deleteInventoryMaterial } from "../inventoryApi";
 import type { InventoryMaterial } from "../inventoryTypes";
 import { formatMoney } from "../../formatters/number";
 import { materialSearchText, searchText } from "../inventoryUtils";
@@ -17,15 +17,37 @@ type InventoryListProps = {
 function MaterialCard({
   material,
   writable,
-  onDeleted
+  onChanged
 }: {
   readonly material: InventoryMaterial;
   readonly writable: boolean;
-  readonly onDeleted: () => Promise<void>;
+  readonly onChanged: () => Promise<void>;
 }): ReactNode {
   const [busy, setBusy] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receiptQuantity, setReceiptQuantity] = useState("1");
+  const [receiptNote, setReceiptNote] = useState("");
   const quantity = Number(material.quantity || 0);
+  const minimum = Number(material.min_quantity || 0);
+  const isLow = minimum > 0 && quantity <= minimum;
   const machineName = material.machine?.name || "Keine Maschine";
+
+  /**
+   * Book a goods receipt for this material.
+   */
+  async function handleReceipt(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      await bookGoodsReceipt(material.id, Number(receiptQuantity), receiptNote);
+      setReceiptOpen(false);
+      setReceiptQuantity("1");
+      setReceiptNote("");
+      await onChanged();
+    } finally {
+      setBusy(false);
+    }
+  }
 
   /**
    * Delete a material after user confirmation.
@@ -38,29 +60,29 @@ function MaterialCard({
     setBusy(true);
     try {
       await deleteInventoryMaterial(material.id);
-      await onDeleted();
+      await onChanged();
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <article className={`record-card inventory-card${quantity <= 5 ? " is-low-stock" : ""}`} data-search-text={searchText(materialSearchText(material))}>
+    <article className={`record-card inventory-card${isLow ? " is-low-stock" : ""}`} data-search-text={searchText(materialSearchText(material))}>
       <div className="record-card-header">
         <div>
           <h3 className="record-card-title">{material.name || "Material"}</h3>
           <p className="record-card-subtitle">{[material.manufacturer || "Hersteller offen", machineName].join(" · ")}</p>
         </div>
-        <span className={quantity <= 5 ? "badge badge-priority is-soon" : "badge badge-status is-done"}>
-          {quantity <= 5 ? "niedrig" : "verfügbar"}
+        <span className={isLow ? "badge badge-priority is-soon" : "badge badge-status is-done"}>
+          {isLow ? "nachbestellen" : "verfügbar"}
         </span>
       </div>
       <div className="record-card-meta inventory-card-meta">
         {[
-          ["Bestand", String(quantity)],
+          ["Bestand", minimum ? `${quantity} / min. ${minimum}` : String(quantity)],
           ["Einzelkosten", formatMoney(material.unit_cost)],
           ["Gesamtwert", formatMoney(material.total_value)],
-          ["Maschine", machineName]
+          ["Lieferzeit", material.lead_time_days ? `${material.lead_time_days} Tage` : "–"]
         ].map(([label, value]) => (
           <span key={label}>
             <small>{label}</small>
@@ -68,7 +90,26 @@ function MaterialCard({
           </span>
         ))}
       </div>
+      {receiptOpen ? (
+        <form className="inventory-receipt-form" onSubmit={(event) => void handleReceipt(event)}>
+          <label>
+            <span>Menge</span>
+            <input className="input input-bordered input-sm" min={1} required type="number" value={receiptQuantity} onChange={(event) => setReceiptQuantity(event.currentTarget.value)} />
+          </label>
+          <label>
+            <span>Lieferschein</span>
+            <input className="input input-bordered input-sm" maxLength={200} placeholder="optional" value={receiptNote} onChange={(event) => setReceiptNote(event.currentTarget.value)} />
+          </label>
+          <button className="btn btn-primary btn-sm" disabled={busy} type="submit">Buchen</button>
+          <button className="btn btn-ghost btn-sm" type="button" onClick={() => setReceiptOpen(false)}>Abbrechen</button>
+        </form>
+      ) : null}
       <div className="record-card-actions">
+        {writable && !receiptOpen ? (
+          <button className="btn btn-outline btn-sm" disabled={busy} onClick={() => setReceiptOpen(true)} type="button">
+            Wareneingang
+          </button>
+        ) : null}
         {material.machine?.id ? (
           <a className="btn btn-outline btn-sm" href={`/machines/${material.machine.id}`}>Maschinenprofil</a>
         ) : null}
@@ -114,7 +155,7 @@ export function InventoryList({ materials, writable, onRefresh }: InventoryListP
         <div className="record-card-grid inventory-card-grid bounded-list-scroll" data-inventory-list data-list-search-items=".inventory-card">
           {filteredMaterials.length ? (
             filteredMaterials.map((material) => (
-              <MaterialCard key={material.id} material={material} onDeleted={onRefresh} writable={writable} />
+              <MaterialCard key={material.id} material={material} onChanged={onRefresh} writable={writable} />
             ))
           ) : (
             <div className="empty-state">

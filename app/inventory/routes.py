@@ -15,6 +15,11 @@ from app.responses import (
 )
 from app.security import current_user, dashboard_permission_required
 from app.services.operations_tracking_service import record_event
+from app.services.stock_movement_service import (
+    book_receipt,
+    material_movements,
+    reorder_suggestions,
+)
 
 inventory_bp = Blueprint("inventory", __name__)
 
@@ -165,6 +170,36 @@ def inventory_summary():
         )
         payload["materials"] = [material.to_dict() for material in materials]
     return jsonify(payload)
+
+
+@inventory_bp.get("/reorder")
+@dashboard_permission_required("inventory", "view")
+def reorder():
+    """Return materials at or below minimum stock with order quantities."""
+    return success_response(reorder_suggestions(), message="Reorder suggestions loaded")
+
+
+@inventory_bp.get("/<int:material_id>/movements")
+@dashboard_permission_required("inventory", "view")
+def movements(material_id):
+    """Return the latest stock movements of one material."""
+    material = db.get_or_404(InventoryMaterial, material_id)
+    return success_response(material_movements(material), message="Movements loaded")
+
+
+@inventory_bp.post("/<int:material_id>/receipts")
+@dashboard_permission_required("inventory", "write")
+def receipt(material_id):
+    """Book delivered parts into stock."""
+    material = db.get_or_404(InventoryMaterial, material_id)
+    movement, error, status = book_receipt(
+        material, request.get_json(silent=True) or {}, current_user()
+    )
+    if error:
+        return service_error_response(error, status)
+    return success_response(
+        {"movement": movement.to_dict(), "material": material.to_dict()}, status, "Receipt booked"
+    )
 
 
 @inventory_bp.post("/forecast")

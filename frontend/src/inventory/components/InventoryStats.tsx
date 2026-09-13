@@ -5,14 +5,13 @@ import { inventoryStats } from "../inventoryUtils";
 
 type InventoryStatsProps = {
   readonly materials: readonly InventoryMaterial[];
-  readonly threshold: number;
 };
 
 /**
  * Render inventory KPI cards.
  */
-export function InventoryStats({ materials, threshold }: InventoryStatsProps): ReactNode {
-  const stats = inventoryStats(materials, threshold);
+export function InventoryStats({ materials }: InventoryStatsProps): ReactNode {
+  const stats = inventoryStats(materials);
 
   return (
     <section className="surface-stat-grid ux-ops-summary-grid" aria-label="Lagerstatus">
@@ -24,7 +23,7 @@ export function InventoryStats({ materials, threshold }: InventoryStatsProps): R
       <article className="surface-stat-card is-warning">
         <span>Mindestbestand</span>
         <strong data-inventory-low-count>{stats.lowStock}</strong>
-        <small>Artikel unter oder gleich aktueller Warnschwelle.</small>
+        <small>Positionen auf oder unter ihrem Mindestbestand.</small>
       </article>
       <article className="surface-stat-card is-ai">
         <span>Lagerwert</span>

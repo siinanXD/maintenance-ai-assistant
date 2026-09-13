@@ -1,12 +1,45 @@
 """OpenAPI paths for shop-floor work: photos, QR labels, spare parts and inspections."""
 
 _AUTH = [{"bearerAuth": []}]
+
+
+def _path_id(name):
+    """Return an integer path parameter definition."""
+    return {"name": name, "in": "path", "required": True, "schema": {"type": "integer"}}
+
+
+def _json_body(properties, required):
+    """Return a required JSON request body definition."""
+    return {
+        "required": True,
+        "content": {
+            "application/json": {
+                "schema": {"type": "object", "required": required, "properties": properties}
+            }
+        },
+    }
+
+
 _ERRORS = {
     "401": {"$ref": "#/components/responses/Unauthorized"},
     "403": {"$ref": "#/components/responses/Forbidden"},
 }
 
 SCHEMAS_FIELD_WORK = {
+    "StockMovement": {
+        "type": "object",
+        "properties": {
+            "id": {"type": "integer"},
+            "material_id": {"type": "integer"},
+            "material_name": {"type": "string", "example": "Rillenkugellager 6205"},
+            "task_id": {"type": "integer", "nullable": True},
+            "quantity_change": {"type": "integer", "example": -2},
+            "reason": {"type": "string", "enum": ["withdrawal", "receipt"]},
+            "note": {"type": "string"},
+            "value": {"type": "number", "example": 25.0},
+            "created_at": {"type": "string", "format": "date-time"},
+        },
+    },
     "Attachment": {
         "type": "object",
         "properties": {
@@ -159,6 +192,98 @@ PATHS_FIELD_WORK = {
                 "200": {"description": "SVG image", "content": {"image/svg+xml": {}}},
                 **_ERRORS,
             },
+        }
+    },
+    "/api/v1/tasks/{task_id}/materials": {
+        "get": {
+            "tags": ["Tasks", "Inventory"],
+            "summary": "Spare parts withdrawn for a work order",
+            "security": _AUTH,
+            "parameters": [_path_id("task_id")],
+            "responses": {
+                "200": {
+                    "description": "Movements with total value",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "items": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/StockMovement"
+                                                },
+                                            },
+                                            "total_value": {"type": "number", "example": 25.0},
+                                        },
+                                    }
+                                },
+                            }
+                        }
+                    },
+                },
+                **_ERRORS,
+            },
+        },
+        "post": {
+            "tags": ["Tasks", "Inventory"],
+            "summary": "Withdraw spare parts for an open work order",
+            "description": "Needs tasks write and inventory view. Stock never goes below zero.",
+            "security": _AUTH,
+            "parameters": [_path_id("task_id")],
+            "requestBody": _json_body(
+                {
+                    "material_id": {"type": "integer", "example": 7},
+                    "quantity": {"type": "integer", "minimum": 1, "example": 2},
+                    "note": {"type": "string", "example": "Antriebsseite"},
+                },
+                required=["material_id", "quantity"],
+            ),
+            "responses": {
+                "201": {"description": "Booked withdrawal"},
+                "409": {"description": "Not enough stock or work order already closed"},
+                **_ERRORS,
+            },
+        },
+    },
+    "/api/v1/inventory/reorder": {
+        "get": {
+            "tags": ["Inventory"],
+            "summary": "Materials at or below minimum stock with order quantities",
+            "description": (
+                "Order quantity refills to twice the minimum and covers the parts consumed "
+                "during the supplier lead time, based on withdrawals of the last 90 days."
+            ),
+            "security": _AUTH,
+            "responses": {"200": {"description": "Reorder suggestions"}, **_ERRORS},
+        }
+    },
+    "/api/v1/inventory/{material_id}/movements": {
+        "get": {
+            "tags": ["Inventory"],
+            "summary": "Latest stock movements of one material",
+            "security": _AUTH,
+            "parameters": [_path_id("material_id")],
+            "responses": {"200": {"description": "Movements, newest first"}, **_ERRORS},
+        }
+    },
+    "/api/v1/inventory/{material_id}/receipts": {
+        "post": {
+            "tags": ["Inventory"],
+            "summary": "Book a goods receipt",
+            "security": _AUTH,
+            "parameters": [_path_id("material_id")],
+            "requestBody": _json_body(
+                {
+                    "quantity": {"type": "integer", "minimum": 1, "example": 10},
+                    "note": {"type": "string", "example": "LS 4711"},
+                },
+                required=["quantity"],
+            ),
+            "responses": {"201": {"description": "Updated material and movement"}, **_ERRORS},
         }
     },
 }

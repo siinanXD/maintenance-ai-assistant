@@ -1,5 +1,6 @@
 import { apiRequest } from "../api/client";
 import { listData, unwrapData } from "../api/payload";
+import type { draftFromIncident } from "./taskDraftUtils";
 import type {
   Department,
   Task,
@@ -41,11 +42,27 @@ export async function saveTask(draft: TaskDraft, editingTaskId: number | null): 
 /**
  * Start or complete an existing task.
  */
-export async function runTaskAction(taskId: number, action: TaskAction): Promise<Task> {
+export async function runTaskAction(
+  taskId: number,
+  action: TaskAction,
+  options: { readonly closeIncident?: boolean } = {}
+): Promise<Task> {
   return unwrapData<Task>(
-    await apiRequest<unknown>(`/api/v1/tasks/${taskId}/${action}`, { method: "POST" })
+    await apiRequest<unknown>(`/api/v1/tasks/${taskId}/${action}`, {
+      method: "POST",
+      body: options.closeIncident ? { close_error_entry: true } : undefined
+    })
   );
 }
+
+/**
+ * Load one incident to prefill a work order.
+ */
+export async function loadIncident(errorId: number): Promise<IncidentForWorkOrder> {
+  return apiRequest<IncidentForWorkOrder>(`/api/v1/errors/${errorId}`);
+}
+
+type IncidentForWorkOrder = Parameters<typeof draftFromIncident>[0];
 
 /**
  * Delete an existing task through the existing task API.

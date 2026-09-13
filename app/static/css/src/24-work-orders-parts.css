@@ -1,0 +1,101 @@
+/*
+ * Auftrag aus Störung, Materialentnahme am Auftrag (tasks/components/TaskMaterialsPanel),
+ * Wareneingang und Bestellvorschlag im Lager (inventory/components).
+ */
+
+@layer components {
+  .task-incident-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-status-danger-border, var(--color-border-default));
+    border-radius: var(--radius-sm);
+    color: var(--color-status-danger-text);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .task-incident-link:hover {
+    background: var(--color-status-danger-bg);
+  }
+
+  .task-materials-list {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .task-materials-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+    font-size: 0.8125rem;
+  }
+
+  .task-materials-list small {
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .task-materials-form,
+  .inventory-receipt-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 5.5rem auto;
+    align-items: end;
+    gap: var(--space-4);
+  }
+
+  .inventory-receipt-form {
+    grid-template-columns: 5.5rem minmax(0, 1fr) auto auto;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-canvas);
+  }
+
+  .task-materials-form label,
+  .inventory-receipt-form label {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .task-materials-form label > span,
+  .inventory-receipt-form label > span {
+    color: var(--color-text-muted);
+    font-family: var(--font-label);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .reorder-table td small {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  .reorder-table th {
+    text-align: left;
+  }
+
+  .reorder-table .is-number {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 639px) {
+    .task-materials-form,
+    .inventory-receipt-form {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}

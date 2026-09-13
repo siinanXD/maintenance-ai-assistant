@@ -92,6 +92,51 @@ class InventoryMaterial(db.Model):
         }
 
 
+class InventoryMovement(db.Model):
+    """One stock change: a withdrawal for a work order, a goods receipt or a correction.
+
+    ``quantity_change`` is negative for withdrawals. The material's ``quantity``
+    is updated in the same transaction, so the movements explain the stock.
+    """
+
+    id = db.Column(db.Integer, primary_key=True)
+    material_id = db.Column(
+        db.Integer, db.ForeignKey("inventory_material.id", ondelete="CASCADE"), nullable=False
+    )
+    task_id = db.Column(db.Integer, db.ForeignKey("task.id", ondelete="SET NULL"))
+    quantity_change = db.Column(db.Integer, nullable=False)
+    reason = db.Column(db.String(20), nullable=False)
+    note = db.Column(db.String(200), nullable=False, default="")
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
+
+    material = db.relationship("InventoryMaterial")
+    task = db.relationship("Task")
+    user = db.relationship("User")
+
+    __table_args__ = (
+        db.Index("ix_inventory_movement_material_created", "material_id", "created_at"),
+        db.Index("ix_inventory_movement_task", "task_id"),
+    )
+
+    def to_dict(self):
+        """Return a JSON-serializable representation of the movement."""
+        unit_cost = self.material.unit_cost if self.material else 0
+        return {
+            "id": self.id,
+            "material_id": self.material_id,
+            "material_name": self.material.name if self.material else "",
+            "task_id": self.task_id,
+            "task_title": self.task.title if self.task else "",
+            "quantity_change": self.quantity_change,
+            "reason": self.reason,
+            "note": self.note,
+            "value": round(abs(self.quantity_change) * (unit_cost or 0), 2),
+            "user": self.user.public_dict() if self.user else None,
+            "created_at": self.created_at.isoformat(),
+        }
+
+
 class MaintenancePlan(db.Model):
     """Recurring maintenance plan that can generate scheduled tasks."""
 

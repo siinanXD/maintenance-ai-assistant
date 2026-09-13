@@ -37,6 +37,13 @@ export type Task = {
   readonly creator?: TaskUser | null;
   readonly current_worker?: TaskUser | null;
   readonly completed_by_user?: TaskUser | null;
+  readonly error_entry_id?: number | null;
+  readonly error_entry?: {
+    readonly id: number;
+    readonly error_code: string;
+    readonly title: string;
+    readonly status: string;
+  } | null;
 };
 
 export type TaskDraft = {
@@ -46,6 +53,8 @@ export type TaskDraft = {
   readonly status: TaskStatus;
   readonly due_date: string;
   readonly description: string;
+  /** Incident the work order is raised for; empty when not linked. */
+  readonly error_entry_id: string;
 };
 
 export type TaskFilters = {
@@ -56,7 +65,7 @@ export type TaskFilters = {
   readonly due: "" | Exclude<TaskDueState, "closed">;
 };
 
-export type TaskSuggestion = TaskDraft & {
+export type TaskSuggestion = Omit<TaskDraft, "error_entry_id"> & {
   readonly possible_cause?: string;
   readonly recommended_action?: string;
 };

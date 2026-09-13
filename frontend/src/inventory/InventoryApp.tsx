@@ -9,12 +9,14 @@ import { InventoryHeader } from "./components/InventoryHeader";
 import { InventoryList } from "./components/InventoryList";
 import { InventoryStats } from "./components/InventoryStats";
 import { MaterialForm } from "./components/MaterialForm";
+import { ReorderPanel } from "./components/ReorderPanel";
 import {
   calculateInventoryForecast,
   loadInventoryMaterials,
-  loadMachines
+  loadMachines,
+  loadReorderSuggestions
 } from "./inventoryApi";
-import type { InventoryForecast, InventoryMaterial, Machine } from "./inventoryTypes";
+import type { InventoryForecast, InventoryMaterial, Machine, ReorderSuggestions } from "./inventoryTypes";
 import { inventoryErrorMessage } from "./inventoryUtils";
 
 const INVENTORY_ISLAND = {
@@ -33,17 +35,20 @@ export function InventoryApp(): ReactNode {
   const [forecast, setForecast] = useState<InventoryForecast | null>(null);
   const [threshold, setThreshold] = useState(5);
   const [loadError, setLoadError] = useState("");
+  const [reorder, setReorder] = useState<ReorderSuggestions | null>(null);
 
   /**
    * Refresh inventory and machine data in parallel.
    */
   async function refreshInventory(): Promise<void> {
-    const [loadedMaterials, loadedMachines] = await Promise.all([
+    const [loadedMaterials, loadedMachines, loadedReorder] = await Promise.all([
       loadInventoryMaterials(),
-      loadMachines()
+      loadMachines(),
+      loadReorderSuggestions()
     ]);
     setMaterials(loadedMaterials);
     setMachines(loadedMachines);
+    setReorder(loadedReorder);
   }
 
   /**
@@ -81,8 +86,9 @@ export function InventoryApp(): ReactNode {
           </div>
         </section>
       ) : null}
-      <InventoryStats materials={materials} threshold={threshold} />
+      <InventoryStats materials={materials} />
       <section className="dashboard-grid">
+        <ReorderPanel suggestions={reorder} />
         <InventoryForecastPanel
           forecast={forecast}
           onForecast={runForecast}

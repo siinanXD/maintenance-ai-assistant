@@ -9,7 +9,7 @@ import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
-import { loadDepartments, loadTasks, prioritizeTasks } from "./taskApi";
+import { loadDepartments, loadIncident, loadTasks, prioritizeTasks } from "./taskApi";
 import { TaskBoard } from "./components/TaskBoard";
 import { TaskFormPanel } from "./components/TaskFormPanel";
 import { TaskHeader } from "./components/TaskHeader";
@@ -27,6 +27,7 @@ import type {
 import {
   consumeTaskActionPreview,
   createEmptyTaskDraft,
+  draftFromIncident,
   draftFromTask,
   initialTaskSearchQuery,
   taskErrorMessage,
@@ -180,8 +181,13 @@ export function TasksApp(): ReactNode {
       setMessage({ text: taskErrorMessage(error), error: true });
     });
 
+    const incidentId = Number(new URLSearchParams(window.location.search).get("from_error"));
     const previewDraft = consumeTaskActionPreview();
-    if (previewDraft) {
+    if (incidentId > 0) {
+      loadIncident(incidentId)
+        .then((incident) => applyDraft(draftFromIncident(incident)))
+        .catch((error: unknown) => setMessage({ text: taskErrorMessage(error), error: true }));
+    } else if (previewDraft) {
       setFormDraft(previewDraft);
       setActiveDrawer("task");
     } else if (window.location.hash === "#task-create") {

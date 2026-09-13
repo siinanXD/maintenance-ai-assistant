@@ -27,6 +27,7 @@ export type ErrorEntry = {
   readonly created_at?: string;
   readonly last_seen_at?: string;
   readonly closed_at?: string;
+  readonly open_task_count?: number;
 };
 
 export type ErrorDraft = {
