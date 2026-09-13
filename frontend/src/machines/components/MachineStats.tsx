@@ -4,34 +4,31 @@ import type { Machine } from "../machineTypes";
 
 type MachineStatsProps = {
   readonly machines: readonly Machine[];
-  readonly issueCount: number;
 };
 
 /**
- * Render machine overview KPI cards.
+ * Machines, how many have open incidents, and the open work on them.
  */
-export function MachineStats({ machines, issueCount }: MachineStatsProps): ReactNode {
+export function MachineStats({ machines }: MachineStatsProps): ReactNode {
+  const withIncidents = machines.filter((machine) => Number(machine.active_errors || 0) > 0).length;
+  const openTasks = machines.reduce((sum, machine) => sum + Number(machine.open_tasks || 0), 0);
+
   return (
     <section className="surface-stat-grid ux-ops-summary-grid" aria-label="Maschinenstatus">
       <article className="surface-stat-card is-primary">
         <span>Anlagen</span>
-        <strong data-machine-count>{machines.length} Maschinen</strong>
-        <small>Alle Produktionsanlagen mit Profil, Historie und Status.</small>
+        <strong data-machine-count>{machines.length}</strong>
+        <small>mit Profil, Historie und QR-Etikett</small>
       </article>
       <article className="surface-stat-card is-warning">
-        <span>Störungen</span>
-        <strong data-dashboard-machine-issue-count>{issueCount}</strong>
-        <small>Offene Störungen mit Maschinenbezug.</small>
-      </article>
-      <article className="surface-stat-card is-ai">
-        <span>Wartung</span>
-        <strong>Präventiv</strong>
-        <small>Hinweise aus Aufgaben, Fehlerhistorie und Anlagenakte.</small>
+        <span>Mit Störung</span>
+        <strong data-dashboard-machine-issue-count>{withIncidents}</strong>
+        <small>Anlagen mit offener Störung</small>
       </article>
       <article className="surface-stat-card is-neutral">
-        <span>Profile</span>
-        <strong>Detailansicht</strong>
-        <small>Offene Tasks, Dokumente und Übergaben je Maschine.</small>
+        <span>Offene Aufgaben</span>
+        <strong>{openTasks}</strong>
+        <small>an Anlagen gebunden</small>
       </article>
     </section>
   );

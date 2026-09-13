@@ -24,9 +24,9 @@ export function TaskHeader({
   return (
     <section className="page-hero task-workboard-hero is-compact">
       <div>
-        <h1 className="page-title">Maintenance Workboard</h1>
+        <h1 className="page-title">Aufgaben</h1>
         <p className="page-description">
-          Wartungs-, Reparatur- und Prüfaufgaben nach Priorität, Status, Bereich und Fälligkeit steuern.
+          Aufträge aus Störungen, Wartung und Prüfungen – nach Status und Fälligkeit.
         </p>
       </div>
       <PageActionBar
@@ -39,8 +39,7 @@ export function TaskHeader({
             label: priorityBusy ? "Wird geladen..." : "Priorität aktualisieren",
             onClick: () => void onRefreshPriorities(),
             variant: "outline"
-          },
-          { href: "/", label: "Cockpit", variant: "ghost" }
+          }
         ]}
       />
     </section>

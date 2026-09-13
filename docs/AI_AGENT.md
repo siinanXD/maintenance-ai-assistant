@@ -63,6 +63,7 @@ nur veroeffentlichte Schichtplaene, eigener Urlaub, Maschinen+Fehler-Recht,
 | `list_documents` | `filter` (recent, outdated, this_week, department, machine), `department`, `machine` | documents:view |
 | `list_shift_entries` | `mode` (entries, count, understaffed), `date`, `time_range` (today, tomorrow), `shift` (early, late, night) | shiftplans:view |
 | `list_inventory` | `filter` (all, low_stock, critical, machine), `machine`, `count_only` | inventory:view |
+| `list_maintenance_plans` | `due_state` (overdue, due_soon, ok), `kind` (inspection, maintenance), `machine`, `count_only` | machines:view |
 | `machine_incident_report` | `machine` (optional; ohne = Ausfallzeit-Ranking) | machines:view + errors:view |
 
 ### Suche, Wissen, Assistenten

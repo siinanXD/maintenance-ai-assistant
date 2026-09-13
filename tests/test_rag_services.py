@@ -549,7 +549,7 @@ def test_openai_embedding_provider_rejects_unexpected_dimensions(app):
 
 def test_reindex_notice_is_documented_for_embedding_provider_changes():
     """Verify docs tell admins to reindex after embedding provider changes."""
-    readme = Path("README.md").read_text(encoding="utf-8")
+    readme = Path("docs/AI_RAG_ARCHITECTURE.md").read_text(encoding="utf-8")
 
     assert (
         "Nach Änderung des Embedding Providers müssen Knowledge-Dokumente neu indexiert werden."

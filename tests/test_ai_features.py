@@ -3304,24 +3304,6 @@ def test_admin_ai_page_contains_ai_and_knowledge_ui(client):
         assert view_name in script
         assert marker in script
 
-    legacy_routes = {
-        "/admin/ai/prompts": "/admin/ai/prompt-faq",
-        "/admin/ai/faq": "/admin/ai/prompt-faq",
-        "/admin/ai/knowledge": "/admin/ai/rag-board",
-        "/admin/ai/lab": "/admin/ai/source-check",
-        "/admin/ai/costs": "/admin/ai/effectiveness",
-        "/admin/ai/feedback": "/admin/ai/effectiveness",
-        "/admin/ai/models": "/admin/ai#ai-models",
-        "/admin/ai/retrieval": "/admin/ai/technical",
-        "/admin/ai/training": "/admin/ai/rag-board",
-        "/admin/ai/diagnostics": "/admin/ai/technical",
-        "/admin/ai/indexing": "/admin/ai/technical",
-    }
-    for route, target in legacy_routes.items():
-        response = client.get(route)
-        assert response.status_code == 302
-        assert response.headers["Location"] == target
-
     html = "\n".join(pages.values())
     source = html + script
 

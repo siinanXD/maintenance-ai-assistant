@@ -11,9 +11,10 @@ const LOGIN_ISLAND = {
 };
 
 const LOGIN_CAPABILITIES = [
-  ["Störungen", "Fehlerkatalog mit Ursache, Lösung und Stillstandszeit"],
-  ["Aufgaben", "Kanban nach Priorität, Fälligkeit und Bereich"],
-  ["Assistent", "Antworten aus App-Daten, Handbüchern und Berichten mit Quelle"]
+  ["Störungen", "Mit Foto melden, mit dem Fehlerkatalog abgleichen, Auftrag anlegen"],
+  ["Aufgaben", "Ersatzteile buchen, Bestand und Bestellvorschlag im Blick"],
+  ["Prüfungen", "Prüfpflichten mit Frist, Nachweis und Folgeauftrag"],
+  ["Assistent", "Antworten aus App-Daten und Handbüchern mit Quelle"]
 ] as const;
 
 /**

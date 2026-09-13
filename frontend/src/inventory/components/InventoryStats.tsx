@@ -30,11 +30,6 @@ export function InventoryStats({ materials }: InventoryStatsProps): ReactNode {
         <strong data-inventory-total-value>{stats.totalValue}</strong>
         <small>Summierter Wert aus Bestand und Einzelkosten.</small>
       </article>
-      <article className="surface-stat-card is-neutral">
-        <span>Maschinenbezug</span>
-        <strong data-inventory-linked-count>{stats.linked}</strong>
-        <small>Ersatzteile mit direkter Anlagenverknüpfung.</small>
-      </article>
     </section>
   );
 }

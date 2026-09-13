@@ -51,12 +51,10 @@ export function inventoryStats(materials: readonly InventoryMaterial[]) {
   const lowStock = materials.filter((material) => (
     Number(material.min_quantity || 0) > 0 && Number(material.quantity || 0) <= Number(material.min_quantity)
   )).length;
-  const linked = materials.filter((material) => Boolean(material.machine?.name)).length;
 
   return {
     count: `${materials.length} Artikel`,
     lowStock: `${lowStock} nachbestellen`,
-    totalValue: formatMoney(totalValue),
-    linked: `${linked} zugeordnet`
+    totalValue: formatMoney(totalValue)
   };
 }

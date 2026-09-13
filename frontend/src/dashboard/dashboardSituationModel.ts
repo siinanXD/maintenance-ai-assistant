@@ -228,6 +228,7 @@ export function dashboardSituationCards(data: DashboardRuntimeData): readonly Da
   const vacations = relevantVacations(data.vacations);
   const absent = absentEmployees(data.employees);
   const shortageCount = numberValue(data.inventorySummary, "shortage_count");
+  const overduePlans = data.maintenancePlans.filter((plan) => plan.due_state === "overdue");
 
   return [
     topFocus
@@ -262,27 +263,38 @@ export function dashboardSituationCards(data: DashboardRuntimeData): readonly Da
       tone: machineCounts.critical || data.errors.length ? "warning" : "good",
       value: machineCounts.critical ? String(machineCounts.critical) : String(data.errors.length || machineCounts.good || "--")
     },
-    {
-      actionLabel: vacations.length ? "Urlaub prüfen" : "Schicht prüfen",
-      detail: vacations.length
-        ? `${vacations.length} offene Anträge`
-        : absent.length
-          ? absent.slice(0, 2).map((employee) => peopleText(employee, "name", "Abwesend")).join(", ")
-          : shortageCount
-            ? `${shortageCount} Materialengpässe`
-            : `${data.employees.length || "--"} Mitarbeitende im Blick`,
-      href: vacations.length ? "/vacations" : absent.length ? "/employees" : shortageCount ? "/inventory" : "/handover",
-      id: "people",
-      label: "Entscheidung",
-      title: vacations.length
-        ? "Urlaubsfreigabe offen"
-        : absent.length
-          ? `${absent.length} abwesend markiert`
-          : shortageCount
-            ? "Material klären"
-            : "Schichtlage ohne Warnung",
-      tone: vacations.length || absent.length || shortageCount ? "warning" : "good",
-      value: vacations.length || absent.length || shortageCount ? "!" : "OK"
-    }
+    overduePlans.length
+      ? {
+          actionLabel: "Prüfungen öffnen",
+          detail: overduePlans.slice(0, 2).map((plan) => String(plan.title || "Plan")).join(", "),
+          href: "/maintenance",
+          id: "people",
+          label: "Entscheidung",
+          title: overduePlans.length === 1 ? "1 Prüfung überfällig" : `${overduePlans.length} Prüfungen überfällig`,
+          tone: "warning",
+          value: String(overduePlans.length)
+        }
+      : {
+          actionLabel: vacations.length ? "Urlaub prüfen" : "Schicht prüfen",
+          detail: vacations.length
+            ? `${vacations.length} offene Anträge`
+            : absent.length
+              ? absent.slice(0, 2).map((employee) => peopleText(employee, "name", "Abwesend")).join(", ")
+              : shortageCount
+                ? `${shortageCount} Materialengpässe`
+                : `${data.employees.length || "--"} Mitarbeitende im Blick`,
+          href: vacations.length ? "/vacations" : absent.length ? "/employees" : shortageCount ? "/inventory" : "/handover",
+          id: "people",
+          label: "Entscheidung",
+          title: vacations.length
+            ? "Urlaubsfreigabe offen"
+            : absent.length
+              ? `${absent.length} abwesend markiert`
+              : shortageCount
+                ? "Material klären"
+                : "Schichtlage ohne Warnung",
+          tone: vacations.length || absent.length || shortageCount ? "warning" : "good",
+          value: vacations.length || absent.length || shortageCount ? "!" : "OK"
+        }
   ];
 }

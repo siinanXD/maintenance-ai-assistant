@@ -7,6 +7,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- Photos and PDFs on incidents and tasks (`/api/v1/attachments`), type detected
+  from content, camera capture on phones
+- QR label per machine (`/api/v1/machines/{id}/qr.svg`, short link `/m/{id}`)
+- Work order from incident (`task.error_entry_id`), closing the incident when the
+  order is completed
+- Spare-part withdrawals per work order, goods receipts, movement history and
+  reorder suggestions (`/api/v1/inventory/reorder`)
+- Inspections page `/maintenance`: plans with legal basis, execution records
+  with result, follow-up orders, re-test after a failed inspection
+- Availability, MTBF and MTTR per machine over 90 days
+- Static assets are versioned by content hash instead of manual `?v=` strings
+
+### Removed
+- Dead code found by AST, import-graph and CSS scans: 44 unused Python
+  definitions, 14 unreachable React files, 100+ unused exports, 546 unused CSS
+  rules; the unused LangGraph answer-generation path; the `/ai/agent`,
+  `/ai/chat/templates`, `/ai/incident-timeline` and `/ai/order-plan` endpoints;
+  legacy Admin-AI redirects
+- Help boxes and placeholder KPI cards without real data on list pages
+
 ### Changed
 - The chat is agent-only: `POST /api/v1/ai/chat` and `POST /api/v1/ai/agent`
   run the same LangGraph tool loop. The rule-based router (`app/ai/intent.py`,

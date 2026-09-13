@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="de" data-theme="maintenance">
+<html lang="de" data-theme="maintenance" data-static-version="{{ static_scripts_version() }}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Maintenance Assistant{% endblock %}</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c9490c'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='Arial,sans-serif' font-size='22' font-weight='800' fill='white'%3EMA%3C/text%3E%3C/svg%3E">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}?v=20260913-attach1">
+    <link rel="stylesheet" href="{{ static_asset_url('css/output.css') }}">
   </head>
   <body class="app-body min-h-screen antialiased">
     {% block app_shell %}
@@ -64,11 +64,11 @@
     </div>
     {% endblock %}
 
-    <script src="{{ url_for('static', filename='core/feature-registry.js') }}?v=20260521-task-priority1"></script>
-    <script src="{{ url_for('static', filename='core/action-dialogs.js') }}?v=20260521-task-priority1"></script>
-    <script src="{{ url_for('static', filename='auth.js') }}?v=20260913-notifications1"></script>
-    <script src="{{ url_for('static', filename='core/api-client.js') }}?v=20260511-api-client1"></script>
-    <script src="{{ url_for('static', filename='app.js') }}?v=20260913-island-timeout1"></script>
+    <script src="{{ static_asset_url('core/feature-registry.js') }}"></script>
+    <script src="{{ static_asset_url('core/action-dialogs.js') }}"></script>
+    <script src="{{ static_asset_url('auth.js') }}"></script>
+    <script src="{{ static_asset_url('core/api-client.js') }}"></script>
+    <script src="{{ static_asset_url('app.js') }}"></script>
     {% block shell_react_entrypoint %}
     {{ react_entrypoint("src/layout/shellChromeEntrypoint.tsx") }}
     {% endblock %}

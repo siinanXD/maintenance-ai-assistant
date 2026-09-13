@@ -18,11 +18,6 @@ export function TaskStats({ tasks }: TaskStatsProps): ReactNode {
 
   return (
     <section className="task-control-strip" aria-label="Aufgaben Kennzahlen">
-      <article className="task-control-stat is-total">
-        <span>Gesamt</span>
-        <strong data-dashboard-task-count>{tasks.length}</strong>
-        <small>sichtbare Aufgaben</small>
-      </article>
       <article className="task-control-stat is-open">
         <span>Offen</span>
         <strong data-task-open-count>{open}</strong>

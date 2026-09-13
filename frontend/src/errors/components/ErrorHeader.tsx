@@ -22,9 +22,9 @@ export function ErrorHeader({
   return (
     <section className="page-hero incident-hub-hero is-compact">
       <div>
-        <h1 className="page-title">Störungszentrale & Fehlerkatalog</h1>
+        <h1 className="page-title">Störungen</h1>
         <p className="page-description">
-          Störungen strukturiert erfassen, bekannte Fehler finden und Lösungen als Wissensbasis pflegen.
+          Melden, mit bekannten Fehlern abgleichen, Auftrag anlegen und Lösung festhalten.
         </p>
       </div>
       <PageActionBar

@@ -55,7 +55,7 @@ function MachineCard({
           <p className="record-card-subtitle">{machine.produced_item || "Kein Produktionsinhalt hinterlegt"}</p>
         </div>
         {machine.active_errors ? (
-          <span className="badge badge-status is-open">{machine.active_errors} offen</span>
+          <span className="badge badge-status is-open">{machine.active_errors === 1 ? "1 Störung" : `${machine.active_errors} Störungen`}</span>
         ) : (
           <span className="badge badge-status is-done">In Betrieb</span>
         )}

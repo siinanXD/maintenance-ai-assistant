@@ -21,6 +21,7 @@ STRUCTURED_TOOL_NAMES = frozenset(
         "list_documents",
         "list_shift_entries",
         "list_inventory",
+        "list_maintenance_plans",
         "machine_incident_report",
     }
 )
@@ -194,6 +195,21 @@ def _list_shift_entries(user, arguments):
             "date": arguments.get("date"),
             "time_range": arguments.get("time_range"),
             "shift": arguments.get("shift"),
+        },
+    )
+
+
+def _list_maintenance_plans(user, arguments):
+    from app.agent.queries.maintenance import list_maintenance_plans
+
+    return _run(
+        list_maintenance_plans,
+        user,
+        {
+            "due_state": arguments.get("due_state"),
+            "kind": arguments.get("kind"),
+            "machine": arguments.get("machine"),
+            "count_only": _bool(arguments.get("count_only")),
         },
     )
 
@@ -530,6 +546,39 @@ register_tool(
         handler=_list_inventory,
         permission=("inventory", "view"),
         scopes=("inventory",),
+    )
+)
+
+register_tool(
+    ToolSpec(
+        name="list_maintenance_plans",
+        label="Prüfungen und Wartung",
+        description=(
+            "Aktive Prüfpflichten (z. B. DGUV V3) und Wartungspläne nach Fälligkeit. "
+            "due_state=overdue (überfällig), due_soon (in 30 Tagen), ok; "
+            "kind=inspection oder maintenance; optional machine."
+        ),
+        parameters={
+            "type": "object",
+            "properties": {
+                "due_state": {
+                    "type": "string",
+                    "enum": ["overdue", "due_soon", "ok"],
+                    "description": "Fälligkeit.",
+                },
+                "kind": {
+                    "type": "string",
+                    "enum": ["inspection", "maintenance"],
+                    "description": "inspection=Prüfpflicht, maintenance=Wartung.",
+                },
+                "machine": _MACHINE,
+                "count_only": _COUNT_ONLY,
+            },
+            "required": [],
+        },
+        handler=_list_maintenance_plans,
+        permission=("machines", "view"),
+        scopes=("machines",),
     )
 )
 

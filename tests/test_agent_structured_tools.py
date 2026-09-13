@@ -662,3 +662,63 @@ def test_count_records_admin_sees_all_scopes(app, make_user, scope):
     assert result.content["count"] == 0
     if scope == "inventory":
         assert "- **Lagerwert:** 0,00 EUR" in result.content["answer_markdown"]
+
+
+def test_list_maintenance_plans_reports_overdue_inspections(app, make_user, make_machine):
+    """Verify the agent lists overdue inspections with legal basis and last proof."""
+    from datetime import date, timedelta
+
+    from app.models import Department, MaintenancePlan
+
+    admin = make_user(
+        username="agent_plans_admin", role=Role.MASTER_ADMIN, department_name="Instandhaltung"
+    )
+    machine_id = make_machine(name="Presse Agent 4")
+    with app.app_context():
+        department = Department.query.filter_by(name="Instandhaltung").one()
+        db.session.add_all(
+            [
+                MaintenancePlan(
+                    title="Elektroprüfung",
+                    kind="inspection",
+                    legal_basis="DGUV Vorschrift 3",
+                    interval_days=365,
+                    next_due_date=date.today() - timedelta(days=2),
+                    machine_id=machine_id,
+                    department=department,
+                    created_by=admin["id"],
+                ),
+                MaintenancePlan(
+                    title="Filterwechsel",
+                    interval_days=30,
+                    next_due_date=date.today() + timedelta(days=60),
+                    department=department,
+                    created_by=admin["id"],
+                ),
+            ]
+        )
+        db.session.commit()
+
+        result = execute_tool(
+            "list_maintenance_plans",
+            {"due_state": "overdue", "kind": "inspection"},
+            _user(admin["id"]),
+        )
+
+    assert result.status == "ok"
+    assert result.content["count"] == 1
+    assert result.content["items"][0]["legal_basis"] == "DGUV Vorschrift 3"
+    assert "Elektroprüfung (DGUV Vorschrift 3), Presse Agent 4" in result.content["answer_markdown"]
+
+
+def test_list_maintenance_plans_requires_machine_permission(
+    app, make_user, set_dashboard_permission
+):
+    """Verify plans stay hidden without machine access."""
+    user = make_user(username="agent_plans_blocked", role=Role.PRODUKTION)
+    set_dashboard_permission(user["username"], "machines", can_view=False)
+
+    with app.app_context():
+        result = execute_tool("list_maintenance_plans", {}, _user(user["id"]))
+
+    assert result.status == "permission_denied"

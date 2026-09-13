@@ -15,6 +15,7 @@ export type DashboardRuntimeData = {
   readonly knowledgeStatus: DashboardPayload | null;
   readonly loadErrors: readonly string[];
   readonly machines: readonly DashboardPayload[];
+  readonly maintenancePlans: readonly DashboardPayload[];
   readonly operationsSummary: DashboardPayload | null;
   readonly dailyBriefing: DashboardPayload | null;
   readonly retrievalTelemetry: DashboardPayload | null;
@@ -56,6 +57,7 @@ const EMPTY_DASHBOARD_DATA: DashboardRuntimeData = {
   knowledgeStatus: null,
   loadErrors: [],
   machines: [],
+  maintenancePlans: [],
   operationsSummary: null,
   dailyBriefing: null,
   retrievalTelemetry: null,
@@ -104,7 +106,7 @@ function settledValue<TValue>(
 
 type DashboardCoreData = Pick<
   DashboardRuntimeData,
-  "employees" | "errors" | "handovers" | "inventorySummary" | "machines" | "operationsSummary" | "tasks" | "vacations"
+  "employees" | "errors" | "handovers" | "inventorySummary" | "machines" | "maintenancePlans" | "operationsSummary" | "tasks" | "vacations"
 > & { readonly loadErrors: readonly string[] };
 
 type DashboardInsightData = Pick<
@@ -127,7 +129,8 @@ export async function loadDashboardCoreData(signal?: AbortSignal): Promise<Dashb
     vacationsResult,
     handoversResult,
     inventoryResult,
-    operationsResult
+    operationsResult,
+    plansResult
   ] = await Promise.allSettled([
     loadDashboardList("/api/v1/tasks?limit=100", signal),
     loadDashboardList("/api/v1/errors?limit=100&active=1", signal),
@@ -136,7 +139,8 @@ export async function loadDashboardCoreData(signal?: AbortSignal): Promise<Dashb
     loadDashboardList("/api/v1/vacations?limit=100", signal),
     loadDashboardList(`/api/v1/handover?date=${todayIsoDate()}`, signal),
     loadDashboardObject("/api/v1/inventory/summary?include_materials=0", signal),
-    loadDashboardObject(`/api/v1/operations/summary?from=${todayIsoDate()}&to=${todayIsoDate()}`, signal)
+    loadDashboardObject(`/api/v1/operations/summary?from=${todayIsoDate()}&to=${todayIsoDate()}`, signal),
+    loadDashboardList("/api/v1/machines/maintenance-plans", signal)
   ]);
   const loadErrors: string[] = [];
 
@@ -147,6 +151,7 @@ export async function loadDashboardCoreData(signal?: AbortSignal): Promise<Dashb
     inventorySummary: settledValue(inventoryResult, null, "Lager", loadErrors),
     loadErrors,
     machines: settledValue(machinesResult, [], "Maschinen", loadErrors),
+    maintenancePlans: settledValue(plansResult, [], "Prüfungen", loadErrors),
     operationsSummary: settledValue(operationsResult, null, "Operations", loadErrors),
     tasks: settledValue(tasksResult, [], "Aufgaben", loadErrors),
     vacations: settledValue(vacationsResult, [], "Urlaub", loadErrors)

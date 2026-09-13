@@ -46,7 +46,7 @@ export function MachineProfileApp(): ReactNode {
     loadMachineProfile(machineId)
       .then((loadedProfile) => {
         setProfile(loadedProfile);
-        setMessage("Maschinenprofil bereit.");
+        setMessage("");
       })
       .catch((error: unknown) => {
         setMessage(machineErrorMessage(error));

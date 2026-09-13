@@ -32,7 +32,7 @@ export const SHELL_NAVIGATION_SECTIONS: readonly ShellNavigationSection[] = [
     ]
   },
   {
-    title: "Wissen & Anlagen",
+    title: "Anlagen & Material",
     links: [
       {
         dashboardKey: "machines",
@@ -41,7 +41,7 @@ export const SHELL_NAVIGATION_SECTIONS: readonly ShellNavigationSection[] = [
         label: "Maschinen",
         routePrefix: "/machines"
       },
-      { dashboardKey: "inventory", href: "/inventory", iconId: "icon-inventory", label: "Inventar" },
+      { dashboardKey: "inventory", href: "/inventory", iconId: "icon-inventory", label: "Lager" },
       { dashboardKey: "documents", href: "/documents", iconId: "icon-document", label: "Dokumente" }
     ]
   },
