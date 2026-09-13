@@ -107,7 +107,7 @@
     height: 0.35rem;
     overflow: hidden;
     border-radius: 999px;
-    background: #e9eef5;
+    background: var(--color-bg-canvas);
   }
 
   .executive-kpi-card .kpi-progress span {

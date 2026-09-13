@@ -9,7 +9,7 @@
   .chat-answer-badge.is-info,
   .chat-answer-insight.is-info {
     border-color: #bfdbfe;
-    background: #eff6ff;
+    background: var(--color-bg-canvas);
     color: #1d4ed8;
   }
 

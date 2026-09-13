@@ -126,9 +126,9 @@ function ErrorCard(props: ErrorCatalogProps & { readonly entry: ErrorEntry }): R
       <div className="incident-card-metrics">
         {[
           ["Stillstand", formatIncidentMinutes(props.entry.downtime_minutes)],
-          ["Produktionsverlust", formatIncidentMinutes(props.entry.production_loss_minutes)],
-          ["Wiederholungen", String(Number(props.entry.repeat_count || 0))],
-          [status === "closed" ? "Geschlossen" : "Zuletzt gesehen", incidentDate(props.entry.closed_at || props.entry.last_seen_at || props.entry.created_at)]
+          ["Verlust", formatIncidentMinutes(props.entry.production_loss_minutes)],
+          ["Wiederholt", String(Number(props.entry.repeat_count || 0))],
+          [status === "closed" ? "Geschlossen" : "Zuletzt",incidentDate(props.entry.closed_at || props.entry.last_seen_at || props.entry.created_at)]
         ].map(([label, value]) => (
           <span key={label}>
             <small>{label}</small>

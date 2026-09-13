@@ -28,7 +28,7 @@
 
   .chat-sources .chat-source-chip:hover {
     border-color: #9ec9fb;
-    background: #f2f8ff;
+    background: var(--color-bg-canvas);
   }
 
   .chat-source-chip-header {
@@ -72,19 +72,19 @@
 
   .chat-source-kind.is-sql {
     border-color: #a5f3fc;
-    background: #ecfeff;
+    background: var(--color-bg-canvas);
     color: #0e7490;
   }
 
   .chat-source-kind.is-rag {
     border-color: #bfdbfe;
-    background: #eff6ff;
+    background: var(--color-bg-canvas);
     color: #1d4ed8;
   }
 
   .chat-source-kind.is-manual-training {
     border-color: #ddd6fe;
-    background: #f5f3ff;
+    background: var(--color-bg-canvas);
     color: #6d28d9;
   }
 

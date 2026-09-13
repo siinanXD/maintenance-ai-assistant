@@ -77,7 +77,7 @@
     height: 2rem;
     place-items: center;
     border-radius: 999px;
-    background: #eaf3ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-blue);
     font-size: 0.72rem;
     font-weight: 950;
@@ -158,7 +158,7 @@
   }
 
   .data-table tbody tr.is-selected {
-    background: #f0f7ff;
+    background: var(--color-bg-canvas);
   }
 
   .chat-widget {
@@ -188,7 +188,7 @@
 
   .chat-panel-header {
     align-items: center;
-    background: #f8fbff;
+    background: var(--color-bg-canvas);
     padding: 0.85rem;
   }
 
@@ -215,7 +215,7 @@
 
   .chat-clear:hover,
   .chat-close:hover {
-    background: #eaf2fb;
+    background: var(--color-bg-canvas);
     color: var(--ui-text);
   }
 

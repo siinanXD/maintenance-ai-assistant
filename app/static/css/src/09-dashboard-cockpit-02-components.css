@@ -27,7 +27,7 @@
 
   .shift-select.is-night {
     border-color: #c7d7ff;
-    background: #f7f9ff;
+    background: var(--color-bg-canvas);
   }
 
   .shift-select span:nth-child(2) {
@@ -119,7 +119,7 @@
 
   .interface-toast.is-info {
     border-color: #bfd7ff;
-    background: #f5f9ff;
+    background: var(--color-bg-canvas);
     color: #0b4fa8;
   }
 

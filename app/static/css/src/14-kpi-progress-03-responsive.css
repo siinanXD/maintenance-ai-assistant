@@ -32,7 +32,7 @@
     gap: 0.15rem;
     border: 1px solid var(--color-border-default);
     border-radius: var(--ui-radius-sm);
-    background: #f4f8fc;
+    background: var(--color-bg-canvas);
     padding: 0.55rem;
     min-width: 0;
   }

@@ -57,12 +57,12 @@
 
   .sp-shift-spaet {
     border-left: 4px solid #3b82f6;
-    background: #eff6ff;
+    background: var(--color-bg-canvas);
   }
 
   .sp-shift-nacht {
     border-left: 4px solid #a855f7;
-    background: #faf5ff;
+    background: var(--color-bg-canvas);
   }
 
   .sp-shift-urlaub {
@@ -84,11 +84,11 @@
   }
 
   .sp-cell-spaet {
-    background: #eff6ff;
+    background: var(--color-bg-canvas);
   }
 
   .sp-cell-nacht {
-    background: #faf5ff;
+    background: var(--color-bg-canvas);
   }
 
   .sp-cell-urlaub {

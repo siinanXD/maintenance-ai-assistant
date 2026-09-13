@@ -35,16 +35,22 @@ API key, and keeps sensitive employee or admin data behind permissions.
 
 ## Screenshots
 
-These screenshots are captured from the running app and reflect the current
-checked-in UI state.
+These screenshots are captured at 1440×960 from the running app with a fresh
+`python seed.py demo` database and reflect the current checked-in UI state.
 
-| Dashboard | Tasks |
+| Cockpit | Assistant |
 | --- | --- |
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Tasks](docs/screenshots/tasks.png) |
+| ![Cockpit](docs/screenshots/dashboard.png) | ![Assistant answering from app data](docs/screenshots/ai-features.png) |
 
-| Error Catalog | AI Features |
+| Error Catalog | Tasks |
 | --- | --- |
-| ![Error Catalog](docs/screenshots/error-catalog.png) | ![AI Features](docs/screenshots/ai-features.png) |
+| ![Error Catalog](docs/screenshots/error-catalog.png) | ![Tasks](docs/screenshots/tasks.png) |
+
+| Machines | Login |
+| --- | --- |
+| ![Machines](docs/screenshots/machines.png) | ![Login](docs/screenshots/login.png) |
+
+<p><img src="docs/screenshots/mobile-cockpit.png" alt="Cockpit on a phone" width="260"></p>
 
 ## Features
 

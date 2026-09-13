@@ -146,7 +146,7 @@
   .knowledge-network-relation-card span {
     width: fit-content;
     border-radius: 999px;
-    background: #edf6ff;
+    background: var(--color-bg-canvas);
     color: #1d4ed8;
     padding: 0.15rem 0.45rem;
     font-size: 0.66rem;

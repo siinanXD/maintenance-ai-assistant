@@ -60,7 +60,7 @@
   }
 
   .timeline-row.is-active {
-    background: #f8fbff;
+    background: var(--color-bg-canvas);
   }
 
   .timeline-row.is-active strong {
@@ -199,7 +199,7 @@
 
   .shortage-tags span {
     border-radius: 0.25rem;
-    background: #f3f6fa;
+    background: var(--color-bg-canvas);
     color: #435169;
     padding: 0.35rem 0.5rem;
     font-size: 0.72rem;

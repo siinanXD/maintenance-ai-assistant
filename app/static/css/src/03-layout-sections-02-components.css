@@ -31,7 +31,7 @@
 
   .ai-admin-nav a:hover,
   .ai-admin-nav a:focus-visible {
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-blue);
     outline: none;
   }
@@ -153,7 +153,7 @@
     max-width: 100%;
     margin: 0.08rem 0.16rem 0.08rem 0;
     border-radius: 0.35rem;
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
     color: #0b5fb8;
     padding: 0.16rem 0.34rem;
     font-size: 0.68rem;

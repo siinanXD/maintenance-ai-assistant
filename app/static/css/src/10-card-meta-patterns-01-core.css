@@ -91,7 +91,7 @@
   .badge.is-progress,
   .badge-status.is-progress {
     border-color: #b8d8ff;
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
     color: #006de5;
   }
 

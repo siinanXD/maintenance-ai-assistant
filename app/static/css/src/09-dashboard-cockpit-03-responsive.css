@@ -125,7 +125,7 @@
     margin: 0;
     padding: 0.8rem 0.85rem;
     border-bottom: 1px solid var(--ops-border);
-    background: #f7f9fc;
+    background: var(--color-bg-canvas);
     color: var(--color-text-primary);
     font-size: 0.85rem;
     font-weight: 850;

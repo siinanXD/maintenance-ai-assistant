@@ -62,7 +62,7 @@
 .handover-step {
   border: 1px solid #e1eaf4;
   border-radius: var(--ui-radius);
-  background: #f8fbff;
+  background: var(--color-bg-canvas);
   padding: 0.9rem;
 }
 
@@ -160,7 +160,7 @@
   align-items: center;
   border: 1px solid var(--color-border-default);
   border-radius: var(--ui-radius-sm);
-  background: #f7fbff;
+  background: var(--color-bg-canvas);
   padding: 0.55rem;
 }
 

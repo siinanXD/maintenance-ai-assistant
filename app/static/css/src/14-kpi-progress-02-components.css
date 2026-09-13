@@ -9,7 +9,7 @@
   }
 
   .data-table tbody tr:hover {
-    background: #f7fbff;
+    background: var(--color-bg-canvas);
   }
 
   .catalog-card-table .data-table tbody tr,
@@ -52,7 +52,7 @@
   .cockpit-task-meta span {
     border: 1px solid var(--color-border-default);
     border-radius: var(--ui-radius-sm);
-    background: #f4f8fc;
+    background: var(--color-bg-canvas);
     color: var(--ui-text-soft);
   }
 
@@ -80,7 +80,7 @@
 
   .quick-action-row strong {
     border-radius: var(--ui-radius-sm);
-    background: #e9f4ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-primary-dark);
   }
 
@@ -168,7 +168,7 @@
   .global-search-result:hover,
   .global-search-result:focus-visible {
     border-color: var(--ui-primary);
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
   }
 
   .global-search-result-content {
@@ -198,7 +198,7 @@
   .global-search-result-badge {
     flex: 0 0 auto;
     border-radius: 999px;
-    background: #e9f4ff;
+    background: var(--color-bg-canvas);
     padding: 0.2rem 0.5rem;
     color: var(--ui-primary-dark);
     font-size: 0.68rem;
@@ -208,7 +208,7 @@
   .global-search-empty {
     border: 1px dashed var(--ui-border-strong);
     border-radius: var(--ui-radius-sm);
-    background: #f6fafe;
+    background: var(--color-bg-canvas);
     padding: 0.85rem;
     color: var(--ui-muted);
     font-size: 0.82rem;

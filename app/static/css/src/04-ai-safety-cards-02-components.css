@@ -4,7 +4,7 @@
     gap: 0.25rem 0.65rem;
     align-items: start;
     border-radius: 0.48rem;
-    background: #f8fbff;
+    background: var(--color-bg-canvas);
     padding: 0.62rem;
   }
 
@@ -50,7 +50,7 @@
     overflow: hidden;
     height: 0.48rem;
     border-radius: 999px;
-    background: #e8eef6;
+    background: var(--color-bg-canvas);
   }
 
   .ai-mini-bar i {
@@ -103,7 +103,7 @@
   .training-card.is-selected,
   .training-card:hover {
     border-color: #9ec9fb;
-    background: #f2f8ff;
+    background: var(--color-bg-canvas);
     box-shadow: 0 8px 18px rgba(11, 114, 231, 0.08);
   }
 
@@ -170,7 +170,7 @@
     justify-content: space-between;
     border: 1px solid #dbeafe;
     border-radius: 0.5rem;
-    background: #f5f9ff;
+    background: var(--color-bg-canvas);
     padding: 0.65rem;
   }
 
@@ -226,7 +226,7 @@
 
   .status-pill.is-source-automatic {
     border-color: #bfdbfe;
-    background: #eff6ff;
+    background: var(--color-bg-canvas);
     color: #1d4ed8;
   }
 

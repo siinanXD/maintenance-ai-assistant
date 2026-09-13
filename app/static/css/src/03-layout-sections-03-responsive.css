@@ -129,7 +129,7 @@
     border: 1px solid #bfdcf8;
     border-left: 4px solid var(--ui-blue);
     border-radius: 0.65rem;
-    background: #f7fbff;
+    background: var(--color-bg-canvas);
     padding: 0.9rem 1rem;
   }
 

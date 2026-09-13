@@ -68,7 +68,7 @@
   min-width: 0;
   border: 1px solid var(--color-border-default);
   border-radius: var(--ui-radius-sm);
-  background: #f7fbff;
+  background: var(--color-bg-canvas);
   padding: 0.55rem;
 }
 
@@ -81,12 +81,12 @@
 
 .knowledge-block.is-symptom {
   border-left: 4px solid #0ea5e9;
-  background: #eef8ff;
+  background: var(--color-bg-canvas);
 }
 
 .knowledge-block.is-impact {
   border-left: 4px solid #8b5cf6;
-  background: #f6f3ff;
+  background: var(--color-bg-canvas);
 }
 
 .incident-edit-dialog {

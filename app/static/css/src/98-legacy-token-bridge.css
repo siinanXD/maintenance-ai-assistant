@@ -346,10 +346,15 @@
   color: var(--color-text-inverse);
 }
 
-.chat-answer-meta span {
+.chat-answer-meta span,
+.chat-answer-meta span:first-child {
   border-color: var(--color-border-default);
   background: var(--color-bg-surface-sunken);
   color: var(--color-text-secondary);
+}
+
+.chat-answer-meta span:first-child {
+  color: var(--color-text-primary);
 }
 
 .help-disclosure summary {
@@ -359,4 +364,31 @@
 /* Kennzahl-Beschriftungen (Nutzerverwaltung) waren Marineblau. */
 .kpi-label {
   color: var(--color-text-muted);
+}
+
+/* Hilfe-Disclosures und Chat-Kopf: Flaeche statt kuehlem Verlauf. */
+.help-disclosure.context-help,
+.chat-panel-header {
+  background: var(--color-bg-surface);
+}
+
+/* Karten-Kennzahlen: lange Beschriftungen (PRODUKTIONSVERLUST) brechen statt ueberzulaufen. */
+.incident-card-metrics small,
+.handover-record-metrics small,
+.machine-profile-record-metrics small,
+.record-card-meta small {
+  hyphens: auto;
+  overflow-wrap: break-word;
+  letter-spacing: 0.02em;
+}
+
+/* Status-Badges in Kartenkoepfen behalten ihre Hoehe statt sich zu strecken. */
+.incident-card-badges {
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+/* Topbar-Schichtchip: alte Regel machte die Schichtzeit zum Grid und brach die Datumszeile um. */
+#maintenance-shell-topbar-root .shift-select small span {
+  display: inline;
 }

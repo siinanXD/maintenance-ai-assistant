@@ -76,6 +76,7 @@
 
   #maintenance-shell-topbar-root .shift-select small {
     display: block;
+    white-space: nowrap;
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     font-variant-numeric: tabular-nums;

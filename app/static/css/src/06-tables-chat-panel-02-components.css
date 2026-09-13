@@ -2,7 +2,7 @@
     height: 1.4rem;
     place-items: center;
     border-radius: 999px;
-    background: #eef6ff;
+    background: var(--color-bg-canvas);
     color: #0b72e7;
     font-weight: 900;
   }

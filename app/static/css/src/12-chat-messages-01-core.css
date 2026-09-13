@@ -92,7 +92,7 @@
     min-height: 1.5rem;
     place-items: center;
     border-radius: 999px;
-    background: #eaf3ff;
+    background: var(--color-bg-canvas);
     color: #0b72e7;
     font-size: 0.7rem;
   }
@@ -188,7 +188,7 @@
 
   .chat-answer-meta span:first-child {
     border-color: #bfdbfe;
-    background: #eff6ff;
+    background: var(--color-bg-canvas);
     color: #1d4ed8;
   }
 

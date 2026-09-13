@@ -190,7 +190,7 @@
   }
 
   .data-table thead th {
-    background: #f8fbff;
+    background: var(--color-bg-canvas);
     color: #42526a;
     font-size: 0.72rem;
     font-weight: 850;

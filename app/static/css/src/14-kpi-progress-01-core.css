@@ -1,4 +1,4 @@
-    background: #e1eaf3;
+    background: var(--color-bg-canvas);
   }
 
   .kpi-progress span {
@@ -132,7 +132,7 @@
   .btn-ghost:hover,
   .btn-outline:hover {
     border-color: var(--ui-primary);
-    background: #eef7ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-primary-dark);
   }
 
@@ -192,7 +192,7 @@
 
   .badge-status.is-progress {
     border-color: #bdd8f2;
-    background: #eef7ff;
+    background: var(--color-bg-canvas);
     color: var(--ui-primary);
   }
 
@@ -243,7 +243,7 @@
     top: 0;
     z-index: 2;
     border-bottom: 1px solid var(--ui-border);
-    background: #f3f8fc;
+    background: var(--color-bg-canvas);
     color: #4b5e72;
     font-size: 0.7rem;
     font-weight: 950;

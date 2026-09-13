@@ -62,7 +62,7 @@ function MachineCard({
       </div>
       <div className="record-card-meta">
         <span>
-          <small>Personalbedarf</small>
+          <small>Personal</small>
           <strong>{machine.required_employees || 1} MA</strong>
         </span>
         <span>
