@@ -1,5 +1,5 @@
 /*
- * Design-Token aus design/tokens/*.json in die beiden Verbraucher uebersetzen:
+ * Design-Token aus design/tokens/tokens.json in die beiden Verbraucher uebersetzen:
  *
  *   app/static/css/src/00-shell-tokens.css   CSS-Custom-Properties
  *   design/tokens/generated/tailwind.cjs     Tailwind-Theme und DaisyUI-Palette
@@ -8,11 +8,17 @@
  * installiert und dieses Skript dort nicht laeuft. tests/test_design_tokens.py
  * prueft bei jedem Lauf, dass sie zur Quelle passen.
  *
- * Nur die semantische Ebene verlaesst den Generator. Die Primitive aus core.json
- * sind Eingabe und sollen in der Anwendung nicht auftauchen.
+ * tokens.json hat das Single-File-Format von Tokens Studio: jedes Token-Set ist
+ * ein Schluessel auf oberster Ebene ("core", "semantic"), daneben stehen $themes
+ * und $metadata. Multi-File-Sync waere ein Pro-Feature; Free-Nutzer koennten
+ * damit nur lesen. Aliase verweisen ohne Set-Namen ({color.blue.600}), weil das
+ * Plugin die Sets zusammenfuehrt -- deshalb entpackt der Generator sie vorher.
+ *
+ * Nur die semantische Ebene verlaesst den Generator. Die Primitive aus dem Set
+ * "core" sind Eingabe und sollen in der Anwendung nicht auftauchen.
  */
 
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,36 +41,45 @@ function posix(value) {
 
 const ROOT_DIR = posix(dirname(dirname(fileURLToPath(import.meta.url))));
 const TOKENS_DIR = posix(join(ROOT_DIR, "design", "tokens"));
+const TOKENS_FILE = `${TOKENS_DIR}/tokens.json`;
+const SETS_DIR = posix(join(ROOT_DIR, "tmp", "token-sets"));
 const GENERATED_DIR = posix(join(TOKENS_DIR, "generated"));
 const CSS_TARGET = posix(join(ROOT_DIR, "app", "static", "css", "src", "00-shell-tokens.css"));
 const TAILWIND_TARGET = posix(join(GENERATED_DIR, "tailwind.cjs"));
+const REQUIRED_SETS = ["core", "semantic"];
 
 const BANNER = [
   "Erzeugt von scripts/build_tokens.mjs. Nicht von Hand aendern.",
-  "Quelle: design/tokens/core.json und design/tokens/semantic.json.",
+  "Quelle: design/tokens/tokens.json (Sets core und semantic).",
   "Neu erzeugen mit: npm run build:tokens"
 ];
 
 /**
- * Return the token source files, ignoring Tokens Studio's bookkeeping files.
+ * Split tokens.json into one file per token set and return their paths.
  *
- * Beim Multi-File-Sync legt Tokens Studio $metadata.json (Reihenfolge der Sets)
- * und $themes.json (Theme-Liste) im selben Ordner ab. Style Dictionary laesst
- * beide nachweislich links liegen, die Ausgabe bleibt mit ihnen byteidentisch.
- * Die Liste ist hier trotzdem explizit, damit nicht eine kuenftige Version oder
- * ein anderes Format still Muell aus $themes.json einliest -- das ist ein Array
- * und kein Token-Set. Zusaetzlich schlaegt ein leerer Ordner so laut fehl.
+ * Style Dictionary merges its source files into one tree, which is exactly how
+ * Tokens Studio resolves aliases across sets. One file per set also keeps each
+ * token's filePath, which isSemantic() uses to tell the layers apart.
+ * Schluessel mit $ am Anfang ($themes, $metadata) sind Verwaltungsdaten des
+ * Plugins und keine Sets.
  *
- * @returns {string[]} Absolute paths of the token files, in a stable order.
+ * @returns {string[]} Absolute paths of the unpacked set files.
  */
 function tokenSourceFiles() {
-  const files = readdirSync(TOKENS_DIR)
-    .filter((name) => name.endsWith(".json") && !name.startsWith("$"))
-    .sort();
-  if (files.length === 0) {
-    throw new Error(`Keine Token-Dateien in ${TOKENS_DIR}`);
+  const payload = JSON.parse(readFileSync(TOKENS_FILE, "utf8"));
+  const sets = Object.keys(payload).filter((name) => !name.startsWith("$"));
+  const missing = REQUIRED_SETS.filter((name) => !sets.includes(name));
+  if (missing.length > 0) {
+    throw new Error(`tokens.json fehlen die Sets: ${missing.join(", ")}`);
   }
-  return files.map((name) => `${TOKENS_DIR}/${name}`);
+
+  rmSync(SETS_DIR, { recursive: true, force: true });
+  mkdirSync(SETS_DIR, { recursive: true });
+  return sets.map((name) => {
+    const path = `${SETS_DIR}/${name}.json`;
+    writeFileSync(path, JSON.stringify(payload[name], null, 2), "utf8");
+    return path;
+  });
 }
 
 /**

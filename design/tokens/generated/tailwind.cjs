@@ -1,6 +1,6 @@
 /*
  * Erzeugt von scripts/build_tokens.mjs. Nicht von Hand aendern.
- * Quelle: design/tokens/core.json und design/tokens/semantic.json.
+ * Quelle: design/tokens/tokens.json (Sets core und semantic).
  * Neu erzeugen mit: npm run build:tokens
  */
 

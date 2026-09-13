@@ -14,6 +14,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 TOKENS_DIR = REPO_ROOT / "design" / "tokens"
+TOKENS_FILE = TOKENS_DIR / "tokens.json"
 CSS_FILE = REPO_ROOT / "app" / "static" / "css" / "src" / "00-shell-tokens.css"
 TAILWIND_FILE = TOKENS_DIR / "generated" / "tailwind.cjs"
 TAILWIND_CONFIG = REPO_ROOT / "tailwind.config.js"
@@ -57,16 +58,16 @@ def _flatten(node, prefix=()):
         yield from _flatten(child, (*prefix, key))
 
 
-def _load(name):
-    """Return the flattened tokens of one token file."""
-    payload = json.loads((TOKENS_DIR / name).read_text(encoding="utf-8"))
-    return dict(_flatten(payload))
+def _load(token_set):
+    """Return the flattened tokens of one set in the single-file tokens.json."""
+    payload = json.loads(TOKENS_FILE.read_text(encoding="utf-8"))
+    return dict(_flatten(payload[token_set]))
 
 
 def _resolved_semantic_tokens():
     """Return the semantic tokens with every alias resolved against the core layer."""
-    core = _load("core.json")
-    semantic = _load("semantic.json")
+    core = _load("core")
+    semantic = _load("semantic")
     everything = {**core, **semantic}
 
     resolved = {}
@@ -138,6 +139,17 @@ def test_tailwind_theme_screens_match_the_four_breakpoints():
     screens = _tailwind_module()["screens"]
 
     assert screens == {"sm": "640px", "md": "768px", "lg": "1024px", "xl": "1440px"}
+
+
+def test_tokens_file_uses_the_tokens_studio_single_file_layout():
+    """Verify tokens.json keeps the shape Tokens Studio's free sync reads and writes."""
+    payload = json.loads(TOKENS_FILE.read_text(encoding="utf-8"))
+
+    assert [key for key in payload if not key.startswith("$")] == ["core", "semantic"]
+    assert payload["$metadata"]["tokenSetOrder"] == ["core", "semantic"]
+    assert isinstance(payload["$themes"], list)
+    assert not list(TOKENS_DIR.glob("core.json")), "Multi-File-Reste neben tokens.json"
+    assert not list(TOKENS_DIR.glob("semantic.json")), "Multi-File-Reste neben tokens.json"
 
 
 def test_tailwind_config_carries_no_literal_values():
