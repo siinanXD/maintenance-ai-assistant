@@ -57,14 +57,31 @@ deshalb keinen Override.
 
 ## Anschluss an Tokens Studio
 
-Noch offen, weil er im Figma-File eingerichtet werden muss:
+Noch offen, weil er im Figma-File eingerichtet werden muss. Plugins laufen in
+der Datei, nicht in den Team-Einstellungen auf figma.com.
 
-1. In Figma das Plugin **Tokens Studio** öffnen, *Settings → Sync → GitHub*.
-2. Repository `siinanXD/maintenance-ai-assistant`, Branch `design/tokens`,
-   Token-Pfad `design/tokens`.
-3. *Import* zieht `core.json` und `semantic.json` als zwei Token-Sets herein.
-4. Änderungen in Figma gehen als Pull Request zurück; `npm run build:tokens`
-   erzeugt daraus die beiden Zieldateien, der Drift-Wächter hält sie ehrlich.
+1. Die Datei „Maintenance AI — Design System & Redesign" öffnen.
+2. Rechtsklick auf die Zeichenfläche → *Plugins* → *Tokens Studio for Figma*
+   (beim ersten Mal über die Suche installieren).
+3. Im Plugin *Settings → Sync providers → Add new → GitHub*.
+4. Eintragen:
+   - Repository: `siinanXD/maintenance-ai-assistant`
+   - Branch: ein eigener, etwa `design/tokens-sync`
+   - Token storage location: `design/tokens`
+   - **Multi-file sync einschalten** — sonst erwartet das Plugin eine einzelne
+     `tokens.json` und findet die beiden Sets nicht.
+   - Personal Access Token: auf github.com selbst erzeugen, *Settings →
+     Developer settings → Personal access tokens*. Fine-grained mit
+     *Contents: read and write* und *Pull requests: read and write* auf dieses
+     eine Repository reicht.
+5. *Pull from GitHub* zieht `core.json` und `semantic.json` als zwei Sets herein.
 
-Bis dahin sind die JSON-Dateien von Hand gepflegt. Am Vertrag ändert das nichts:
-Wer an ihnen dreht, muss neu bauen, sonst wird die CI rot.
+Beim Sync legt das Plugin zusätzlich `$metadata.json` und `$themes.json` in den
+Ordner. Beide sind Verwaltungsdateien, keine Token-Sets; der Generator liest
+ausschließlich die Dateien ohne `$` am Anfang.
+
+Änderungen aus Figma kommen als Pull Request zurück. Danach lokal
+`npm run build:tokens` — der Drift-Wächter erzwingt es, sonst wird die CI rot.
+
+Bis der Sync steht, sind die JSON-Dateien von Hand gepflegt. Am Vertrag ändert
+das nichts.
