@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 
-import { formatMoney } from "../../formatters/number";
+import { formatMoney } from "../../utils/number";
 import { loadInventoryOptions, loadTaskMaterials, withdrawTaskMaterial, type InventoryOption, type TaskMaterials } from "../taskMaterialsApi";
 
 type TaskMaterialsPanelProps = {

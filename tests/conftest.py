@@ -352,21 +352,3 @@ def make_document(app):
             return document.id
 
     return _make_document
-
-
-def create_generated_document(app, task_id, created_by, relative_path, department):
-    """Create generated document metadata for tests that need custom paths."""
-    with app.app_context():
-        document = GeneratedDocument(
-            task_id=task_id,
-            document_type="maintenance_report",
-            title="Wartungsbericht",
-            relative_path=relative_path,
-            department=department,
-            machine="Anlage 1",
-            created_by=created_by,
-            created_at=datetime.now(UTC),
-        )
-        db.session.add(document)
-        db.session.commit()
-        return document.id

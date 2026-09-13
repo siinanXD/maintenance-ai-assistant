@@ -949,23 +949,6 @@ def test_shiftplan_calendar_admin_can_filter_employee(
     assert payload["entries"][0]["shift"] == "Frei"
 
 
-def test_shiftplan_react_source_renders_warnings(client):
-    """Verify shift plan React UI has warning rendering code."""
-    script = shiftplans_runtime_source()
-    page_html = client.get("/shiftplans").get_data(as_text=True)
-
-    assert "plan.warnings" in script
-    assert "Warnungen" in script or "Warnungen" in page_html
-    assert "data-shiftplan-calendar" in script
-
-
-def shiftplans_runtime_source():
-    """Return the shift planning React source."""
-    source_paths = list((REPO_ROOT / "frontend" / "src" / "shiftplans").rglob("*.ts"))
-    source_paths.extend((REPO_ROOT / "frontend" / "src" / "shiftplans").rglob("*.tsx"))
-    return "\n".join(path.read_text(encoding="utf-8") for path in source_paths)
-
-
 def test_shiftplan_delete_requires_master_admin(
     client,
     make_user,

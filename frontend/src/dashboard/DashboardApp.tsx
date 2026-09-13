@@ -1,43 +1,26 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { safeErrorMessage } from "../utils/errors";
 import {
   completeDashboardTask,
-  createDashboardTask,
   loadDashboardCoreData,
   loadDashboardInsightData,
   loadDashboardTask,
   startDashboardTask,
-  suggestDashboardTask,
   updateDashboardTask,
   type DashboardPayload,
   type DashboardShiftCalendar,
   type DashboardTaskMutation,
   type DashboardTaskReportPayload
 } from "./dashboardApi";
-import { DashboardMarkup } from "./DashboardMarkup";
-import { EMPTY_DASHBOARD_VIEW_STATE, type DashboardViewState } from "./dashboardModel";
+import { DashboardCockpitPanels } from "./components/DashboardCockpitPanels";
+import { DashboardHero } from "./components/DashboardHero";
+import { DashboardKpis } from "./components/DashboardKpis";
+import { dashboardKpiCards, EMPTY_DASHBOARD_VIEW_STATE, type DashboardViewState } from "./dashboardModel";
 import { employeesToShiftCalendar } from "./dashboardShiftModel";
-import { taskDraftFromSuggestion } from "./dashboardTaskDraftModel";
-
-const DASHBOARD_ISLAND = {
-  mountedFlag: "maintenanceDashboardReactMounted",
-  mountEvent: "maintenance-dashboard-react-mounted"
-} as const;
-
-declare global {
-  interface Window {
-    maintenanceDashboardReactAssetsOwned?: boolean;
-    maintenanceDashboardReactOperationsOwned?: boolean;
-    maintenanceDashboardReactPeopleOwned?: boolean;
-    maintenanceDashboardReactShiftOwned?: boolean;
-    maintenanceDashboardReactSideOwned?: boolean;
-    maintenanceDashboardReactTasksOwned?: boolean;
-    maintenanceDashboardReactTechnicalOwned?: boolean;
-    maintenanceDashboardReactDraftOwned?: boolean;
-  }
-}
+import { DashboardSituationStrip } from "./components/DashboardSituationStrip";
+import { DashboardTaskDetailModal } from "./components/DashboardTaskDetailModal";
+import { DashboardTechnicalDetails } from "./components/DashboardTechnicalDetails";
 
 /**
  * Render the dashboard with React-owned markup and initial React data loading.
@@ -49,10 +32,6 @@ export function DashboardApp(): ReactNode {
   const [isShiftCalendarLoading, setIsShiftCalendarLoading] = useState(true);
   const [shiftCalendar, setShiftCalendar] = useState<DashboardShiftCalendar | null>(null);
   const [taskMessage, setTaskMessage] = useState("");
-  const [cockpitMessage, setCockpitMessage] = useState("");
-  const [draftTask, setDraftTask] = useState<DashboardTaskMutation | null>(null);
-  const [isDraftBusy, setIsDraftBusy] = useState(false);
-  const [suggestText, setSuggestText] = useState("");
 
   const refreshDashboardData = useCallback(async (signal?: AbortSignal): Promise<void> => {
     setDashboardState((currentState) => ({
@@ -86,18 +65,6 @@ export function DashboardApp(): ReactNode {
         isLoading: false
       };
     });
-  }, []);
-
-  useEffect(() => {
-    window.maintenanceDashboardReactAssetsOwned = true;
-    window.maintenanceDashboardReactOperationsOwned = true;
-    window.maintenanceDashboardReactPeopleOwned = true;
-    window.maintenanceDashboardReactShiftOwned = true;
-    window.maintenanceDashboardReactSideOwned = true;
-    window.maintenanceDashboardReactTasksOwned = true;
-    window.maintenanceDashboardReactTechnicalOwned = true;
-    window.maintenanceDashboardReactDraftOwned = true;
-    markIslandMounted(DASHBOARD_ISLAND);
   }, []);
 
   useEffect(() => {
@@ -221,85 +188,27 @@ export function DashboardApp(): ReactNode {
     );
   }
 
-  /**
-   * Request a React-owned task draft from the existing suggestion API.
-   */
-  async function handleSuggestSubmit(text: string): Promise<void> {
-    const trimmedText = text.trim();
-    if (!trimmedText) {
-      setCockpitMessage("Bitte Aufgabenbeschreibung eingeben.");
-      return;
-    }
-
-    setIsDraftBusy(true);
-    setCockpitMessage("KI erstellt Vorschlag...");
-    try {
-      const suggestion = await suggestDashboardTask(trimmedText);
-      setDraftTask(taskDraftFromSuggestion(suggestion));
-      setCockpitMessage("Vorschlag erstellt. Bitte prüfen und speichern.");
-    } catch (error) {
-      setCockpitMessage(safeErrorMessage(error, "Vorschlag konnte nicht erstellt werden."));
-    } finally {
-      setIsDraftBusy(false);
-    }
-  }
-
-  /**
-   * Persist the hidden cockpit draft through the existing task API.
-   */
-  async function handleDraftSubmit(payload: DashboardTaskMutation): Promise<void> {
-    if (!payload.title?.trim()) {
-      setCockpitMessage("Bitte Titel eingeben.");
-      return;
-    }
-
-    setIsDraftBusy(true);
-    setCockpitMessage("Speichert...");
-    try {
-      await createDashboardTask(payload);
-      setDraftTask(null);
-      setSuggestText("");
-      setCockpitMessage("Aufgabe gespeichert.");
-      await refreshDashboardData();
-    } catch (error) {
-      setCockpitMessage(safeErrorMessage(error, "Aufgabe konnte nicht gespeichert werden."));
-    } finally {
-      setIsDraftBusy(false);
-    }
-  }
-
-  /**
-   * Reset the hidden cockpit draft without touching loaded dashboard data.
-   */
-  function handleDraftCancel(): void {
-    setDraftTask(null);
-    setCockpitMessage("Vorschlag verworfen.");
-  }
-
   return (
-    <div data-dashboard-react-shell data-dashboard-react-runtime={dashboardState.isLoading ? "loading" : "ready"}>
-      <DashboardMarkup
-        activeTask={activeTask}
+    <>
+      <DashboardHero dashboardState={dashboardState} />
+      <DashboardSituationStrip dashboardState={dashboardState} onOpenTask={handleOpenTask} />
+      <DashboardKpis kpis={dashboardKpiCards(dashboardState)} />
+      <DashboardCockpitPanels
         dashboardState={dashboardState}
-        isTaskBusy={isTaskBusy}
         isShiftCalendarLoading={isShiftCalendarLoading}
-        onCloseTask={handleCloseTask}
-        onCompleteTask={handleCompleteTask}
         onOpenTask={handleOpenTask}
-        onStartTask={handleStartTask}
-        onUpdateTask={handleUpdateTask}
-        cockpitMessage={cockpitMessage}
-        draftTask={draftTask}
-        isDraftBusy={isDraftBusy}
-        onDraftCancel={handleDraftCancel}
-        onDraftChange={setDraftTask}
-        onDraftSubmit={(payload) => void handleDraftSubmit(payload)}
-        onSuggestSubmit={(text) => void handleSuggestSubmit(text)}
-        onSuggestTextChange={setSuggestText}
         shiftCalendar={shiftCalendar}
-        suggestText={suggestText}
-        taskMessage={taskMessage}
       />
-    </div>
+      <DashboardTechnicalDetails dashboardState={dashboardState} />
+      <DashboardTaskDetailModal
+        activeTask={activeTask}
+        isBusy={isTaskBusy}
+        message={taskMessage}
+        onClose={handleCloseTask}
+        onComplete={handleCompleteTask}
+        onStart={handleStartTask}
+        onUpdate={handleUpdateTask}
+      />
+    </>
   );
 }

@@ -37,17 +37,17 @@ export function VacationHistoryPanel(props: VacationHistoryPanelProps): ReactNod
           <p>Genehmigte, abgelehnte und stornierte Anträge als nachvollziehbare Karten.</p>
         </div>
         <div className="vacation-history-controls">
-          <select className="select select-bordered select-sm" data-vac-filter-status value={props.filterStatus} onChange={(event) => props.onFilterStatusChange(event.currentTarget.value)}>
+          <select className="select select-bordered select-sm" value={props.filterStatus} onChange={(event) => props.onFilterStatusChange(event.currentTarget.value)}>
             <option value="">Alle Status</option>
             <option value="approved">Genehmigt</option>
             <option value="rejected">Abgelehnt</option>
             <option value="cancelled">Storniert</option>
             <option value="pending">Ausstehend</option>
           </select>
-          <button className="btn btn-outline btn-sm" data-vac-filter-btn type="button">Anzeigen</button>
+          <button className="btn btn-outline btn-sm" type="button">Anzeigen</button>
         </div>
       </header>
-      <div className="vacation-history-list" data-vac-history-list>
+      <div className="vacation-history-list">
         {props.filteredHistory.length ? props.filteredHistory.map((request) => (
           <VacationRequestCard
             key={request.id}
@@ -63,7 +63,7 @@ export function VacationHistoryPanel(props: VacationHistoryPanelProps): ReactNod
       <div className="overflow-x-auto sr-only" aria-hidden="true">
         <table className="table table-sm vacation-history-table">
           <caption>Urlaubsanträge mit Zeitraum, Tagen, Status und Notiz</caption>
-          <tbody data-vac-table-body>
+          <tbody>
             {props.filteredHistory.map((request) => (
               <tr key={request.id}>
                 <td>{request.employee?.name || String(request.employee_id)}</td>
@@ -78,7 +78,7 @@ export function VacationHistoryPanel(props: VacationHistoryPanelProps): ReactNod
           </tbody>
         </table>
       </div>
-      <p className="empty-state" data-vac-empty hidden={props.filteredHistory.length > 0}>Keine Einträge vorhanden.</p>
+      <p className="empty-state" hidden={props.filteredHistory.length > 0}>Keine Einträge vorhanden.</p>
     </article>
   );
 }

@@ -56,7 +56,7 @@ export function UploadCheckPanel({ onReview }: UploadCheckPanelProps): ReactNode
 
   return (
     <article className="card app-card lg:order-4 lg:col-span-12">
-      <form data-document-upload-check-form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="card-body">
           <div className="panel-header">
             <div>
@@ -75,7 +75,7 @@ export function UploadCheckPanel({ onReview }: UploadCheckPanelProps): ReactNode
             </div>
             <div className="toolbar">
               <button className="btn btn-primary" type="submit">Dokument prüfen</button>
-              <span className={`panel-meta${message.error ? " is-error" : ""}`} data-document-upload-check-message>{message.text}</span>
+              <span className={`panel-meta${message.error ? " is-error" : ""}`}>{message.text}</span>
             </div>
           </div>
         </div>
@@ -109,8 +109,8 @@ export function ManualUploadPanel({ machines, onUploaded }: ManualUploadPanelPro
   }
 
   return (
-    <article className="card app-card lg:order-4 lg:col-span-12" data-manual-upload-card>
-      <form data-manual-upload-form onSubmit={handleSubmit}>
+    <article className="card app-card lg:order-4 lg:col-span-12">
+      <form onSubmit={handleSubmit}>
         <div className="card-body">
           <div className="panel-header">
             <div>
@@ -129,7 +129,7 @@ export function ManualUploadPanel({ machines, onUploaded }: ManualUploadPanelPro
             </div>
             <div className="field">
               <label htmlFor="manual-machine">Maschine</label>
-              <select className="select select-bordered" id="manual-machine" name="machine_id" data-manual-machine-select>
+              <select className="select select-bordered" id="manual-machine" name="machine_id">
                 <option value="">Keine Maschine</option>
                 {machines.map((machine) => <option key={machine.id} value={machine.id}>{machine.name}</option>)}
               </select>
@@ -141,7 +141,7 @@ export function ManualUploadPanel({ machines, onUploaded }: ManualUploadPanelPro
           </div>
           <div className="toolbar form-actions">
             <button className="btn btn-primary" type="submit">Handbuch hochladen</button>
-            <span className={`panel-meta${message.error ? " is-error" : ""}`} data-manual-message>{message.text}</span>
+            <span className={`panel-meta${message.error ? " is-error" : ""}`}>{message.text}</span>
           </div>
         </div>
       </form>
@@ -159,24 +159,24 @@ export function ReviewPanel({ review }: ReviewPanelProps): ReactNode {
   const status = reviewStatusText(review?.status);
 
   return (
-    <article className="card app-card lg:order-2 lg:col-span-12" data-document-review-panel hidden={!review}>
+    <article className="card app-card lg:order-2 lg:col-span-12" hidden={!review}>
       <div className="card-body">
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Dokumentprüfung</h2>
-            <p className="panel-meta" data-document-review-summary>Prüfung für {documentMeta.title || documentMeta.filename || "Dokument"}</p>
+            <p className="panel-meta">Prüfung für {documentMeta.title || documentMeta.filename || "Dokument"}</p>
           </div>
-          <span className={statusBadgeClass(review?.status)} data-document-review-status-badge>{status}</span>
+          <span className={statusBadgeClass(review?.status)}>{status}</span>
         </div>
         <div className="review-score-card">
-          <ReviewMetric label="Qualitätsscore" selector="data-document-review-score" value={String(review?.quality_score || 0)} />
-          <ReviewMetric label="Status" selector="data-document-review-status" value={status} />
-          <ReviewMetric label="Quelle" selector="data-document-review-source" value={documentMeta.source || documentMeta.document_type || "Dokument"} />
+          <ReviewMetric label="Qualitätsscore" value={String(review?.quality_score || 0)} />
+          <ReviewMetric label="Status" value={status} />
+          <ReviewMetric label="Quelle" value={documentMeta.source || documentMeta.document_type || "Dokument"} />
         </div>
-        <div className="review-checklist" data-document-review-findings>
+        <div className="review-checklist">
           {findings.length ? findings.map((finding, index) => <ReviewFindingItem finding={finding} key={`${finding.field || "finding"}-${index}`} />) : <ReviewFindingItem finding={{ field: "Keine Findings", message: "Die Prüfung hat keine offenen Punkte gefunden.", severity: "good" }} />}
         </div>
-        <div className="panel-meta" data-document-review-recommendations>{recommendations.length ? `Empfehlungen: ${recommendations.join(" | ")}` : "Keine Empfehlungen erforderlich."}</div>
+        <div className="panel-meta">{recommendations.length ? `Empfehlungen: ${recommendations.join(" | ")}` : "Keine Empfehlungen erforderlich."}</div>
       </div>
     </article>
   );
@@ -187,16 +187,16 @@ export function ReviewPanel({ review }: ReviewPanelProps): ReactNode {
  */
 export function SummaryPanel({ summary }: SummaryPanelProps): ReactNode {
   return (
-    <article className="card app-card lg:order-2 lg:col-span-12" data-document-summary-panel hidden={!summary}>
+    <article className="card app-card lg:order-2 lg:col-span-12" hidden={!summary}>
       <div className="card-body">
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Zusammenfassung</h2>
-            <p className="panel-meta" data-document-summary-title>{summary?.title || "Dokument zusammenfassen"}</p>
+            <p className="panel-meta">{summary?.title || "Dokument zusammenfassen"}</p>
           </div>
-          <span className="badge badge-status is-open" data-document-summary-status>{summary?.summary_status || summary?.analysis_status || "-"}</span>
+          <span className="badge badge-status is-open">{summary?.summary_status || summary?.analysis_status || "-"}</span>
         </div>
-        <pre className="panel-meta whitespace-pre-wrap" data-document-summary-text>{summary?.summary || summary?.analysis || "Keine Zusammenfassung vorhanden."}</pre>
+        <pre className="panel-meta whitespace-pre-wrap">{summary?.summary || summary?.analysis || "Keine Zusammenfassung vorhanden."}</pre>
       </div>
     </article>
   );
@@ -205,11 +205,11 @@ export function SummaryPanel({ summary }: SummaryPanelProps): ReactNode {
 /**
  * Render one review metric.
  */
-function ReviewMetric({ label, selector, value }: { readonly label: string; readonly selector: string; readonly value: string }): ReactNode {
+function ReviewMetric({ label, value }: { readonly label: string; readonly value: string }): ReactNode {
   return (
     <div>
       <span className="resource-label">{label}</span>
-      <strong {...{ [selector]: true }}>{value}</strong>
+      <strong>{value}</strong>
     </div>
   );
 }

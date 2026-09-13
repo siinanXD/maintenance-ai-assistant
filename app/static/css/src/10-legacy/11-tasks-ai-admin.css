@@ -1,0 +1,700 @@
+@layer components {
+.status-explainer,
+  .guided-empty-state {
+    border-left: 4px solid var(--ui-primary);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(243, 248, 252, 0.98)),
+      #ffffff;
+    color: var(--ui-text-soft);
+    box-shadow: var(--ui-shadow-xs);
+  }
+
+.empty-state {
+    border: 1px dashed var(--ui-border-strong);
+    border-radius: var(--ui-radius);
+    background: var(--color-bg-canvas);
+    color: var(--ui-muted);
+    font-weight: 800;
+  }
+
+.ai-ops-command-grid {
+    gap: 1rem;
+  }
+
+.activity-feed,
+  .ai-priority-rail,
+  .ai-system-rail,
+  .ai-risk-grid,
+  .ai-knowledge-health {
+    padding: 0.95rem;
+  }
+
+.activity-feed-item,
+  .ai-signal-card,
+  .ai-system-row,
+  .review-check-item,
+  .knowledge-block {
+    border-radius: var(--ui-radius);
+    border-color: var(--ui-border);
+    background: var(--color-bg-surface);
+  }
+
+.ai-admin-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.36fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+.ai-admin-hero-status {
+    display: grid;
+    gap: 0.65rem;
+    justify-items: start;
+    border: 1px solid #d7e7f3;
+    border-radius: var(--ui-radius);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 0.9rem;
+  }
+
+.ai-admin-nav {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--ui-surface);
+    padding: 0.45rem;
+    box-shadow: var(--ui-shadow-xs);
+  }
+
+.ai-admin-nav a {
+    min-height: 2.2rem;
+    border-radius: var(--ui-radius-sm);
+    color: var(--ui-text-soft);
+    padding: 0.52rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 850;
+    white-space: nowrap;
+  }
+
+.ai-admin-nav a.is-active {
+    background: var(--ui-primary);
+    color: var(--color-text-inverse);
+  }
+
+.ai-admin-load-message {
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    margin: 0.75rem 0 0;
+    padding: 0.75rem 1rem;
+  }
+
+.ai-admin-load-message.is-error {
+    background: rgba(185, 28, 28, 0.08);
+    border-color: rgba(185, 28, 28, 0.28);
+    color: var(--ui-danger);
+  }
+
+.ai-safety-grid,
+  .ai-capability-grid,
+  .content-grid.two-columns {
+    gap: 0.85rem;
+  }
+
+.chat-toggle {
+    border-radius: var(--ui-radius);
+    background: linear-gradient(135deg, var(--ui-primary), var(--ui-teal));
+  }
+
+.status-badge,
+  .priority-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.55rem;
+    border-radius: var(--ui-radius-sm);
+    border: 1px solid var(--ui-border);
+    padding: 0.22rem 0.52rem;
+    font-size: 0.7rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(18rem, 1fr));
+    gap: 0.9rem;
+    align-items: start;
+  }
+
+.kanban-column {
+    min-height: 32rem;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    background: var(--color-bg-canvas);
+    box-shadow: var(--ui-shadow-xs);
+  }
+
+.kanban-column.is-open {
+    border-top: 4px solid var(--ui-red);
+  }
+
+.kanban-column.is-progress {
+    border-top: 4px solid var(--ui-primary);
+  }
+
+.kanban-column.is-done {
+    border-top: 4px solid var(--ui-green);
+  }
+
+.kanban-column-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8rem;
+    border-bottom: 1px solid #e2ebf4;
+    padding: 0.9rem;
+  }
+
+.kanban-column-header h3 {
+    color: var(--ui-text);
+    font-size: 1rem;
+    font-weight: 940;
+  }
+
+.kanban-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--color-bg-surface);
+    color: var(--ui-text);
+    font-size: 0.8rem;
+    font-weight: 950;
+  }
+
+.kanban-list {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.85rem;
+  }
+
+.kanban-empty-state {
+    min-height: 5rem;
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+
+.kanban-column.is-open .task-card {
+    border-left-color: var(--ui-red);
+  }
+
+.kanban-column.is-done .task-card {
+    border-left-color: var(--ui-green);
+  }
+
+.task-card-meta {
+    flex-wrap: wrap;
+  }
+
+.filter-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+.filter-chip {
+    min-height: 2rem;
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius-sm);
+    background: var(--color-bg-surface);
+    color: var(--ui-text-soft);
+    padding: 0.42rem 0.7rem;
+    font-size: 0.76rem;
+    font-weight: 850;
+  }
+
+.filter-chip.is-active {
+    color: var(--ui-primary-dark);
+  }
+
+.error-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+.error-card {
+    display: grid;
+    gap: 0.9rem;
+    border: 1px solid var(--ui-border);
+    border-left: 4px solid var(--ui-red);
+    border-radius: var(--ui-radius);
+    background: var(--color-bg-surface);
+    padding: 1rem;
+    box-shadow: var(--ui-shadow-xs);
+  }
+
+.error-card-header,
+  .error-card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+.error-card-actions {
+    align-items: center;
+    flex-wrap: wrap;
+    border-top: 1px solid #e6eef6;
+    padding-top: 0.75rem;
+  }
+
+.error-card-title {
+    color: var(--ui-text);
+    font-size: 1rem;
+    font-weight: 940;
+  }
+
+.error-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.45rem;
+  }
+
+.error-card-meta span {
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--ui-radius-sm);
+    background: var(--color-bg-canvas);
+    color: var(--ui-text-soft);
+    padding: 0.28rem 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 820;
+  }
+
+.error-card-blocks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+.knowledge-block {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.8rem;
+  }
+
+.knowledge-block.is-cause {
+    border-left: 4px solid var(--ui-amber);
+    background: #fffaf0;
+  }
+
+.knowledge-block.is-solution {
+    border-left: 4px solid var(--ui-green);
+    background: #f0fbf5;
+  }
+
+.knowledge-block span {
+    color: var(--ui-muted);
+    font-size: 0.68rem;
+    font-weight: 950;
+    text-transform: uppercase;
+  }
+
+.knowledge-block strong {
+    color: var(--ui-text-soft);
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus);
+  }
+
+@media (max-width: 1180px) {
+    .surface-stat-grid,
+    .executive-kpi-grid,
+    .dashboard-grid.dashboard-grid-4,
+    .ai-status-overview {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kanban-board,
+    .error-card-grid,
+    .record-card-grid,
+    .machine-profile-kpi-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .machine-profile-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .machine-profile-side {
+      position: static;
+    }
+
+    .ai-admin-hero {
+      grid-template-columns: 1fr;
+    }
+
+  }
+
+@media (max-width: 760px) {
+    .app-main {
+      padding: 1rem 0.85rem 4rem;
+    }
+
+    .desktop-topbar {
+      padding-inline: 0.9rem;
+    }
+
+    .page-hero,
+    .ai-admin-hero {
+      padding: 1rem;
+    }
+
+    .surface-stat-grid,
+    .executive-kpi-grid,
+    .dashboard-grid.dashboard-grid-4,
+    .ai-status-overview,
+    .kanban-board,
+    .error-card-grid,
+    .error-card-blocks,
+    .machine-profile-layout,
+    .machine-profile-kpi-grid,
+    .machine-profile-facts,
+    .machine-profile-record-metrics,
+    .content-grid.two-columns {
+      grid-template-columns: 1fr;
+    }
+
+    .machine-profile-hero,
+    .machine-profile-panel-header,
+    .machine-profile-record-header {
+      display: grid;
+    }
+
+    .machine-profile-hero {
+      grid-template-columns: 1fr;
+    }
+
+    .machine-profile-actions {
+      display: grid;
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .machine-profile-actions .btn {
+      width: 100%;
+    }
+
+    .global-search {
+      min-width: 0;
+      width: 100%;
+      flex: none;
+    }
+
+    .global-search-panel {
+      left: 0;
+      right: auto;
+      width: 100%;
+    }
+
+    .record-card-meta {
+      grid-template-columns: 1fr;
+    }
+
+    .panel-header,
+    .ops-panel-header,
+    .ai-admin-area-header {
+      display: grid;
+    }
+
+  }
+
+}
+
+.task-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.task-filter-field span {
+  color: var(--ui-muted);
+  font-size: 0.68rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.task-workflow-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(22rem, 1.05fr);
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.task-action-panel,
+.task-priority-panel,
+.task-board-shell {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  background: var(--color-bg-surface);
+  box-shadow: var(--ui-shadow-xs);
+}
+
+.task-action-panel summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.6rem;
+  padding: 1rem;
+  cursor: pointer;
+}
+
+.task-action-panel summary strong,
+.task-action-panel summary small {
+  display: block;
+}
+
+.task-action-panel summary strong {
+  color: var(--ui-text);
+  font-weight: 950;
+}
+
+.task-action-panel summary small {
+  color: var(--ui-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.task-form-body,
+.task-priority-panel,
+.task-board-shell {
+  padding: 1rem;
+}
+
+.task-suggestion-box {
+  margin-top: 0.85rem;
+}
+
+.task-board-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.task-board-header h2 {
+  color: var(--ui-text);
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
+.task-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(15rem, 1.4fr) repeat(4, minmax(9rem, 0.7fr)) auto;
+  gap: 0.65rem;
+  align-items: end;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: var(--ui-radius);
+  background: var(--color-bg-canvas);
+  padding: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.task-filter-field {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.task-filter-summary {
+  grid-column: 1 / -1;
+  color: var(--ui-muted);
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.task-maintenance-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(18rem, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+  padding: 0;
+  overflow-x: auto;
+}
+
+.task-maintenance-board .kanban-column {
+  min-height: 34rem;
+  border: 1px solid var(--ui-border);
+  border-top: 4px solid var(--ui-primary);
+  border-radius: var(--ui-radius);
+  background: var(--color-bg-canvas);
+  box-shadow: var(--ui-shadow-xs);
+}
+
+.task-maintenance-board .kanban-column.is-open {
+  border-top-color: #ef4444;
+}
+
+.task-maintenance-board .kanban-column.is-progress {
+  border-top-color: #14b8a6;
+}
+
+.task-maintenance-board .kanban-column.is-done {
+  border-top-color: #22c55e;
+}
+
+.task-maintenance-board .kanban-column-header small {
+  display: block;
+  color: var(--ui-muted);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.task-card {
+  display: grid;
+  gap: 0.8rem;
+  min-height: 15rem;
+  border: 1px solid var(--ui-border);
+  border-left: 4px solid var(--ui-primary);
+  border-radius: var(--ui-radius);
+  background: var(--color-bg-surface);
+  padding: 0.9rem;
+  box-shadow: var(--ui-shadow-xs);
+}
+
+.task-card.is-priority-urgent,
+.task-card.is-overdue {
+  border-left-color: #ef4444;
+}
+
+.task-card.is-priority-soon,
+.task-card.is-due-today {
+  border-left-color: #f59e0b;
+}
+
+.task-card.is-in_progress {
+  border-left-color: #14b8a6;
+}
+
+.task-card.is-done {
+  border-left-color: #22c55e;
+}
+
+.task-card-top,
+.task-card-actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.task-card-heading {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.task-card-title {
+  color: var(--ui-text);
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.task-type-badge {
+  justify-self: start;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--ui-radius-sm);
+  background: var(--color-bg-canvas);
+  color: var(--ui-primary-dark);
+  padding: 0.2rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 950;
+}
+
+.task-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.task-card-description {
+  color: var(--ui-text-soft);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.task-card-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.task-card-meta span {
+  min-width: 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--ui-radius-sm);
+  background: var(--color-bg-canvas);
+  color: var(--ui-text-soft);
+  padding: 0.45rem 0.52rem;
+  font-size: 0.74rem;
+  font-weight: 820;
+  overflow-wrap: anywhere;
+}
+
+.task-card-meta span.is-risk {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: #fff5f5;
+  color: #991b1b;
+}
+
+.task-card-timeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.42rem;
+  border-top: 1px solid #e6eef6;
+  padding-top: 0.65rem;
+}
+
+.task-card-timeline span {
+  min-width: 0;
+}
+
+.task-card-timeline small,
+.task-card-timeline strong {
+  display: block;
+}
+
+.task-card-timeline small {
+  color: var(--ui-muted);
+  font-size: 0.64rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.task-card-timeline strong {
+  color: var(--ui-text-soft);
+  font-size: 0.72rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.task-card-actions {
+  flex-wrap: wrap;
+  align-items: center;
+  border-top: 1px solid #e6eef6;
+  padding-top: 0.75rem;
+}

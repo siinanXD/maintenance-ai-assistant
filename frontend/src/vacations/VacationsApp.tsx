@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import {
   loadCurrentUser,
   loadVacationEmployees,
@@ -10,7 +11,6 @@ import {
   loadVacationSummary,
   previewVacationImpact
 } from "./vacationApi";
-import { VacationHeader, VacationStats } from "./components/VacationHeader";
 import { VacationOpsPanels, VacationPendingPanel } from "./components/VacationPanels";
 import { VacationRequestPanel } from "./components/VacationRequestPanel";
 import type {
@@ -31,11 +31,6 @@ import {
   vacationValidationError,
   vacationYearOptions
 } from "./vacationUtils";
-
-const VACATIONS_ISLAND = {
-  mountedFlag: "maintenanceVacationsReactMounted",
-  mountEvent: "maintenance-vacations-react-mounted"
-};
 
 /**
  * Render the React vacations workflow island.
@@ -109,10 +104,6 @@ export function VacationsApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(VACATIONS_ISLAND);
-  }, []);
-
-  useEffect(() => {
     loadInitialData().catch((error: unknown) => {
       setMessage({ text: vacationErrorMessage(error), type: "error" });
     });
@@ -161,8 +152,31 @@ export function VacationsApp(): ReactNode {
 
   return (
     <>
-      <VacationHeader onRequestOpen={() => setIsRequestDrawerOpen(true)} />
-      <VacationStats requests={requests} selectedBalance={selectedBalance} summaries={summaries} />
+      <PageHeader
+        title="Urlaubsplanung"
+        description="Anträge, Vertreter, Schichtbezug und Auswirkungen auf den Betrieb in einer Ansicht."
+        actions={[
+          { onClick: () => setIsRequestDrawerOpen(true), schema: createActionDefinition("vacationRequest"), variant: "primary" },
+          { href: "#vacation-decisions", label: "Offene Anträge" }
+        ]}
+      />
+      <StatStrip
+        label="Urlaubskennzahlen"
+        stats={[
+          { label: "Ausstehend", value: pendingRequests.length, meta: "Anträge zur Entscheidung", tone: pendingRequests.length ? "warning" : "neutral" },
+          {
+            label: "Konflikte",
+            value: requests.filter((request) => (
+              ["pending", "approved"].includes(request.status || "") && ["warning", "critical"].includes(request.impact_level || "")
+            )).length,
+            meta: "Unterbesetzung oder Schichttreffer",
+            tone: "danger"
+          },
+          { label: "Verfügbar", value: selectedBalance ? String(selectedBalance.available || 0) : "–", meta: "für die ausgewählte Person", tone: "success" },
+          { label: "Genehmigt", value: summaries.reduce((sum, summary) => sum + Number(summary.used || 0), 0), meta: "genutzte Tage im Jahr" },
+          { label: "Reserviert", value: summaries.reduce((sum, summary) => sum + Number(summary.pending || 0), 0), meta: "durch offene Anträge" }
+        ]}
+      />
       <section className="vacation-planning-grid" aria-label="Urlaubsplanung Workflow">
         <VacationPendingPanel
           onMessageChange={setMessage}

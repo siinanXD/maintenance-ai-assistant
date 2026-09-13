@@ -2,8 +2,8 @@ import { listData } from "../api/payload";
 import { formatGermanDateTime } from "../utils/date";
 import { safeErrorMessage } from "../utils/errors";
 import { type AdminAiPayload } from "./adminAiApi";
-import { moneyText, numberText, percentText } from "./adminAiEffectivenessModel";
 import { ragText, safeJobResultText } from "./adminAiRagBoardModel";
+import { moneyText, numberText, percentText } from "./adminAiFormat";
 
 export type AdminAiTechnicalFilters = {
   readonly debugQuery: string;

@@ -30,7 +30,7 @@ function previewValue(value: unknown): string {
 function SourcePanel({ result }: { readonly result: ErrorAssistantResult | null }): ReactNode {
   const sources = result?.sources || [];
   return (
-    <div className="rag-source-panel" data-error-rag-sources hidden={!sources.length}>
+    <div className="rag-source-panel" hidden={!sources.length}>
       {sources.map((source, index) => (
         <article className="source-card" key={`${source.title || "Quelle"}-${index}`}>
           <strong>{source.title || "Quelle"}</strong>
@@ -48,7 +48,7 @@ function SourcePanel({ result }: { readonly result: ErrorAssistantResult | null 
 function ActionPreview({ result }: { readonly result: ErrorAssistantResult | null }): ReactNode {
   const preview = result?.action_preview;
   return (
-    <div className="ai-action-preview" data-error-action-preview hidden={!preview}>
+    <div className="ai-action-preview" hidden={!preview}>
       {preview ? (
         <>
           <strong>{preview.label || "AI-Aktion"}</strong>
@@ -103,7 +103,7 @@ export function ErrorAnalysisPanel({ currentDepartment, drawerMode = false, hidd
   }
 
   return (
-    <details className="incident-action-panel app-card" data-default-collapsed="true" data-mobile-collapsible data-permission-write="errors" hidden={hidden} open={drawerMode}>
+    <details className="incident-action-panel app-card" hidden={hidden} open={drawerMode}>
       <summary>
         <span>
           <strong>Aus Beschreibung vorschlagen</strong>
@@ -111,25 +111,25 @@ export function ErrorAnalysisPanel({ currentDepartment, drawerMode = false, hidd
         </span>
       </summary>
       <div className="incident-form-body">
-        <form data-error-analyze-form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="error-analysis-description">Fehlerbeschreibung</label>
             <textarea className="textarea textarea-bordered" id="error-analysis-description" name="description" placeholder="z. B. Sensor meldet sporadisch kein Signal an Maschine 3." value={description} onChange={(event) => setDescription(event.currentTarget.value)} />
           </div>
           <div className="toolbar form-actions">
             <button className="btn btn-primary" type="submit">Vorschlag erstellen</button>
-            <span className={`panel-meta${message.error ? " is-error" : ""}`} data-error-analyze-message role="status" aria-live="polite">{message.text}</span>
+            <span className={`panel-meta${message.error ? " is-error" : ""}`} role="status" aria-live="polite">{message.text}</span>
           </div>
         </form>
-        <div className="suggestion-box incident-suggestion-box" data-error-analysis hidden={!analysis}>
+        <div className="suggestion-box incident-suggestion-box" hidden={!analysis}>
           <div className="form-grid">
             {(["machine", "department", "title", "symptoms", "possible_causes", "solution"] as const).map((field) => (
               <div className={`field${field === "title" || field === "symptoms" ? " is-full" : ""}`} key={field}>
                 <label htmlFor={`analysis-${field}`}>{analysisLabel(field)}</label>
                 {field === "symptoms" || field === "possible_causes" || field === "solution" ? (
-                  <textarea className="textarea textarea-bordered" data-error-analysis-field={field} id={`analysis-${field}`} value={analysis?.[field] || ""} onChange={(event) => setAnalysis({ ...analysis, [field]: event.currentTarget.value })} />
+                  <textarea className="textarea textarea-bordered" id={`analysis-${field}`} value={analysis?.[field] || ""} onChange={(event) => setAnalysis({ ...analysis, [field]: event.currentTarget.value })} />
                 ) : (
-                  <input className="input input-bordered" data-error-analysis-field={field} id={`analysis-${field}`} value={analysis?.[field] || ""} onChange={(event) => setAnalysis({ ...analysis, [field]: event.currentTarget.value })} />
+                  <input className="input input-bordered" id={`analysis-${field}`} value={analysis?.[field] || ""} onChange={(event) => setAnalysis({ ...analysis, [field]: event.currentTarget.value })} />
                 )}
               </div>
             ))}
@@ -137,7 +137,7 @@ export function ErrorAnalysisPanel({ currentDepartment, drawerMode = false, hidd
           <ActionPreview result={assistantResult} />
           <SourcePanel result={assistantResult} />
           <div className="toolbar form-actions">
-            <button className="btn btn-primary" data-apply-error-analysis type="button" onClick={applyAnalysis}>In Störungsformular übernehmen</button>
+            <button className="btn btn-primary" type="button" onClick={applyAnalysis}>In Störungsformular übernehmen</button>
           </div>
         </div>
       </div>

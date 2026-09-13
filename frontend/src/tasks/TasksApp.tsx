@@ -5,16 +5,15 @@ import {
   type ReactNode
 } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import { loadDepartments, loadIncident, loadTasks, prioritizeTasks } from "./taskApi";
 import { TaskBoard } from "./components/TaskBoard";
 import { TaskFormPanel } from "./components/TaskFormPanel";
-import { TaskHeader } from "./components/TaskHeader";
 import { TaskPriorityPanel } from "./components/TaskPriorityPanel";
-import { TaskStats } from "./components/TaskStats";
 import { TaskSuggestionPanel } from "./components/TaskSuggestionPanel";
 import type {
   Department,
@@ -30,15 +29,11 @@ import {
   draftFromIncident,
   draftFromTask,
   initialTaskSearchQuery,
+  taskDueState,
   taskErrorMessage,
   taskMatchesFilters,
   taskSortScore
 } from "./taskUtils";
-
-const TASKS_ISLAND = {
-  mountedFlag: "maintenanceTasksReactMounted",
-  mountEvent: "maintenance-tasks-react-mounted"
-};
 
 /**
  * Return the visible department filter options from loaded tasks.
@@ -156,10 +151,6 @@ export function TasksApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(TASKS_ISLAND);
-  }, []);
-
-  useEffect(() => {
     refreshTaskData().catch((error: unknown) => {
       setMessage({ text: taskErrorMessage(error), error: true });
     });
@@ -180,18 +171,37 @@ export function TasksApp(): ReactNode {
 
   return (
     <>
-      <TaskHeader
-        onCreateFromMessage={() => setActiveDrawer("suggestion")}
-        onCreateTask={() => {
-          setEditingTaskId(null);
-          setFormDraft(createEmptyTaskDraft());
-          setActiveDrawer("task");
-        }}
-        onRefreshPriorities={refreshPriorities}
-        priorityBusy={priorityBusy}
-        writable={writable}
+      <PageHeader
+        title="Aufgaben"
+        description="Aufträge aus Störungen, Wartung und Prüfungen – nach Status und Fälligkeit."
+        actions={[
+          {
+            hidden: !writable,
+            onClick: () => {
+              setEditingTaskId(null);
+              setFormDraft(createEmptyTaskDraft());
+              setActiveDrawer("task");
+            },
+            schema: createActionDefinition("taskCreate"),
+            variant: "primary"
+          },
+          { hidden: !writable, onClick: () => setActiveDrawer("suggestion"), schema: createActionDefinition("taskSuggestion") },
+          {
+            disabled: priorityBusy,
+            label: priorityBusy ? "Wird geladen..." : "Priorität aktualisieren",
+            onClick: () => void refreshPriorities()
+          }
+        ]}
       />
-      <TaskStats tasks={tasks} />
+      <StatStrip
+        label="Aufgaben-Kennzahlen"
+        stats={[
+          { label: "Offen", value: tasks.filter((task) => task.status === "open").length, meta: "bereit zur Einplanung" },
+          { label: "In Bearbeitung", value: tasks.filter((task) => task.status === "in_progress").length, meta: "laufende Arbeit", tone: "primary" },
+          { label: "Überfällig", value: tasks.filter((task) => taskDueState(task) === "overdue").length, meta: "sofort prüfen", tone: "danger" },
+          { label: "Erledigt", value: tasks.filter((task) => task.status === "done").length, meta: "abgeschlossen", tone: "success" }
+        ]}
+      />
       {message.text && activeDrawer === null ? (
         <p className={`workflow-status${message.error ? " is-error" : ""}`} role="status">{message.text}</p>
       ) : null}

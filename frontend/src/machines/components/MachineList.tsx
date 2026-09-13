@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 
+import { confirmAction } from "../../app/runtimeBridge";
 import { deleteMachine } from "../machineApi";
 import type { Machine, MessageState } from "../machineTypes";
 import { searchText } from "../machineUtils";
@@ -30,7 +31,7 @@ function MachineCard({
    * Delete one machine after confirmation.
    */
   async function handleDelete(): Promise<void> {
-    const confirmed = window.confirm(`${machine.name} wirklich löschen? Zugeordnete Historie bleibt in den Fachseiten sichtbar.`);
+    const confirmed = await confirmAction({ title: "Maschine löschen", message: `${machine.name} wirklich löschen? Zugeordnete Historie bleibt in den Fachseiten sichtbar.`, confirmText: "Löschen" });
     if (!confirmed) return;
     setBusy(true);
     try {
@@ -47,7 +48,6 @@ function MachineCard({
   return (
     <article
       className="record-card machine-record-card"
-      data-search-text={[machine.name, machine.produced_item, machine.required_employees].filter(Boolean).join(" ")}
     >
       <div className="record-card-header">
         <div>
@@ -111,15 +111,15 @@ export function MachineList(props: MachineListProps): ReactNode {
             <h2 className="panel-title">Maschinenübersicht</h2>
             <p className="panel-meta">Anlagen, Personalbedarf und aktuelle Wartungshinweise</p>
           </div>
-          <span className="badge badge-status is-open" data-machine-count>{props.machines.length} Maschinen</span>
+          <span className="badge badge-status is-open">{props.machines.length} Maschinen</span>
         </div>
         <div className="list-toolbar">
           <label className="compact-search-field" htmlFor="react-machine-list-search">
             <span>Maschinen suchen</span>
-            <input className="input input-bordered input-sm" data-list-search data-list-search-target="[data-machine-list]" id="react-machine-list-search" onChange={(event) => setQuery(event.target.value)} placeholder="Name, Produkt, Personalbedarf" value={query} />
+            <input className="input input-bordered input-sm" id="react-machine-list-search" onChange={(event) => setQuery(event.target.value)} placeholder="Name, Produkt, Personalbedarf" value={query} />
           </label>
         </div>
-        <div className="record-card-grid machine-card-grid" data-list-search-items=".record-card" data-machine-list>
+        <div className="record-card-grid machine-card-grid" data-machine-list>
           {filteredMachines.length ? (
             filteredMachines.map((machine) => <MachineCard key={machine.id} {...props} machine={machine} />)
           ) : (

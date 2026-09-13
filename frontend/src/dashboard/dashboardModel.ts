@@ -1,12 +1,5 @@
 import { todayIsoDate } from "../utils/date";
 import { type DashboardPayload, type DashboardRuntimeData, EMPTY_DASHBOARD_DATA } from "./dashboardApi";
-import {
-  handoverStatusMeta,
-  handoverStatusValue,
-  peopleStatusMeta,
-  peopleStatusValue,
-  relevantVacations
-} from "./dashboardPeopleModel";
 
 export type DashboardViewState = {
   readonly data: DashboardRuntimeData;
@@ -21,20 +14,8 @@ export type DashboardKpiState = {
   readonly colorClass: string;
   readonly label: string;
   readonly meta: string;
-  readonly metaHook?: string;
-  readonly progressHook: string;
   readonly progressWidth: string;
   readonly value: string;
-  readonly valueHook: string;
-};
-
-export type DashboardStatusChipState = {
-  readonly colorClass: string;
-  readonly label: string;
-  readonly meta: string;
-  readonly metaHook?: string;
-  readonly value: string;
-  readonly valueHook: string;
 };
 
 export const EMPTY_DASHBOARD_VIEW_STATE: DashboardViewState = {
@@ -50,15 +31,6 @@ export const EMPTY_DASHBOARD_VIEW_STATE: DashboardViewState = {
 function textValue(payload: DashboardPayload, key: string): string {
   const value = payload[key];
   return typeof value === "string" ? value : "";
-}
-
-/**
- * Return a numeric field from a flexible dashboard payload.
- */
-function numberValue(payload: DashboardPayload | null, key: string): number {
-  const value = payload?.[key];
-  const parsed = typeof value === "number" ? value : Number(value || 0);
-  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 /**
@@ -105,145 +77,45 @@ function machineStatusValue(machines: readonly DashboardPayload[]): string {
 }
 
 /**
- * Return a compact system health value from AI and knowledge status payloads.
- */
-function systemStatusValue(data: DashboardRuntimeData): string {
-  if (data.loadErrors.length) {
-    return "Prüfen";
-  }
-
-  const status = textValue(data.aiStatus ?? {}, "status").toLowerCase();
-  if (status && status !== "ok" && status !== "ready" && status !== "healthy") {
-    return "Prüfen";
-  }
-
-  return data.aiStatus || data.knowledgeStatus || data.retrievalTelemetry ? "OK" : "--";
-}
-
-/**
- * Build dashboard KPI cards from React-owned dashboard data.
+ * Build the four cockpit KPI cards from the loaded dashboard data.
  */
 export function dashboardKpiCards(state: DashboardViewState): readonly DashboardKpiState[] {
   const { data } = state;
   const activeTasks = data.tasks.filter(isActiveTask);
   const openTasks = activeTasks.filter((task) => textValue(task, "status") === "open");
   const progressTasks = activeTasks.filter((task) => textValue(task, "status") === "in_progress");
-  const doneTasks = data.tasks.filter((task) => textValue(task, "status") === "done");
   const criticalTasks = activeTasks.filter(
     (task) => textValue(task, "priority") === "urgent" || isOverdueTask(task)
   );
-  const vacationCount = relevantVacations(data.vacations).length;
-  const shortageCount = numberValue(data.inventorySummary, "shortage_count");
-  const knowledgeGapCount = data.knowledgeGaps.length || numberValue(data.knowledgeStatus, "open_gap_count");
 
   return [
     {
       colorClass: "is-red",
       label: "Kritisch heute",
       meta: criticalTasks.length ? "sofort prüfen" : "keine kritische Arbeit",
-      metaHook: "data-dashboard-critical-meta",
-      progressHook: "data-dashboard-critical-progress",
       progressWidth: progressPercent(criticalTasks.length, Math.max(activeTasks.length, 1)),
-      value: String(criticalTasks.length),
-      valueHook: "data-dashboard-critical-count"
+      value: String(criticalTasks.length)
     },
     {
       colorClass: "is-orange",
       label: "Aktive Störungen",
       meta: data.errors.length ? `${data.errors.length} aktive Störungen` : "keine aktive Störung",
-      metaHook: "data-dashboard-machine-status-meta",
-      progressHook: "data-dashboard-error-progress",
       progressWidth: progressPercent(data.errors.length, Math.max(data.machines.length, 1)),
-      value: data.errors.length ? String(data.errors.length) : "--",
-      valueHook: "data-dashboard-unresolved-errors"
+      value: data.errors.length ? String(data.errors.length) : "--"
     },
     {
       colorClass: "is-blue",
       label: "Offene Aufgaben",
       meta: `${progressTasks.length} in Arbeit`,
-      metaHook: "data-dashboard-open-meta",
-      progressHook: "data-dashboard-open-progress",
       progressWidth: progressPercent(openTasks.length, Math.max(data.tasks.length, 1)),
-      value: String(openTasks.length),
-      valueHook: "data-dashboard-open-count"
+      value: String(openTasks.length)
     },
     {
       colorClass: "is-teal",
       label: "Maschinenstatus",
       meta: data.machines.length ? `${data.machines.length} Maschinen im Blick` : "Maschinen werden geladen",
-      metaHook: "data-dashboard-machine-kpi-meta",
-      progressHook: "data-dashboard-machine-progress",
       progressWidth: progressPercent(data.machines.length - data.errors.length, Math.max(data.machines.length, 1)),
-      value: machineStatusValue(data.machines),
-      valueHook: "data-dashboard-machine-status"
-    },
-    {
-      colorClass: "is-green",
-      label: "Erledigte Aufgaben",
-      meta: "Abgeschlossen im aktuellen Fenster",
-      progressHook: "data-dashboard-done-progress",
-      progressWidth: progressPercent(doneTasks.length, Math.max(data.tasks.length, 1)),
-      value: String(doneTasks.length),
-      valueHook: "data-dashboard-done-count"
-    },
-    {
-      colorClass: "is-cyan",
-      label: "Schichtlage",
-      meta: handoverStatusMeta(data),
-      metaHook: "data-dashboard-shift-meta",
-      progressHook: "data-dashboard-shift-progress",
-      progressWidth: data.handovers.length ? "72%" : "18%",
-      value: handoverStatusValue(data),
-      valueHook: "data-dashboard-shift-status"
-    },
-    {
-      colorClass: "is-indigo",
-      label: "Personalhinweise",
-      meta: peopleStatusMeta(data),
-      metaHook: "data-dashboard-people-meta",
-      progressHook: "data-dashboard-people-progress",
-      progressWidth: progressPercent(data.employees.length - vacationCount, Math.max(data.employees.length, 1)),
-      value: peopleStatusValue(data),
-      valueHook: "data-dashboard-people-status"
-    },
-    {
-      colorClass: "is-slate",
-      label: "Systemstatus",
-      meta: knowledgeGapCount || shortageCount ? `${knowledgeGapCount + shortageCount} Hinweise` : "Indexstatus stabil",
-      metaHook: "data-dashboard-index-status-meta",
-      progressHook: "data-dashboard-system-progress",
-      progressWidth: data.loadErrors.length ? "35%" : "100%",
-      value: systemStatusValue(data),
-      valueHook: "data-dashboard-system-status"
+      value: machineStatusValue(data.machines)
     }
   ];
-}
-
-/**
- * Build compact status chips for secondary dashboard signals.
- */
-export function dashboardStatusChips(state: DashboardViewState): readonly DashboardStatusChipState[] {
-  return dashboardKpiCards(state).slice(4).map((kpi) => ({
-    colorClass: kpi.colorClass,
-    label: kpi.label,
-    meta: kpi.meta,
-    metaHook: kpi.metaHook,
-    value: kpi.value,
-    valueHook: kpi.valueHook
-  }));
-}
-
-/**
- * Return a compact dashboard load-status message for hidden status hooks.
- */
-export function dashboardLoadMessage(state: DashboardViewState): string {
-  if (state.errorMessage) {
-    return state.errorMessage;
-  }
-
-  if (state.isLoading) {
-    return "Dashboard-Daten werden geladen.";
-  }
-
-  return "Dashboard-Daten geladen.";
 }

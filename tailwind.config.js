@@ -12,7 +12,7 @@
  *
  * DaisyUI ist entfernt. Version 5 setzt Tailwind 4 voraus und hat mit Tailwind
  * 3.4 keine einzige Regel erzeugt; .btn, .badge und Co. stammen aus
- * app/static/css/src/.
+ * app/static/css/src/ (siehe app/static/css/README.md).
  */
 
 const tokens = require("./design/tokens/generated/tailwind.cjs");

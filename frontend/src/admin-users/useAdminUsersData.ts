@@ -26,7 +26,7 @@ import {
   schemaDashboardKeys,
   refreshCurrentUserIfNeeded
 } from "./adminUserUtils";
-import { type AdminUsersFiltersValue } from "./AdminUsersFilters";
+import { type AdminUsersFiltersValue } from "./components/AdminUsersFilters";
 import { useAdminUsersSidePanels } from "./useAdminUsersSidePanels";
 
 type AdminUsersData = {

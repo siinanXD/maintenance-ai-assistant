@@ -6,7 +6,7 @@ export function isObjectPayload(value: unknown): value is Record<string, unknown
 }
 
 /**
- * Normalize list responses returned by legacy and envelope API endpoints.
+ * Return the item list from a plain array, `{data: [...]}` or `{data: {items: [...]}}` response.
  */
 export function listData<TItem>(payload: unknown): TItem[] {
   if (Array.isArray(payload)) {
@@ -33,7 +33,7 @@ export function listData<TItem>(payload: unknown): TItem[] {
 }
 
 /**
- * Normalize success-envelope responses while accepting legacy raw payloads.
+ * Return `data` from a success envelope, or the payload itself when it has none.
  */
 export function unwrapData<TData>(payload: unknown): TData {
   if (isObjectPayload(payload) && Object.prototype.hasOwnProperty.call(payload, "data")) {

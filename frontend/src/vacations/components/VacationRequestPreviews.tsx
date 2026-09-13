@@ -25,5 +25,5 @@ export function BalancePreview(props: BalancePreviewProps): ReactNode {
     text = `${props.selectedEmployee.name}: ${props.selectedBalance.available || 0} verfügbar, ${props.selectedBalance.pending || 0} reserviert, ${props.selectedBalance.used || 0} genehmigt.`;
   }
 
-  return <div className={`vacation-balance-preview is-full${error ? " is-error" : ""}`} data-vac-balance-preview>{text}</div>;
+  return <div className={`vacation-balance-preview is-full${error ? " is-error" : ""}`}>{text}</div>;
 }

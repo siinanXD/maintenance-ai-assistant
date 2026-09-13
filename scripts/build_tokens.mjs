@@ -1,7 +1,7 @@
 /*
  * Design-Token in die beiden Verbraucher der Anwendung uebersetzen:
  *
- *   app/static/css/src/00-shell-tokens.css   CSS-Custom-Properties, hell und dunkel
+ *   app/static/css/src/00-foundation/tokens.css   CSS-Custom-Properties, hell und dunkel
  *   design/tokens/generated/tailwind.cjs     Tailwind-Farben, Breakpoints, Schriften
  *
  * Quellen:
@@ -46,7 +46,7 @@ const TOKENS_FILE = `${TOKENS_DIR}/tokens.json`;
 const APP_FILE = `${TOKENS_DIR}/app.json`;
 const SETS_DIR = posix(join(ROOT_DIR, "tmp", "token-sets"));
 const GENERATED_DIR = posix(join(TOKENS_DIR, "generated"));
-const CSS_TARGET = posix(join(ROOT_DIR, "app", "static", "css", "src", "00-shell-tokens.css"));
+const CSS_TARGET = posix(join(ROOT_DIR, "app", "static", "css", "src", "00-foundation", "tokens.css"));
 const TAILWIND_TARGET = posix(join(GENERATED_DIR, "tailwind.cjs"));
 
 const FIGMA_SETS = ["core", "semantic", "semantic-dark", "layout", "typography", "effects"];

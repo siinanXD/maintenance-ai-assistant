@@ -19,7 +19,7 @@ function inputValue(event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HT
 }
 
 /**
- * Render one edit text input with a legacy DOM id.
+ * Render one labelled text input of the edit dialog.
  */
 function EditTextField(props: {
   readonly id: string;

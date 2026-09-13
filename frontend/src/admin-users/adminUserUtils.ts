@@ -1,7 +1,7 @@
 import {
-  confirmLegacyAction,
-  legacyAuthRuntime,
-  requestLegacyText
+  confirmAction,
+  authRuntime,
+  requestText
 } from "../app/runtimeBridge";
 import { formatGermanDateTime } from "../utils/date";
 import { triggerBrowserDownload } from "../utils/download";
@@ -141,14 +141,14 @@ export function permissionChangeSummary(
  * Request confirmation through the shared app dialog.
  */
 export async function confirmAdminAction(title: string, message: string, confirmText = "Bestätigen"): Promise<boolean> {
-  return confirmLegacyAction({ title, message, confirmText });
+  return confirmAction({ title, message, confirmText });
 }
 
 /**
  * Request password text through the shared app dialog.
  */
 export async function requestPassword(title: string, message: string): Promise<string | null> {
-  return requestLegacyText({
+  return requestText({
     title,
     message,
     label: "Neues Passwort",
@@ -169,7 +169,7 @@ export function downloadBackup(downloadUrl: string | undefined, filename: string
  * Refresh the existing auth runtime when the current user changes.
  */
 export async function refreshCurrentUserIfNeeded(updatedUserId: number, currentUserId: number | undefined): Promise<void> {
-  const runtime = legacyAuthRuntime();
+  const runtime = authRuntime();
   if (updatedUserId === currentUserId && runtime?.refreshUser) {
     await runtime.refreshUser();
   }

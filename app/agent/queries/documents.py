@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime, time, timedelta
+from datetime import UTC, datetime, time, timedelta
 
 from app.models import GeneratedDocument, MachineManual
 from app.security import has_dashboard_permission
@@ -130,9 +130,9 @@ def _recent_items(user):
 
 
 def _this_week_items(user):
-    """Return documents created during the current calendar week."""
-    monday = date.today() - timedelta(days=date.today().weekday())
-    start = datetime.combine(monday, time.min)
+    """Return documents created during the current calendar week (UTC, like created_at)."""
+    today = datetime.now(UTC).date()
+    start = datetime.combine(today - timedelta(days=today.weekday()), time.min)
     documents = (
         visible_documents_query(user)
         .filter(GeneratedDocument.created_at >= start)

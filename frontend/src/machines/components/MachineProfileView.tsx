@@ -67,7 +67,7 @@ function ProfileKpis({ profile }: { readonly profile: MachineProfile | null }): 
   ];
 
   return (
-    <section className="machine-profile-kpi-grid" aria-label="Wichtige Maschinenkennzahlen" data-machine-profile-kpis>
+    <section className="machine-profile-kpi-grid" aria-label="Wichtige Maschinenkennzahlen">
       {kpiRows.map(([label, value, meta, tone]) => (
         <article className={`machine-profile-kpi-card ${tone}`} key={label}>
           <span>{label}</span>
@@ -94,36 +94,36 @@ export function MachineProfileView({ message, profile }: MachineProfileViewProps
   ] as readonly { readonly item: MachineProfileRecord; readonly type: string }[];
 
   return (
-    <section className="machine-profile-page" data-machine-profile-page data-machine-id={machine?.id || ""}>
+    <section className="machine-profile-page" data-machine-id={machine?.id || ""}>
       <section className="machine-profile-hero app-card">
         <div className="machine-profile-copy">
           <p className="page-kicker">Maschinenprofil</p>
-          <h1 className="page-title" data-machine-profile-name>{machine?.name || "Maschine wird geladen"}</h1>
-          <p className="page-description" data-machine-profile-summary>
+          <h1 className="page-title">{machine?.name || "Maschine wird geladen"}</h1>
+          <p className="page-description">
             {machine?.name
               ? [machine.produced_item || "Kein Produkt hinterlegt", `${machine.required_employees || 1} Mitarbeiter pro Schicht`, machine.site?.name || "Werk nicht zugeordnet"].join(" · ")
               : "Stammdaten, offene Arbeit, Störungen, Dokumente und Übergaben an einem Ort."}
           </p>
-          <div className="machine-profile-badges" data-machine-profile-badges>
+          <div className="machine-profile-badges">
             <span className={genericStatusBadgeClass(machine?.status)}>{machineStatusLabel(machine?.status)}</span>
             <span className={criticalityBadgeClass(machine?.criticality)}>{criticalityLabel(machine?.criticality)}</span>
           </div>
         </div>
         <div className="machine-profile-actions">
-          <a className="btn btn-primary btn-sm" data-machine-profile-report-link href={`/errors?machine=${query}#incident-create`}>Störung melden</a>
-          <a className="btn btn-outline btn-sm" data-machine-profile-task-link href={`/tasks?search=${query}`}>Aufgabe planen</a>
-          <a className="btn btn-outline btn-sm" data-machine-profile-error-link href={`/errors?search=${query}`}>Störungen prüfen</a>
-          <a className="btn btn-outline btn-sm" data-machine-profile-document-link href={`/documents?search=${query}`}>Dokumente</a>
+          <a className="btn btn-primary btn-sm" href={`/errors?machine=${query}#incident-create`}>Störung melden</a>
+          <a className="btn btn-outline btn-sm" href={`/tasks?search=${query}`}>Aufgabe planen</a>
+          <a className="btn btn-outline btn-sm" href={`/errors?search=${query}`}>Störungen prüfen</a>
+          <a className="btn btn-outline btn-sm" href={`/documents?search=${query}`}>Dokumente</a>
           {machine?.id ? <MachineQrLabel machineId={machine.id} machineName={machine.name || "Maschine"} /> : null}
         </div>
       </section>
 
-      {message ? <p className="workflow-status" role="status" aria-live="polite" data-machine-profile-message>{message}</p> : null}
+      {message ? <p className="workflow-status" role="status" aria-live="polite">{message}</p> : null}
       <ProfileKpis profile={profile} />
 
       <section className="machine-profile-layout">
         <aside className="machine-profile-side">
-          <article className="machine-profile-panel" data-machine-profile-master>
+          <article className="machine-profile-panel">
             <div className="machine-profile-panel-header">
               <div>
                 <p className="page-kicker">Stammdaten</p>
@@ -132,35 +132,35 @@ export function MachineProfileView({ message, profile }: MachineProfileViewProps
             </div>
             <FactGrid profile={profile} />
           </article>
-          <ProfilePanel selector="data-machine-profile-materials" kicker="Material" title="Ersatzteile">
+          <ProfilePanel kicker="Material" title="Ersatzteile">
             {permissions.inventory === false ? (
               <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div>
             ) : (
               <ProfileRecordList emptyHref="/inventory" emptyLabel="Lager öffnen" emptyText="Keine Ersatzteile zugeordnet." items={profile?.materials} mapper={materialRecord} />
             )}
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-timeline" kicker="Verlauf" title="Letzte Signale">
+          <ProfilePanel kicker="Verlauf" title="Letzte Signale">
             <ProfileRecordList emptyText="Noch keine Signale im Maschinenverlauf." items={profile?.timeline} mapper={timelineRecord} />
           </ProfilePanel>
         </aside>
 
         <div className="machine-profile-main">
-          <ProfilePanel selector="data-machine-profile-tasks" kicker="Arbeit" title="Offene Aufgaben" actionHref="/tasks" actionLabel="Alle Aufgaben">
+          <ProfilePanel kicker="Arbeit" title="Offene Aufgaben" actionHref="/tasks" actionLabel="Alle Aufgaben">
             {permissions.tasks === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyHref="/tasks" emptyLabel="Aufgabe anlegen" emptyText="Keine offenen Aufgaben zur Maschine." items={profile?.open_tasks} mapper={taskRecord} />}
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-errors" kicker="Lage" title="Aktive Störungen" actionHref="/errors" actionLabel="Fehlerkatalog">
+          <ProfilePanel kicker="Lage" title="Aktive Störungen" actionHref="/errors" actionLabel="Fehlerkatalog">
             {permissions.errors === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyHref="/errors" emptyLabel="Störung melden" emptyText="Keine aktive Störung zur Maschine." items={profile?.active_errors} mapper={errorRecord} />}
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-error-history" kicker="Historie" title="Fehlerhistorie">
+          <ProfilePanel kicker="Historie" title="Fehlerhistorie">
             {permissions.errors === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyText="Noch keine Fehlerhistorie vorhanden." items={profile?.error_history} mapper={errorRecord} />}
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-maintenance" kicker="Wartung" title="Prüfungen und Wartungen" actionHref="/maintenance" actionLabel="Alle Pläne">
+          <ProfilePanel kicker="Wartung" title="Prüfungen und Wartungen" actionHref="/maintenance" actionLabel="Alle Pläne">
             <ProfileRecordList emptyHref="/maintenance" emptyLabel="Plan anlegen" emptyText="Keine Wartungspläne für diese Maschine." items={profile?.maintenance_plans} mapper={maintenanceRecord} />
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-documents" kicker="Wissen" title="Dokumente und Handbücher" actionHref="/documents" actionLabel="Knowledge Base">
+          <ProfilePanel kicker="Wissen" title="Dokumente und Handbücher" actionHref="/documents" actionLabel="Knowledge Base">
             {permissions.documents === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyHref="/documents" emptyLabel="Dokument hochladen" emptyText="Keine Dokumente oder Handbücher zugeordnet." items={documentRows.map((entry) => entry.item)} mapper={(item) => documentRecord(item, documentRows.find((entry) => entry.item === item)?.type || "Dokument")} />}
           </ProfilePanel>
-          <ProfilePanel selector="data-machine-profile-handovers" kicker="Schicht" title="Übergaben zur Maschine" actionHref="/handover" actionLabel="Schichtübergabe">
+          <ProfilePanel kicker="Schicht" title="Übergaben zur Maschine" actionHref="/handover" actionLabel="Schichtübergabe">
             {permissions.shiftplans === false ? <div className="machine-profile-empty"><strong>Keine Berechtigung für diesen Bereich.</strong></div> : <ProfileRecordList emptyHref="/handover" emptyLabel="Übergabe erfassen" emptyText="Keine Übergaben zur Maschine." items={profile?.shift_handovers} mapper={handoverRecord} />}
           </ProfilePanel>
         </div>

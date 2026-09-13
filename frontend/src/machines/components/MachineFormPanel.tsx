@@ -62,9 +62,9 @@ export function MachineFormPanel({ drawerMode = false, hidden, onCreated }: Mach
   return (
     <details
       className="card app-card mobile-action-section lg:order-4 lg:col-span-12"
-      data-default-collapsed="true"
-      data-mobile-collapsible
-      data-permission-write="machines"
+     
+     
+     
       hidden={hidden}
       onToggle={(event) => handleToggle(event.currentTarget.open)}
       open={drawerMode || open}
@@ -75,7 +75,7 @@ export function MachineFormPanel({ drawerMode = false, hidden, onCreated }: Mach
           <span className="mobile-action-meta">Anlage und Produktionsdaten erfassen</span>
         </span>
       </summary>
-      <form data-machine-form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="card-body">
           <div className="panel-header">
             <div>
@@ -101,7 +101,7 @@ export function MachineFormPanel({ drawerMode = false, hidden, onCreated }: Mach
             <button className="btn btn-primary" disabled={busy} type="submit">
               {busy ? "Speichert..." : "Maschine speichern"}
             </button>
-            <span className={`panel-meta${message.error ? " is-error" : ""}`} data-machine-message>
+            <span className={`panel-meta${message.error ? " is-error" : ""}`}>
               {message.text}
             </span>
           </div>

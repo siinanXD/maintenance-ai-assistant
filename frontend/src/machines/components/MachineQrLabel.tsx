@@ -37,11 +37,11 @@ export function MachineQrLabel({ machineId, machineName }: MachineQrLabelProps):
 
   return (
     <>
-      <button className="btn btn-outline btn-sm" data-machine-qr-open type="button" onClick={() => void openLabel()}>
+      <button className="btn btn-outline btn-sm" type="button" onClick={() => void openLabel()}>
         QR-Etikett
       </button>
       <dialog className="qr-label-dialog" ref={dialogRef} aria-labelledby="qr-label-title">
-        <div className="qr-label-print" data-qr-label>
+        <div className="qr-label-print">
           <p className="page-kicker">Maschine</p>
           <h2 id="qr-label-title">{machineName}</h2>
           {qrUrl ? <img alt={`QR-Code für ${machineName}`} src={qrUrl} /> : <div className="qr-label-placeholder">{error || "Wird erstellt…"}</div>}

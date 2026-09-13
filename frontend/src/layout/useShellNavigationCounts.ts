@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { apiRequest } from "../api/client";
 import { canViewStoredDashboard } from "../auth/permissions";
 import type { MaintenanceUser } from "../auth/session";
-import type { ShellNavigationCounts } from "./ShellNavigationTypes";
+import type { ShellNavigationCounts } from "./shellNavigationTypes";
 
 const EMPTY_NAVIGATION_COUNTS: ShellNavigationCounts = {
   errors: 0,

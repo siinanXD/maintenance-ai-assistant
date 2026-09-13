@@ -5,16 +5,15 @@
   type ReactNode
 } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import { ErrorAnalysisPanel } from "./components/ErrorAnalysisPanel";
 import { ErrorCatalog } from "./components/ErrorCatalog";
 import { ErrorCreatePanel } from "./components/ErrorCreatePanel";
 import { ErrorEditDialog } from "./components/ErrorEditDialog";
-import { ErrorHeader } from "./components/ErrorHeader";
-import { ErrorStats } from "./components/ErrorStats";
 import { SimilarErrorsPanel } from "./components/SimilarErrorsPanel";
 import { loadDepartments, loadErrors } from "./errorApi";
 import type {
@@ -28,13 +27,9 @@ import type {
 import {
   createEmptyErrorDraft,
   errorMessage,
+  formatIncidentMinutes,
   initialErrorSearchQuery
 } from "./errorUtils";
-
-const ERRORS_ISLAND = {
-  mountedFlag: "maintenanceErrorsReactMounted",
-  mountEvent: "maintenance-errors-react-mounted"
-};
 
 /**
  * Return the user's first visible department as form default.
@@ -62,6 +57,8 @@ export function ErrorsApp(): ReactNode {
   });
   const [message, setMessage] = useState<MessageState>({ text: "", error: false });
   const [similarResult, setSimilarResult] = useState<SimilarErrorResult | null>(null);
+
+  const openErrors = errors.filter((entry) => (entry.status || "open") !== "closed");
 
   const currentDepartment = useMemo(
     () => createDraft.department || defaultDepartment(departments),
@@ -100,10 +97,6 @@ export function ErrorsApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(ERRORS_ISLAND);
-  }, []);
-
-  useEffect(() => {
     refreshErrorsData().catch((error: unknown) => {
       setMessage({ text: errorMessage(error), error: true });
     });
@@ -116,13 +109,33 @@ export function ErrorsApp(): ReactNode {
 
   return (
     <>
-      <ErrorHeader
-        onAnalysisOpen={() => setActiveDrawer("analysis")}
-        onCreateOpen={() => setActiveDrawer("create")}
-        onSearchFocus={focusSearch}
-        writable={writable}
+      <PageHeader
+        title="Störungen"
+        description="Melden, mit bekannten Fehlern abgleichen, Auftrag anlegen und Lösung festhalten."
+        actions={[
+          { hidden: !writable, onClick: () => setActiveDrawer("create"), schema: createActionDefinition("errorCreate"), variant: "primary" },
+          { label: "Katalog durchsuchen", onClick: focusSearch },
+          { hidden: !writable, onClick: () => setActiveDrawer("analysis"), schema: createActionDefinition("errorSuggestion"), variant: "ghost" }
+        ]}
       />
-      <ErrorStats errors={errors} />
+      <StatStrip
+        label="Störungskennzahlen"
+        stats={[
+          { label: "Offen", value: openErrors.length, meta: `von ${errors.length} im Katalog`, tone: "primary" },
+          {
+            label: "Kritisch",
+            value: openErrors.filter((entry) => entry.severity === "critical" || entry.severity === "high").length,
+            meta: "offen mit hoher Schwere",
+            tone: "danger"
+          },
+          {
+            label: "Stillstand",
+            value: formatIncidentMinutes(openErrors.reduce((sum, entry) => sum + Number(entry.downtime_minutes || 0), 0)),
+            meta: "durch offene Störungen",
+            tone: "warning"
+          }
+        ]}
+      />
       {message.text ? (
         <section className="card app-card" role="alert">
           <div className="card-body">

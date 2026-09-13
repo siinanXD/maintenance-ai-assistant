@@ -48,13 +48,13 @@ export function VacationPendingPanel(props: VacationPendingPanelProps): ReactNod
         </div>
         <label className="field field-compact" htmlFor="vac-year">
           <span>Jahr</span>
-          <select className="select select-bordered select-sm" data-vac-year id="vac-year" value={props.selectedYear} onChange={(event) => props.onYearChange(event.currentTarget.value)}>
+          <select className="select select-bordered select-sm" id="vac-year" value={props.selectedYear} onChange={(event) => props.onYearChange(event.currentTarget.value)}>
             {props.yearOptions.map((year) => <option key={year} value={year}>{year}</option>)}
           </select>
         </label>
       </header>
-      <div className="vacation-pending-list" data-vac-pending-list>
-        <p className="empty-state" data-vac-pending-empty hidden={props.pendingRequests.length > 0}>Keine ausstehenden Anträge.</p>
+      <div className="vacation-pending-list">
+        <p className="empty-state" hidden={props.pendingRequests.length > 0}>Keine ausstehenden Anträge.</p>
         {props.pendingRequests.map((request) => (
           <VacationRequestCard
             key={request.id}

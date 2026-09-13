@@ -4,10 +4,11 @@ import {
   type ReactNode
 } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import {
   loadMachineHistory,
   loadMachines,
@@ -17,8 +18,6 @@ import { MachineEditDialog } from "./components/MachineEditDialog";
 import { MachineFormPanel } from "./components/MachineFormPanel";
 import { MachineHistoryPanel } from "./components/MachineHistoryPanel";
 import { MachineList } from "./components/MachineList";
-import { MachineStats } from "./components/MachineStats";
-import { MachinesHeader } from "./components/MachinesHeader";
 import { MaintenanceRecommendations } from "./components/MaintenanceRecommendations";
 import type {
   Machine,
@@ -27,11 +26,6 @@ import type {
   MessageState
 } from "./machineTypes";
 import { machineErrorMessage } from "./machineUtils";
-
-const MACHINES_OVERVIEW_ISLAND = {
-  mountedFlag: "maintenanceMachinesReactMounted",
-  mountEvent: "maintenance-machines-react-mounted"
-};
 
 /**
  * Render the React machines overview island.
@@ -97,10 +91,6 @@ export function MachinesOverviewApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(MACHINES_OVERVIEW_ISLAND);
-  }, []);
-
-  useEffect(() => {
     refreshMachines().catch((error: unknown) => {
       setMessage({ text: machineErrorMessage(error), error: true });
     });
@@ -112,13 +102,32 @@ export function MachinesOverviewApp(): ReactNode {
 
   return (
     <>
-      <MachinesHeader
-        issueCount={issueCount}
-        onAssistantFocus={focusAssistant}
-        onCreateMachine={() => setIsCreateDrawerOpen(true)}
-        writable={writable}
+      <PageHeader
+        title="Maschinen"
+        description="Status, offene Arbeit, Kennzahlen und QR-Etikett je Anlage."
+        actions={[
+          { hidden: !writable, onClick: () => setIsCreateDrawerOpen(true), schema: createActionDefinition("machineCreate"), variant: "primary" },
+          { label: "Maschine prüfen", onClick: focusAssistant },
+          { hidden: issueCount === 0, href: "/errors", label: `${issueCount} Störungen`, variant: "ghost" }
+        ]}
       />
-      <MachineStats machines={machines} />
+      <StatStrip
+        label="Maschinenstatus"
+        stats={[
+          { label: "Anlagen", value: machines.length, meta: "mit Profil, Historie und QR-Etikett" },
+          {
+            label: "Mit Störung",
+            value: machines.filter((machine) => Number(machine.active_errors || 0) > 0).length,
+            meta: "Anlagen mit offener Störung",
+            tone: issueCount ? "warning" : "neutral"
+          },
+          {
+            label: "Offene Aufgaben",
+            value: machines.reduce((sum, machine) => sum + Number(machine.open_tasks || 0), 0),
+            meta: "an Anlagen gebunden"
+          }
+        ]}
+      />
       {message.text ? (
         <section className="card app-card" role="alert">
           <div className="card-body">

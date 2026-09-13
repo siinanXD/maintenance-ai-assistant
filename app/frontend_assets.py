@@ -23,13 +23,6 @@ def register_frontend_asset_helpers(app):
         path = Path(current_app.static_folder) / filename
         return f"{url_for('static', filename=filename)}?v={_file_version(str(path), _mtime(path))}"
 
-    @app.template_global()
-    def static_scripts_version():
-        """Return one version for the page island scripts that app.js imports lazily."""
-        folder = Path(current_app.static_folder)
-        files = sorted([*folder.glob("pages/*.js"), *folder.glob("core/*.js"), folder / "app.js"])
-        return _files_version(tuple((str(path), _mtime(path)) for path in files))
-
 
 def _mtime(path):
     """Return a file's modification time, or 0 when it is missing."""
@@ -46,15 +39,6 @@ def _file_version(path, mtime):
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()[:10]
     except OSError:
         return "missing"
-
-
-@lru_cache(maxsize=4)
-def _files_version(entries):
-    """Return a short combined hash for several files."""
-    digest = hashlib.sha256()
-    for path, mtime in entries:
-        digest.update(_file_version(path, mtime).encode())
-    return digest.hexdigest()[:10]
 
 
 def render_react_entrypoint(entry_name):

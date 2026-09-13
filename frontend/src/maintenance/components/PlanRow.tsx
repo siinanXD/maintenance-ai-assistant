@@ -28,7 +28,7 @@ export function PlanRow({ plan, writable, onEdit, onRecord }: PlanRowProps): Rea
   const [records, setRecords] = useState<MaintenanceRecord[] | null>(null);
 
   return (
-    <li className={`plan-row is-${plan.due_state}`} data-plan-id={plan.id}>
+    <li className={`plan-row is-${plan.due_state}`}>
       <div className="plan-row-due">
         <strong>{formatPlanDate(plan.next_due_date)}</strong>
         <small>{plan.is_active ? relativeDue(plan) : DUE_STATE_LABELS.inactive}</small>

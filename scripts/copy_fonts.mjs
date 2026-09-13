@@ -2,7 +2,7 @@
  * Die Werkbank-Schriften selbst hosten.
  *
  * Kopiert die benoetigten Schnitte aus den @fontsource-Paketen nach
- * app/static/fonts/ und erzeugt app/static/css/src/00-fonts.css mit den
+ * app/static/fonts/ und erzeugt app/static/css/src/00-foundation/fonts.css mit den
  * @font-face-Regeln. Die Schriften stehen unter der SIL Open Font License; die
  * Lizenzdatei jeder Familie wird mitkopiert.
  *
@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
 const FONTS_DIR = join(ROOT_DIR, "app", "static", "fonts");
-const CSS_TARGET = join(ROOT_DIR, "app", "static", "css", "src", "00-fonts.css");
+const CSS_TARGET = join(ROOT_DIR, "app", "static", "css", "src", "00-foundation", "fonts.css");
 
 /** Families, the CSS family name and the weights the design system uses. */
 const FAMILIES = [

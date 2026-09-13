@@ -35,7 +35,6 @@ export function TaskPriorityPanel({
         </div>
         <button
           className="btn btn-outline btn-sm"
-          data-task-priority-refresh
           disabled={busy}
           onClick={onRefresh}
           type="button"
@@ -43,7 +42,7 @@ export function TaskPriorityPanel({
           {busy ? "Wird geladen..." : "Aktualisieren"}
         </button>
       </header>
-      <div className="priority-score-list" data-task-priority-list>
+      <div className="priority-score-list">
         {items.map((item) => (
             <div className="priority-score-card" key={`${item.task.id}-${item.score}`}>
               <div className={scoreClassName(item.risk_level)}>{item.score}</div>

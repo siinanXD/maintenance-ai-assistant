@@ -21,7 +21,7 @@ export function VacationSummaryPanel(props: VacationSummaryPanelProps): ReactNod
           <p>Verfügbar, reserviert und genehmigt mit Bereich, Schicht und Qualifikation.</p>
         </div>
       </header>
-      <div className="vacation-summary-list" data-vac-summary-list>
+      <div className="vacation-summary-list">
         {props.summaries.length ? props.summaries.map((summary) => {
           const available = Number(summary.available || 0);
           const className = `vacation-summary-card${available <= 0 ? " is-critical" : available <= 5 || Number(summary.pending || 0) >= 5 ? " is-warning" : ""}`;

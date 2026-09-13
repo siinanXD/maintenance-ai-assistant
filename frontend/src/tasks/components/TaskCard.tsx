@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 
+import { confirmAction } from "../../app/runtimeBridge";
 import { AttachmentPanel } from "../../components/attachments/AttachmentPanel";
 import { TaskMaterialsPanel } from "./TaskMaterialsPanel";
 import { deleteTask, runTaskAction } from "../taskApi";
@@ -16,7 +17,6 @@ import {
   taskMachineHint,
   taskMetricLabel,
   taskOwnerLabel,
-  taskSearchText,
   taskTypeLabel
 } from "../taskUtils";
 
@@ -55,7 +55,7 @@ export function TaskCard({
 
     const incident = task.error_entry;
     const closeIncident = action === "complete" && incident && incident.status !== "closed"
-      ? window.confirm(`Störung ${incident.error_code} „${incident.title}“ ebenfalls schließen?`)
+      ? await confirmAction({ title: "Störung schließen", message: `Störung ${incident.error_code} „${incident.title}“ ebenfalls schließen?`, confirmText: "Schließen", cancelText: "Offen lassen" })
       : false;
 
     try {
@@ -77,7 +77,7 @@ export function TaskCard({
    * Delete this task after user confirmation.
    */
   async function handleDelete(): Promise<void> {
-    if (!window.confirm(`Aufgabe "${task.title}" wirklich löschen?`)) {
+    if (!(await confirmAction({ title: "Aufgabe löschen", message: `Aufgabe „${task.title}“ wirklich löschen?`, confirmText: "Löschen" }))) {
       return;
     }
 
@@ -103,11 +103,6 @@ export function TaskCard({
         dueState === "overdue" ? "is-overdue" : "",
         dueState === "today" ? "is-due-today" : ""
       ].filter(Boolean).join(" ")}
-      data-department={task.department?.name || ""}
-      data-due-state={dueState}
-      data-priority={task.priority || ""}
-      data-search-text={taskSearchText(task)}
-      data-status={task.status || ""}
     >
       <div className="task-card-top">
         <div className="task-card-heading">

@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Schichtplan - Maintenance Assistant{% endblock %}
+{% block header_title %}Schichtplan{% endblock %}
 
 {% block content %}
 <div id="maintenance-shiftplans-root"></div>
-{{ react_entrypoint("src/shiftplans/shiftplansEntrypoint.tsx") }}
+{{ react_entrypoint("src/shiftplans/entry.tsx") }}
 {% endblock %}

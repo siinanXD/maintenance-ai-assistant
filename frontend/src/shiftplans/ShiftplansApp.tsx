@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { confirmAction } from "../app/runtimeBridge";
 import { canWriteDashboard } from "../auth/permissions";
+import { subscribeToSessionChange } from "../auth/sessionChange";
+import { ActionDrawer } from "../components/ui/ActionDrawer";
+import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { triggerBrowserDownload } from "../utils/download";
 import {
   deleteShiftPlan,
   deleteShiftplanEntry,
@@ -14,9 +20,12 @@ import {
   moveEntryToSlot,
   previewShiftPlan,
   publishShiftPlan,
+  shiftplanExportUrl,
   updateShiftplanEntry,
-} from "./shiftplansApi";
-import { ShiftplansAppShell } from "./ShiftplansAppShell";
+} from "./shiftplanApi";
+import { ShiftplansEditDialog } from "./components/ShiftplansEditDialog";
+import { ShiftplansGenerationForm } from "./components/ShiftplansGenerationForm";
+import { ShiftplansPlanView } from "./components/ShiftplansPlanView";
 import type {
   Machine,
   ShiftModel,
@@ -27,21 +36,20 @@ import type {
   ShiftplansMessage,
   ShiftplanDraft,
   ShiftplanWarning,
-} from "./ShiftplansTypes";
+} from "./shiftplanTypes";
 import {
   EMPTY_SHIFTPLAN_DRAFT,
   buildGenerationPayload,
   shiftplansErrorMessage,
-} from "./shiftplansUtils";
+} from "./shiftplanUtils";
 import {
   currentUserIsAdmin,
   plansWithFallback,
   selectedPlanIndexFor,
-} from "./ShiftplansAppModel";
-import { useShiftplansAuthReload, useShiftplansMountMarker } from "./useShiftplansLifecycle";
+} from "./shiftplanModel";
 
 /**
- * Render the shift planning page with React-owned behavior and legacy fallback hooks.
+ * Shift planning: generate, review, publish and adjust plans per department.
  */
 export function ShiftplansApp(): ReactNode {
   const writable = canWriteDashboard("shiftplans");
@@ -68,7 +76,6 @@ export function ShiftplansApp(): ReactNode {
     [draft.shiftModelKey, models]
   );
 
-  useShiftplansMountMarker();
 
   /**
    * Load initial data for models, machines, and plans.
@@ -122,11 +129,11 @@ export function ShiftplansApp(): ReactNode {
     refreshPlanDetails(currentPlan).catch(() => undefined);
   }, [currentPlan?.id, currentPlan?.status, selectedPlanIndex]);
 
-  useShiftplansAuthReload(() => {
+  useEffect(() => subscribeToSessionChange(() => {
     refreshInitialData().catch((error: unknown) => {
       setFormMessage({ text: shiftplansErrorMessage(error, "Schichtplanung konnte nicht geladen werden."), isError: true });
     });
-  });
+  }), []);
 
   /**
    * Toggle one selected machine.
@@ -191,7 +198,7 @@ export function ShiftplansApp(): ReactNode {
    * Delete one shiftplan entry after confirmation.
    */
   async function deleteEntry(entry: ShiftplanEntry): Promise<void> {
-    if (!window.confirm("Eintrag wirklich löschen?")) return;
+    if (!(await confirmAction({ title: "Schichteintrag löschen", message: "Eintrag wirklich löschen?", confirmText: "Löschen" }))) return;
     setDeletingEntry(true);
     try {
       await deleteShiftplanEntry(entry.id);
@@ -237,15 +244,19 @@ export function ShiftplansApp(): ReactNode {
     if (willPublish) {
       const conflicts = await loadShiftplanConflicts(currentPlan.id).catch(() => null);
       const criticalCount = conflicts?.summary?.critical || 0;
-      if (criticalCount > 0 && !window.confirm(`Der Plan hat ${criticalCount} kritische Konflikte. Trotzdem veröffentlichen?`)) {
+      if (criticalCount > 0 && !(await confirmAction({
+        title: "Kritische Konflikte",
+        message: `Der Plan hat ${criticalCount} kritische Konflikte. Trotzdem veröffentlichen?`,
+        confirmText: "Veröffentlichen",
+      }))) {
         setWarnings([...(conflicts?.conflicts || [])]);
         return;
       }
     }
-    const message = willPublish
-      ? `Plan "${currentPlan.title}" veröffentlichen? Mitarbeiter können ihn dann sehen.`
-      : "Plan zurück auf Entwurf setzen? Er wird für Mitarbeiter ausgeblendet.";
-    if (!window.confirm(message)) return;
+    const confirmed = await confirmAction(willPublish
+      ? { title: "Plan veröffentlichen", message: `„${currentPlan.title}“ veröffentlichen? Mitarbeiter können ihn dann sehen.`, confirmText: "Veröffentlichen" }
+      : { title: "Zurück auf Entwurf", message: "Der Plan wird für Mitarbeiter ausgeblendet.", confirmText: "Auf Entwurf setzen" });
+    if (!confirmed) return;
     const updatedPlan = await publishShiftPlan(currentPlan.id);
     await refreshInitialData(updatedPlan.id, updatedPlan);
   }
@@ -254,51 +265,93 @@ export function ShiftplansApp(): ReactNode {
    * Delete the current plan after confirmation.
    */
   async function removeCurrentPlan(): Promise<void> {
-    if (!currentPlan?.id || !window.confirm(`Plan "${currentPlan.title}" wirklich löschen?`)) return;
+    if (!currentPlan?.id) return;
+    const confirmed = await confirmAction({
+      title: "Plan löschen",
+      message: `„${currentPlan.title}“ wirklich löschen?`,
+      confirmText: "Löschen",
+    });
+    if (!confirmed) return;
     await deleteShiftPlan(currentPlan.id);
     await refreshInitialData();
   }
 
+  /**
+   * Download the current plan as an Excel file.
+   */
+  function downloadCurrentPlan(): void {
+    if (!currentPlan?.id) return;
+    triggerBrowserDownload(shiftplanExportUrl(currentPlan.id), `${currentPlan.title || "schichtplan"}.xlsx`);
+  }
+
   return (
-    <ShiftplansAppShell
-      busyAction={busyAction}
-      changelog={changelog}
-      currentPlan={currentPlan}
-      deletingEntry={deletingEntry}
-      dialogEntry={dialogEntry}
-      dialogMessage={dialogMessage}
-      draft={draft}
-      formMessage={formMessage}
-      isAdmin={isAdmin}
-      machines={machines}
-      models={models}
-      onDeleteEntry={deleteEntry}
-      onDeletePlan={removeCurrentPlan}
-      onDialogSave={saveDialog}
-      onDraftChange={setDraft}
-      onEditEntry={setDialogEntry}
-      onGenerate={() => submitPlan("generate")}
-      onGenerateClose={() => setShowGenerateDrawer(false)}
-      onGenerateOpen={() => setShowGenerateDrawer(true)}
-      onMachineToggle={toggleMachine}
-      onMoveEntryToEntry={moveToEntry}
-      onMoveEntryToSlot={moveToSlot}
-      onPlanSelect={setSelectedPlanIndex}
-      onPreview={() => submitPlan("preview")}
-      onPublish={() => {
-        togglePublish().catch((error: unknown) => {
-          setFormMessage({ text: shiftplansErrorMessage(error), isError: true });
-        });
-      }}
-      plans={plans}
-      savingEntry={savingEntry}
-      selectedMachineIds={selectedMachineIds}
-      selectedPlanIndex={selectedPlanIndex}
-      setDialogEntry={setDialogEntry}
-      setDialogMessage={setDialogMessage}
-      showGenerateDrawer={showGenerateDrawer}
-      warnings={warnings}
-      writable={writable}
-    />
+    <>
+      <div className="no-print">
+        <PageHeader
+          title="Schichtplan"
+          description="Abteilung auswählen, Zeitraum festlegen und Plan generieren."
+          actions={[
+            { hidden: !writable, onClick: () => setShowGenerateDrawer(true), schema: createActionDefinition("shiftplanGenerate"), variant: "primary" },
+            { label: "Drucken", onClick: () => window.print() }
+          ]}
+        />
+      </div>
+      <section className="dashboard-grid">
+        <ShiftplansPlanView
+          changelog={changelog}
+          currentPlan={currentPlan}
+          isAdmin={isAdmin}
+          onDeleteEntry={deleteEntry}
+          onDeletePlan={removeCurrentPlan}
+          onDownload={downloadCurrentPlan}
+          onEditEntry={(entry) => {
+            setDialogMessage({ text: "" });
+            setDialogEntry(entry);
+          }}
+          onMoveEntryToEntry={moveToEntry}
+          onMoveEntryToSlot={moveToSlot}
+          onPlanSelect={setSelectedPlanIndex}
+          onPrint={() => window.print()}
+          onPublish={() => {
+            togglePublish().catch((error: unknown) => {
+              setFormMessage({ text: shiftplansErrorMessage(error), isError: true });
+            });
+          }}
+          plans={plans}
+          selectedPlanIndex={selectedPlanIndex}
+          warnings={warnings}
+          writable={writable}
+        />
+      </section>
+      <ShiftplansEditDialog
+        deleting={deletingEntry}
+        entry={dialogEntry}
+        isAdmin={isAdmin}
+        message={dialogMessage}
+        onClose={() => setDialogEntry(null)}
+        onDelete={deleteEntry}
+        onSave={saveDialog}
+        saving={savingEntry}
+      />
+      <ActionDrawer
+        definition={createActionDefinition("shiftplanGenerate")}
+        isOpen={showGenerateDrawer}
+        onClose={() => setShowGenerateDrawer(false)}
+      >
+        <ShiftplansGenerationForm
+          busyAction={busyAction}
+          draft={draft}
+          machines={machines}
+          message={formMessage}
+          models={models}
+          onDraftChange={setDraft}
+          onGenerate={() => submitPlan("generate")}
+          onMachineToggle={toggleMachine}
+          onPreview={() => submitPlan("preview")}
+          selectedMachineIds={selectedMachineIds}
+          writable={writable}
+        />
+      </ActionDrawer>
+    </>
   );
 }

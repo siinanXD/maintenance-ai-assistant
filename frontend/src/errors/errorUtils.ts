@@ -136,7 +136,7 @@ export function errorSeverityClass(severity: unknown): string {
 }
 
 /**
- * Format incident minutes like the legacy workflow.
+ * Format minutes as "35 min" or, from one hour, as "1,5 h".
  */
 export function formatIncidentMinutes(value: unknown): string {
   const minutes = Number(value || 0);
@@ -145,7 +145,7 @@ export function formatIncidentMinutes(value: unknown): string {
 }
 
 /**
- * Format incident dates like the legacy workflow.
+ * Format an incident timestamp as day, month and time.
  */
 export function incidentDate(value: unknown): string {
   return formatGermanDateTime(value, {

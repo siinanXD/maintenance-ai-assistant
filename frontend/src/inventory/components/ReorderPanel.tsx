@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { formatMoney } from "../../formatters/number";
+import { formatMoney } from "../../utils/number";
 import type { ReorderSuggestions } from "../inventoryTypes";
 
 type ReorderPanelProps = {
@@ -14,7 +14,7 @@ export function ReorderPanel({ suggestions }: ReorderPanelProps): ReactNode {
   const items = suggestions?.items || [];
 
   return (
-    <article className="card app-card lg:col-span-12" data-inventory-reorder>
+    <article className="card app-card lg:col-span-12">
       <div className="card-body">
         <div className="panel-header">
           <div>

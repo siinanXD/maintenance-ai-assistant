@@ -1,20 +1,19 @@
 import { type ReactNode } from "react";
 
-import { useAuthContext } from "../auth/AuthProvider";
+import { useAuthSession } from "../auth/useAuthSession";
 import type { MaintenanceUser } from "../auth/session";
 import { ShellGlobalSearch } from "./ShellGlobalSearch";
 import {
   canViewNavigationLink,
   canViewNavigationSection,
   isActiveNavigationLink,
-  navigationDataAttributes,
   SHELL_NAVIGATION_SECTIONS
 } from "./ShellNavigationModel";
-import type { ShellNavigationCounts, ShellNavigationLink, ShellNavigationProps } from "./ShellNavigationTypes";
+import type { ShellNavigationCounts, ShellNavigationLink, ShellNavigationProps } from "./shellNavigationTypes";
 import { useShellNavigationCounts } from "./useShellNavigationCounts";
 
 /**
- * Render one sidebar navigation link with the legacy-compatible hooks intact.
+ * Render one sidebar navigation link.
  */
 function SidebarNavigationLink({
   counts,
@@ -36,7 +35,6 @@ function SidebarNavigationLink({
 
   return (
     <a
-      {...navigationDataAttributes(link)}
       aria-current={isActive ? "page" : undefined}
       className={className}
       hidden={!canViewNavigationLink(link, user)}
@@ -49,12 +47,12 @@ function SidebarNavigationLink({
       ) : null}
       <span>{link.label}</span>
       {link.dashboardKey === "errors" ? (
-        <span className="nav-count is-alert" data-dashboard-machine-issue-count>
+        <span className="nav-count is-alert">
           {counts.errors}
         </span>
       ) : null}
       {link.dashboardKey === "tasks" ? (
-        <span className="nav-count" data-dashboard-task-count>
+        <span className="nav-count">
           {counts.tasks}
         </span>
       ) : null}
@@ -83,7 +81,6 @@ function MobileNavigationLink({
 
   return (
     <a
-      {...navigationDataAttributes(link)}
       aria-current={isActive ? "page" : undefined}
       className={className}
       hidden={!canViewNavigationLink(link, user)}
@@ -102,7 +99,7 @@ export function ShellSidebarNavigation({
   currentPath,
   onToggleCollapsed
 }: ShellNavigationProps): ReactNode {
-  const { user } = useAuthContext();
+  const { user } = useAuthSession();
   const counts = useShellNavigationCounts(user);
   const toggleLabel = collapsed ? "Menü erweitern" : "Menü minimieren";
 
@@ -123,8 +120,6 @@ export function ShellSidebarNavigation({
         {SHELL_NAVIGATION_SECTIONS.map((section) => (
           <section
             className="sidebar-nav-group"
-            data-nav-group
-            data-nav-open={section.defaultOpen ? "true" : undefined}
             hidden={!canViewNavigationSection(section, user)}
             key={section.title}
           >
@@ -160,17 +155,16 @@ export function ShellSidebarNavigation({
  * Render the mobile navigation prepared for the final React shell.
  */
 export function ShellMobileNavigation({ currentPath }: ShellNavigationProps): ReactNode {
-  const { user } = useAuthContext();
+  const { user } = useAuthSession();
 
   return (
-    <details className="mobile-nav" data-nav-root>
+    <details className="mobile-nav">
       <summary>Menü</summary>
       <div className="mobile-nav-panel">
         <ShellGlobalSearch inputId="global-search-mobile-react" isMobile />
         {SHELL_NAVIGATION_SECTIONS.map((section) => (
           <section
             className="mobile-nav-group"
-            data-nav-group
             hidden={!canViewNavigationSection(section, user)}
             key={section.title}
           >

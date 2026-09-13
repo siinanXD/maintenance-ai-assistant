@@ -1,19 +1,14 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
+import { PageHeader } from "../components/ui/PageHeader";
 import { PlanForm } from "./components/PlanForm";
 import { PlanRow } from "./components/PlanRow";
 import { RecordForm } from "./components/RecordForm";
 import { DUE_STATE_LABELS, draftFromPlan, emptyPlanDraft } from "./maintenanceLabels";
 import { loadMachineOptions, loadPlans } from "./maintenanceApi";
 import type { DueState, MachineOption, MaintenancePlan, PlanDraft, PlanKind } from "./maintenanceTypes";
-
-const MAINTENANCE_ISLAND = {
-  mountedFlag: "maintenanceMaintenanceReactMounted",
-  mountEvent: "maintenance-maintenance-react-mounted"
-};
 
 const GROUP_ORDER: readonly DueState[] = ["overdue", "due_soon", "ok", "inactive"];
 
@@ -44,7 +39,6 @@ export function MaintenancePlansApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(MAINTENANCE_ISLAND);
     refresh().catch((error: unknown) => {
       setPlans([]);
       setMessage({ text: error instanceof Error ? error.message : "Pläne konnten nicht geladen werden.", error: true });
@@ -77,13 +71,11 @@ export function MaintenancePlansApp(): ReactNode {
 
   return (
     <>
-      <header className="page-intro">
-        <div>
-          <h1 className="page-title">Prüfungen &amp; Wartung</h1>
-          <p className="page-description">Prüfpflichten und Wartungspläne mit Nachweis. Überfälliges steht oben.</p>
-        </div>
-        {writable ? <button className="btn btn-primary" data-plan-create type="button" onClick={() => openPlan(null)}>Plan anlegen</button> : null}
-      </header>
+      <PageHeader
+        title="Prüfungen & Wartung"
+        description="Prüfpflichten und Wartungspläne mit Nachweis. Überfälliges steht oben."
+        actions={[{ hidden: !writable, label: "Plan anlegen", onClick: () => openPlan(null), variant: "primary" }]}
+      />
 
       <section className="plan-summary" aria-label="Fälligkeiten">
         {GROUP_ORDER.slice(0, 3).map((state) => (

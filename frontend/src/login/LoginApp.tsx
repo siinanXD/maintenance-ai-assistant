@@ -1,14 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
+import { authRuntime } from "../app/runtimeBridge";
 import { readStoredSession } from "../auth/session";
-import { LoginForm } from "./LoginForm";
+import { LoginForm } from "./components/LoginForm";
 import type { LoginData } from "./loginTypes";
-
-const LOGIN_ISLAND = {
-  mountedFlag: "maintenanceLoginReactMounted",
-  mountEvent: "maintenance-login-react-mounted"
-};
 
 const LOGIN_CAPABILITIES = [
   ["Störungen", "Mit Foto melden, mit dem Fehlerkatalog abgleichen, Auftrag anlegen"],
@@ -22,13 +17,13 @@ const LOGIN_CAPABILITIES = [
  */
 function LoggedInPanel(): ReactNode {
   return (
-    <article className="login-card" data-logged-in-panel>
+    <article className="login-card">
       <p className="page-kicker">Sitzung aktiv</p>
       <h2 className="login-card-title">Du bist angemeldet</h2>
       <p className="login-card-meta">Weiter zum Cockpit oder abmelden, um das Konto zu wechseln.</p>
       <div className="login-actions">
         <a className="btn btn-primary" href="/">Zum Cockpit</a>
-        <button className="btn btn-ghost" type="button" data-logout-button>Abmelden</button>
+        <button className="btn btn-ghost" type="button" onClick={() => void authRuntime()?.logout?.()}>Abmelden</button>
       </div>
     </article>
   );
@@ -68,17 +63,11 @@ function LoginBrandPanel(): ReactNode {
 export function LoginApp(): ReactNode {
   const [session, setSession] = useState(() => readStoredSession());
   const loggedIn = Boolean(session.token && session.user);
-
-  useEffect(() => {
-    markIslandMounted(LOGIN_ISLAND);
-  }, []);
-
   useEffect(() => {
     /**
      * Sync the island when the existing auth runtime changes localStorage.
      */
     function handleAuthChange(): void {
-      markIslandMounted(LOGIN_ISLAND);
       setSession(readStoredSession());
     }
 

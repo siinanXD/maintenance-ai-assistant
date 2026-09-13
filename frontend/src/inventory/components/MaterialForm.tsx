@@ -98,9 +98,9 @@ export function MaterialForm({ drawerMode = false, machines, onCreated }: Materi
   return (
     <details
       className="card app-card mobile-action-section lg:order-3 lg:col-span-12"
-      data-mobile-collapsible
-      data-default-collapsed="true"
-      data-permission-write="inventory"
+     
+     
+     
       onToggle={(event) => handleToggle(event.currentTarget.open)}
       open={drawerMode || open}
     >
@@ -110,7 +110,7 @@ export function MaterialForm({ drawerMode = false, machines, onCreated }: Materi
           <span className="mobile-action-meta">Bestand und Wert erfassen</span>
         </span>
       </summary>
-      <form data-inventory-form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="card-body">
           <div className="panel-header">
             <div>
@@ -137,7 +137,7 @@ export function MaterialForm({ drawerMode = false, machines, onCreated }: Materi
             </div>
             <div className="field">
               <label htmlFor="react-material-machine">Verbaut an Maschine</label>
-              <select className="select select-bordered" data-machine-select disabled={busy} id="react-material-machine" name="machine_id" onChange={(event) => updateField("machine_id", event.target.value)} value={formState.machine_id}>
+              <select className="select select-bordered" disabled={busy} id="react-material-machine" name="machine_id" onChange={(event) => updateField("machine_id", event.target.value)} value={formState.machine_id}>
                 <option value="">Keine Maschine</option>
                 {machines.map((machine) => (
                   <option key={machine.id} value={machine.id}>{machine.name}</option>
@@ -149,7 +149,7 @@ export function MaterialForm({ drawerMode = false, machines, onCreated }: Materi
             <button className="btn btn-primary" disabled={busy} type="submit">
               {busy ? "Speichert..." : "Material speichern"}
             </button>
-            <span className={`panel-meta${message.error ? " is-error" : ""}`} data-inventory-message>
+            <span className={`panel-meta${message.error ? " is-error" : ""}`}>
               {message.text}
             </span>
           </div>

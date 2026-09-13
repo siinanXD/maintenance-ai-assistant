@@ -1,7 +1,7 @@
 import { formatGermanDateTime } from "../utils/date";
 import { triggerBrowserDownload } from "../utils/download";
 import { safeErrorMessage } from "../utils/errors";
-import type { DocumentFilters, GeneratedDocument, MachineManual } from "./documentTypes";
+import type { DocumentFilters, GeneratedDocument } from "./documentTypes";
 
 /**
  * Return empty document filters.
@@ -78,16 +78,3 @@ export function generatedDocumentSearchText(document: GeneratedDocument): string
   ].filter(Boolean).join(" ").toLowerCase();
 }
 
-/**
- * Return searchable text for a machine manual.
- */
-export function manualSearchText(manual: MachineManual): string {
-  return [
-    manual.title,
-    manual.original_filename,
-    manual.department,
-    manual.machine?.name,
-    manual.analysis_status,
-    manual.summary_status
-  ].filter(Boolean).join(" ").toLowerCase();
-}

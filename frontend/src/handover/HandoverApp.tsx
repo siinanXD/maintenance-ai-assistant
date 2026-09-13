@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { hasStoredToken } from "../auth/session";
 import { subscribeToSessionChange } from "../auth/sessionChange";
@@ -11,22 +10,21 @@ import {
   loadHandovers,
   updateHandover,
 } from "./handoverApi";
-import { HandoverMarkup } from "./HandoverMarkup";
+import { ActionDrawer } from "../components/ui/ActionDrawer";
+import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
+import { HandoverDialog } from "./components/HandoverDialog";
+import { HandoverForm } from "./components/HandoverForm";
+import { HandoverGuidance } from "./components/HandoverGuidance";
+import { HandoverList } from "./components/HandoverList";
 import {
   EMPTY_HANDOVER_FILTERS,
   filterHandoversBySearch,
   handoverErrorMessage,
   handoverStats,
 } from "./handoverUtils";
-import type { HandoverFilters, HandoverMessage, HandoverPayload, HandoverRecord, Machine } from "./HandoverTypes";
-
-const HANDOVER_ISLAND = {
-  mountedFlag: "maintenanceHandoverReactMounted",
-  mountEvent: "maintenance-handover-react-mounted",
-} as const;
-
-const HANDOVER_ROOT_SELECTOR = "#maintenance-handover-root";
-const HANDOVER_SHELL_SELECTOR = "[data-handover-react-shell]";
+import type { HandoverFilters, HandoverMessage, HandoverPayload, HandoverRecord, Machine } from "./handoverTypes";
 
 /**
  * Convert one handover form submission into an API payload.
@@ -53,7 +51,7 @@ function handoverPayloadIsValid(payload: HandoverPayload): boolean {
 }
 
 /**
- * Render the handover page with React-owned behavior and legacy fallback hooks.
+ * Shift handover: structured record per shift, filters, confirmation and editing.
  */
 export function HandoverApp(): ReactNode {
   const writable = canWriteDashboard("shiftplans");
@@ -196,21 +194,6 @@ export function HandoverApp(): ReactNode {
   }
 
   useEffect(() => {
-    /**
-     * Announce React ownership only after the rendered shell is visible in the root.
-     */
-    function markMountedWhenShellExists(): void {
-      const rootElement = document.querySelector(HANDOVER_ROOT_SELECTOR);
-      if (rootElement?.querySelector(HANDOVER_SHELL_SELECTOR)) {
-        markIslandMounted(HANDOVER_ISLAND);
-      }
-    }
-
-    const frameId = window.requestAnimationFrame(markMountedWhenShellExists);
-    return () => window.cancelAnimationFrame(frameId);
-  }, []);
-
-  useEffect(() => {
     loadInitialData().catch((error: unknown) => {
       setListMessage({ text: handoverErrorMessage(error), isError: true });
     });
@@ -230,33 +213,56 @@ export function HandoverApp(): ReactNode {
   );
 
   return (
-    <div data-handover-react-shell>
-      <HandoverMarkup
-        dialogMessage={dialogMessage}
-        editHandover={editHandover}
+    <>
+      <PageHeader
+        title="Schichtübergabe"
+        description="Strukturierte Übergabe für Produktion, Instandhaltung, Sicherheit, Material und offene Folgearbeiten."
+        actions={[
+          { hidden: !writable, onClick: () => setShowCreateDrawer(true), schema: createActionDefinition("handoverCreate"), variant: "primary" },
+          { label: "Verlauf prüfen", onClick: focusList }
+        ]}
+      />
+      <StatStrip
+        label="Schichtübergabe-Kennzahlen"
+        stats={[
+          { label: "Offen", value: stats.open, meta: "nicht bestätigte Übergaben", tone: "primary" },
+          { label: "Bestätigt", value: stats.completed, meta: "abgeschlossene Protokolle", tone: "success" },
+          { label: "Sicherheit", value: stats.safety, meta: "Hinweise mit Sicherheitsbezug", tone: stats.safety ? "danger" : "neutral" },
+          { label: "Folgepunkte", value: stats.followup, meta: "offen für die nächste Schicht" }
+        ]}
+      />
+      <section className="handover-workflow-grid" id="handover-workflow" aria-label="Schichtübergabe-Workflow">
+        <HandoverGuidance />
+      </section>
+      <HandoverList
         filters={filters}
-        formMessage={formMessage}
         handovers={visibleHandovers}
         loadedCount={handovers.length}
-        listMessage={listMessage}
         machines={machines}
-        onCloseDialog={() => setEditHandover(null)}
+        message={listMessage}
         onComplete={completeSelectedHandover}
-        onCreateClose={() => setShowCreateDrawer(false)}
-        onCreateOpen={() => setShowCreateDrawer(true)}
         onEdit={openEditDialog}
         onFilter={applyFilters}
         onFilterChange={setFilters}
-        onFocusList={focusList}
         onResetFilters={resetFilters}
-        onSaveDialog={saveDialog}
-        onSubmit={submitForm}
-        savingDialog={savingDialog}
-        showCreateDrawer={showCreateDrawer}
-        stats={stats}
-        submitting={submitting}
         writable={writable}
       />
-    </div>
+      <HandoverDialog
+        handover={editHandover}
+        message={dialogMessage}
+        onClose={() => setEditHandover(null)}
+        onSave={saveDialog}
+        saving={savingDialog}
+      />
+      <ActionDrawer
+        definition={createActionDefinition("handoverCreate")}
+        isOpen={showCreateDrawer}
+        onClose={() => setShowCreateDrawer(false)}
+      >
+        {writable ? (
+          <HandoverForm machines={machines} message={formMessage} onSubmit={submitForm} submitting={submitting} />
+        ) : null}
+      </ActionDrawer>
+    </>
   );
 }

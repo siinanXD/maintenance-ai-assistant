@@ -1,24 +1,12 @@
 import type { MaintenanceAuthRuntime } from "../auth/permissions";
 
-type MaintenanceFeature = {
-  readonly key: string;
-  readonly label?: string;
-  readonly permissionKey?: string;
-  readonly route: string;
-  readonly routeAliases?: readonly string[];
-  readonly routePrefixes?: readonly string[];
-};
+/**
+ * Typed access to the globals that the plain scripts in base.html publish:
+ * auth.js (window.maintenanceAuth), core/action-dialogs.js (window.maintenanceDialogs)
+ * and app.js (window.maintenanceFrontend).
+ */
 
-export type MaintenanceFeatureRegistry = {
-  readonly all: readonly MaintenanceFeature[];
-  readonly destinations?: Record<string, string>;
-  readonly forPath?: (pathname: string) => MaintenanceFeature | null;
-  readonly get?: (featureKey: string) => MaintenanceFeature | null;
-  readonly keys?: readonly string[];
-  readonly permissionKeyFor?: (featureKey: string) => string;
-};
-
-export type MaintenanceDialogOptions = {
+type MaintenanceDialogOptions = {
   readonly cancelText?: string;
   readonly confirmText?: string;
   readonly defaultValue?: string;
@@ -34,69 +22,40 @@ export type MaintenanceDialogOptions = {
 type MaintenanceDialogsRuntime = {
   readonly confirmAction?: (options: MaintenanceDialogOptions) => Promise<boolean>;
   readonly requestText?: (options: MaintenanceDialogOptions) => Promise<string | null>;
-  readonly showInfoDialog?: (options: MaintenanceDialogOptions) => Promise<boolean>;
 };
 
+type ToastOptions = string | { readonly variant?: string; readonly duration?: number };
+
 type MaintenanceFrontendRuntime = {
-  readonly setWorkflowStatus?: (message: string, variant?: string) => void;
-  readonly showInterfaceToast?: (message: string, options?: string | { readonly variant?: string; readonly duration?: number }) => void;
+  readonly showInterfaceToast?: (message: string, options?: ToastOptions) => void;
 };
 
 declare global {
   interface Window {
     readonly maintenanceAuth?: MaintenanceAuthRuntime;
     readonly maintenanceDialogs?: MaintenanceDialogsRuntime;
-    readonly maintenanceFeatures?: MaintenanceFeatureRegistry;
     readonly maintenanceFrontend?: MaintenanceFrontendRuntime;
   }
 }
 
 /**
- * Return the legacy auth runtime when auth.js has initialized it.
+ * Return the auth runtime once auth.js has initialized it.
  */
-export function legacyAuthRuntime(): MaintenanceAuthRuntime | null {
+export function authRuntime(): MaintenanceAuthRuntime | null {
   return window.maintenanceAuth || null;
 }
 
 /**
- * Return the legacy feature registry with a stable empty fallback.
+ * Show a toast through app.js.
  */
-export function legacyFeatureRegistry(): MaintenanceFeatureRegistry {
-  return window.maintenanceFeatures || { all: [] };
+export function showToast(message: string, options?: ToastOptions): void {
+  window.maintenanceFrontend?.showInterfaceToast?.(message, options);
 }
 
 /**
- * Return a permission key from the legacy feature registry when available.
+ * Open the shared confirmation dialog, falling back to the browser dialog.
  */
-export function legacyPermissionKeyFor(featureKey: string): string {
-  return legacyFeatureRegistry().permissionKeyFor?.(featureKey) || featureKey;
-}
-
-/**
- * Show a toast through the existing global frontend runtime.
- */
-export function showLegacyToast(
-  message: string,
-  options?: string | { readonly variant?: string; readonly duration?: number }
-): void {
-  if (window.maintenanceFrontend?.showInterfaceToast) {
-    window.maintenanceFrontend.showInterfaceToast(message, options);
-  }
-}
-
-/**
- * Set the shared workflow status through the existing global frontend runtime.
- */
-export function setLegacyWorkflowStatus(message: string, variant?: string): void {
-  if (window.maintenanceFrontend?.setWorkflowStatus) {
-    window.maintenanceFrontend.setWorkflowStatus(message, variant);
-  }
-}
-
-/**
- * Open the legacy confirmation dialog with a browser-confirm fallback.
- */
-export function confirmLegacyAction(options: MaintenanceDialogOptions): Promise<boolean> {
+export function confirmAction(options: MaintenanceDialogOptions): Promise<boolean> {
   if (window.maintenanceDialogs?.confirmAction) {
     return window.maintenanceDialogs.confirmAction(options);
   }
@@ -104,25 +63,12 @@ export function confirmLegacyAction(options: MaintenanceDialogOptions): Promise<
 }
 
 /**
- * Open the legacy text dialog with a browser-prompt fallback.
+ * Open the shared text input dialog.
  */
-export function requestLegacyText(options: MaintenanceDialogOptions): Promise<string | null> {
+export function requestText(options: MaintenanceDialogOptions): Promise<string | null> {
   if (window.maintenanceDialogs?.requestText) {
     return window.maintenanceDialogs.requestText(options);
   }
-  console.warn("maintenanceDialogs.requestText is unavailable", options);
-  showLegacyToast("Eingabedialog konnte nicht geöffnet werden.", "error");
+  showToast("Eingabedialog konnte nicht geöffnet werden.", "error");
   return Promise.resolve(null);
-}
-
-/**
- * Open the legacy info dialog with an alert fallback.
- */
-export function showLegacyInfoDialog(options: MaintenanceDialogOptions): Promise<boolean> {
-  if (window.maintenanceDialogs?.showInfoDialog) {
-    return window.maintenanceDialogs.showInfoDialog(options);
-  }
-  console.warn("maintenanceDialogs.showInfoDialog is unavailable", options);
-  showLegacyToast(options.message || options.title || "Information", "info");
-  return Promise.resolve(true);
 }

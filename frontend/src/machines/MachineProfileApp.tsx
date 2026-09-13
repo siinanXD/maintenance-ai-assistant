@@ -4,16 +4,10 @@ import {
   type ReactNode
 } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { loadMachineProfile } from "./machineApi";
 import { MachineProfileView } from "./components/MachineProfileView";
 import type { MachineProfile } from "./machineTypes";
 import { machineErrorMessage } from "./machineUtils";
-
-const MACHINE_PROFILE_ISLAND = {
-  mountedFlag: "maintenanceMachinesReactMounted",
-  mountEvent: "maintenance-machines-react-mounted"
-};
 
 /**
  * Read the machine id from the React profile root.
@@ -31,11 +25,6 @@ function readMachineId(): number | null {
 export function MachineProfileApp(): ReactNode {
   const [message, setMessage] = useState("Maschinenprofil wird geladen...");
   const [profile, setProfile] = useState<MachineProfile | null>(null);
-
-  useEffect(() => {
-    markIslandMounted(MACHINE_PROFILE_ISLAND);
-  }, []);
-
   useEffect(() => {
     const machineId = readMachineId();
     if (!machineId) {

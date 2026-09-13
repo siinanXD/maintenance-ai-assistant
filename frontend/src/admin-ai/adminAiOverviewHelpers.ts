@@ -36,34 +36,6 @@ export function numberField(source: AdminAiPayload | null, key: string, fallback
 }
 
 /**
- * Format a number with the German frontend locale.
- */
-export function numberText(value: unknown): string {
-  const parsed = Number(value ?? 0);
-  if (!Number.isFinite(parsed)) return String(value ?? "-");
-  return parsed.toLocaleString("de-DE");
-}
-
-/**
- * Format a ratio as whole percent.
- */
-export function percentText(value: unknown): string {
-  const parsed = Number(value ?? 0);
-  return `${Math.round((Number.isFinite(parsed) ? parsed : 0) * 100)}%`;
-}
-
-/**
- * Format a USD cost value like the legacy Admin-AI runtime.
- */
-export function moneyText(value: unknown): string {
-  const parsed = Number(value ?? 0);
-  return `$${(Number.isFinite(parsed) ? parsed : 0).toLocaleString("de-DE", {
-    maximumFractionDigits: 6,
-    minimumFractionDigits: 0
-  })}`;
-}
-
-/**
  * Map Admin-AI health status values to existing CSS tone classes.
  */
 export function toneForStatus(status: unknown): AdminAiStatusCard["tone"] {

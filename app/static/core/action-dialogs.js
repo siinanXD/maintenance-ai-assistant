@@ -173,7 +173,6 @@
 
   window.maintenanceDialogs = {
     confirmAction: (options) => openActionDialog({ ...(options || {}), mode: "confirm" }),
-    requestText: (options) => openActionDialog({ ...(options || {}), mode: "text" }),
-    showInfoDialog: (options) => openActionDialog({ ...(options || {}), mode: "info" })
+    requestText: (options) => openActionDialog({ ...(options || {}), mode: "text" })
   };
 })();

@@ -28,12 +28,12 @@ export function MaintenanceRecommendations({
   onHistory
 }: MaintenanceRecommendationsProps): ReactNode {
   return (
-    <article className="card app-card lg:order-2 lg:col-span-12" data-maintenance-recommendations-panel>
+    <article className="card app-card lg:order-2 lg:col-span-12">
       <div className="card-body">
         <div className="panel-header">
           <div>
             <h2 className="panel-title">Präventive Wartung</h2>
-            <p className="panel-meta" data-maintenance-recommendations-summary>
+            <p className="panel-meta">
               {recommendations.length
                 ? `${recommendations.length} präventive Hinweise aus Aufgaben, Fehlern und Quellen.`
                 : "Keine auffälligen Wartungssignale gefunden."}
@@ -41,7 +41,7 @@ export function MaintenanceRecommendations({
           </div>
           <span className="badge badge-ai">Assist</span>
         </div>
-        <div className="resource-card-grid maintenance-recommendation-grid" data-maintenance-recommendations-list>
+        <div className="resource-card-grid maintenance-recommendation-grid">
           {recommendations.length ? (
             recommendations.map((item) => (
               <article className="resource-card maintenance-recommendation-card" key={`${item.machine?.id || "machine"}-${item.score || 0}`}>

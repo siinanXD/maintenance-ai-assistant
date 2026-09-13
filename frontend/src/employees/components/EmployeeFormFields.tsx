@@ -27,7 +27,7 @@ export function EmployeeFormFields({ draft, idPrefix = "", onDraftChange }: Empl
   }
 
   /**
-   * Return the DOM id for a field while preserving legacy IDs.
+   * Return the DOM id for a form field.
    */
   function id(baseId: string): string {
     return idPrefix ? `${idPrefix}-${baseId}` : baseId;

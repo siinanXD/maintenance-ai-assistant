@@ -65,13 +65,13 @@ export function MachineHistoryPanel({ history }: MachineHistoryPanelProps): Reac
       <div className="card-body">
         <div className="panel-header">
           <div>
-            <h2 className="panel-title" data-machine-history-title>
+            <h2 className="panel-title">
               {history ? `Anlagenakte: ${history.machine.name}` : "Anlagenakte"}
             </h2>
-            <p className="panel-meta" data-machine-history-summary>{history?.summary?.text || "Historie einer Maschine aus Aufgaben, Fehlern und Dokumenten."}</p>
+            <p className="panel-meta">{history?.summary?.text || "Historie einer Maschine aus Aufgaben, Fehlern und Dokumenten."}</p>
           </div>
         </div>
-        <div className="stats-list" data-machine-history-counts>
+        <div className="stats-list">
           {[
             ["Aufgaben", counts.tasks || 0],
             ["Fehler", counts.errors || 0],
@@ -91,11 +91,11 @@ export function MachineHistoryPanel({ history }: MachineHistoryPanelProps): Reac
           </div>
           <button className="btn btn-primary" disabled={busy} type="submit">{busy ? "Fragt..." : "Fragen"}</button>
         </form>
-        <div className={`ai-response${answer.startsWith("Die ") ? " is-error" : ""}`} data-machine-assistant-answer>{answer}</div>
-        <div className="rag-source-panel" data-machine-assistant-sources hidden={!sources.length}>
+        <div className={`ai-response${answer.startsWith("Die ") ? " is-error" : ""}`}>{answer}</div>
+        <div className="rag-source-panel" hidden={!sources.length}>
           <AssistantSources sources={sources} />
         </div>
-        <div className="timeline-list" data-machine-history-list>
+        <div className="timeline-list">
           {history?.timeline?.length ? (
             history.timeline.map((item, index) => (
               <article className="machine-profile-record" key={`${item.title || "item"}-${index}`}>
