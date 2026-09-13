@@ -15,6 +15,7 @@ from app.security import (
 from app.services.attachment_service import delete_attachments_for
 from app.services.maintenance_tag_service import suggest_tags_for_task_payload
 from app.services.operations_tracking_service import record_event
+from app.services.stock_movement_service import task_materials, withdraw_for_task
 from app.services.task_service import (
     create_task,
     delete_task,
@@ -224,3 +225,31 @@ def delete_task_endpoint(task_id):
     if error:
         return service_error_response(error, status)
     return "", 204
+
+
+@tasks_bp.get("/<int:task_id>/materials")
+@dashboard_permission_required("tasks", "view")
+def list_task_materials(task_id):
+    """Return the spare parts withdrawn for a work order."""
+    task = db.get_or_404(Task, task_id)
+    if not same_department_or_admin(task):
+        return error_response("Forbidden", 403)
+    payload, error, status = task_materials(task, current_user())
+    if error:
+        return service_error_response(error, status)
+    return success_response(payload, message="Task materials loaded")
+
+
+@tasks_bp.post("/<int:task_id>/materials")
+@dashboard_permission_required("tasks", "write")
+def withdraw_task_material(task_id):
+    """Withdraw spare parts from stock for a work order."""
+    task = db.get_or_404(Task, task_id)
+    if not same_department_or_admin(task):
+        return error_response("Forbidden", 403)
+    movement, error, status = withdraw_for_task(
+        task, request.get_json(silent=True) or {}, current_user()
+    )
+    if error:
+        return service_error_response(error, status)
+    return success_response(movement.to_dict(), status, "Material withdrawn")

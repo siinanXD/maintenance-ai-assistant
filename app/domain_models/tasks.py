@@ -24,6 +24,10 @@ class Task(db.Model):
     planned_minutes = db.Column(db.Integer, nullable=False, default=0)
     actual_minutes = db.Column(db.Integer, nullable=False, default=0)
     blocked_reason = db.Column(db.String(220), nullable=False, default="")
+    # Incident this work order was raised for; kept when the incident is deleted.
+    error_entry_id = db.Column(
+        db.Integer, db.ForeignKey("error_entry.id", ondelete="SET NULL"), index=True
+    )
     reopened_count = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
     updated_at = db.Column(
@@ -34,6 +38,7 @@ class Task(db.Model):
     )
 
     department = db.relationship("Department", back_populates="tasks")
+    error_entry = db.relationship("ErrorEntry", foreign_keys=[error_entry_id])
     creator = db.relationship(
         "User",
         foreign_keys=[created_by],
@@ -87,6 +92,17 @@ class Task(db.Model):
             "actual_minutes": self.actual_minutes,
             "blocked_reason": self.blocked_reason,
             "reopened_count": self.reopened_count,
+            "error_entry_id": self.error_entry_id,
+            "error_entry": (
+                {
+                    "id": self.error_entry.id,
+                    "error_code": self.error_entry.error_code,
+                    "title": self.error_entry.title,
+                    "status": self.error_entry.status,
+                }
+                if self.error_entry
+                else None
+            ),
             "response_minutes": response_minutes,
             "cycle_minutes": cycle_minutes,
             "created_at": self.created_at.isoformat(),

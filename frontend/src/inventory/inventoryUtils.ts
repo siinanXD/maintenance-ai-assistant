@@ -46,14 +46,16 @@ export function materialSearchText(material: InventoryMaterial): string {
 /**
  * Return KPI values for the inventory status cards.
  */
-export function inventoryStats(materials: readonly InventoryMaterial[], threshold: number) {
+export function inventoryStats(materials: readonly InventoryMaterial[]) {
   const totalValue = materials.reduce((sum, material) => sum + Number(material.total_value || 0), 0);
-  const lowStock = materials.filter((material) => Number(material.quantity || 0) <= threshold).length;
+  const lowStock = materials.filter((material) => (
+    Number(material.min_quantity || 0) > 0 && Number(material.quantity || 0) <= Number(material.min_quantity)
+  )).length;
   const linked = materials.filter((material) => Boolean(material.machine?.name)).length;
 
   return {
     count: `${materials.length} Artikel`,
-    lowStock: `${lowStock} kritisch`,
+    lowStock: `${lowStock} nachbestellen`,
     totalValue: formatMoney(totalValue),
     linked: `${linked} zugeordnet`
   };

@@ -27,7 +27,12 @@ from app.domain_models.documents import (
     MachineManualVersion,
 )
 from app.domain_models.errors import ErrorEntry
-from app.domain_models.machines import InventoryMaterial, Machine, MaintenancePlan
+from app.domain_models.machines import (
+    InventoryMaterial,
+    InventoryMovement,
+    Machine,
+    MaintenancePlan,
+)
 from app.domain_models.notifications import Notification, NotificationDelivery
 from app.domain_models.operations import OperationalEvent, OperationalKpiAggregate
 from app.domain_models.organization import AuditLogEntry, DashboardPermission, Department, Site
@@ -45,6 +50,7 @@ from app.domain_models.workforce import (
 )
 
 __all__ = [
+    "InventoryMovement",
     "Attachment",
     "AIAuditEvent",
     "AIAnswerTrace",

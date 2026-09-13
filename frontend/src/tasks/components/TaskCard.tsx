@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 
 import { AttachmentPanel } from "../../components/attachments/AttachmentPanel";
+import { TaskMaterialsPanel } from "./TaskMaterialsPanel";
 import { deleteTask, runTaskAction } from "../taskApi";
 import type { MessageState, Task } from "../taskTypes";
 import {
@@ -52,12 +53,17 @@ export function TaskCard({
       error: false
     });
 
+    const incident = task.error_entry;
+    const closeIncident = action === "complete" && incident && incident.status !== "closed"
+      ? window.confirm(`Störung ${incident.error_code} „${incident.title}“ ebenfalls schließen?`)
+      : false;
+
     try {
-      await runTaskAction(task.id, action);
+      await runTaskAction(task.id, action, { closeIncident });
       await onMutated();
       onPrioritiesStale();
       onMessageChange({
-        text: action === "start" ? "Aufgabe gestartet." : "Aufgabe abgeschlossen.",
+        text: action === "start" ? "Aufgabe gestartet." : closeIncident ? "Aufgabe abgeschlossen, Störung geschlossen." : "Aufgabe abgeschlossen.",
         error: false
       });
     } catch (error) {
@@ -106,6 +112,11 @@ export function TaskCard({
       <div className="task-card-top">
         <div className="task-card-heading">
           <span className="task-type-badge">{taskTypeLabel(task)}</span>
+          {task.error_entry ? (
+            <a className="task-incident-link" href={`/errors?search=${encodeURIComponent(task.error_entry.error_code)}`}>
+              Störung {task.error_entry.error_code}
+            </a>
+          ) : null}
           <h3 className="task-card-title">{task.title}</h3>
         </div>
         <div className="task-card-badges">
@@ -147,6 +158,7 @@ export function TaskCard({
         ) : null}
       </div>
 
+      <TaskMaterialsPanel open={task.status === "open" || task.status === "in_progress"} taskId={task.id} writable={writable} />
       <AttachmentPanel entityId={task.id} entityType="task" writable={writable} />
 
       <div className="task-card-actions">

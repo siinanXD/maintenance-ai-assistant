@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AttachmentPanel } from "../../components/attachments/AttachmentPanel";
+import { canWriteDashboard } from "../../auth/permissions";
 import { closeErrorEntry, deleteErrorEntry, loadSimilarErrors } from "../errorApi";
 import type { ErrorEntry, ErrorFilters, MessageState, SimilarErrorResult } from "../errorTypes";
 import {
@@ -94,6 +95,14 @@ function ErrorCardActions(props: {
 
   return (
     <div className="error-card-actions">
+      {status !== "closed" && canWriteDashboard("tasks") ? (
+        <a className="btn btn-primary btn-sm" data-error-work-order href={`/tasks?from_error=${props.entry.id}`}>Auftrag anlegen</a>
+      ) : null}
+      {props.entry.open_task_count ? (
+        <a className="btn btn-ghost btn-sm" href={`/tasks?search=${encodeURIComponent(props.entry.error_code || props.entry.title || "")}`}>
+          {props.entry.open_task_count === 1 ? "1 offener Auftrag" : `${props.entry.open_task_count} offene Aufträge`}
+        </a>
+      ) : null}
       <button className="btn btn-outline btn-sm" type="button" onClick={handleSimilar}>Ähnliche Fehler finden</button>
       {props.writable && status !== "closed" ? <button className="btn btn-outline btn-sm" type="button" onClick={handleClose}>Schließen</button> : null}
       {props.writable ? <button className="btn btn-outline btn-sm" type="button" onClick={() => props.onEdit(props.entry)}>Bearbeiten</button> : null}

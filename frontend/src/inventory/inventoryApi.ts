@@ -1,6 +1,6 @@
 import { apiRequest } from "../api/client";
 import { listData, unwrapData } from "../api/payload";
-import type { InventoryForecast, InventoryMaterial, Machine } from "./inventoryTypes";
+import type { InventoryForecast, InventoryMaterial, Machine, ReorderSuggestions } from "./inventoryTypes";
 
 export type CreateMaterialPayload = {
   readonly name: string;
@@ -61,4 +61,21 @@ export async function calculateInventoryForecast(payload: ForecastPayload): Prom
   });
 
   return unwrapData<InventoryForecast>(response);
+}
+
+/**
+ * Load materials at or below minimum stock with order proposals.
+ */
+export async function loadReorderSuggestions(): Promise<ReorderSuggestions> {
+  return unwrapData<ReorderSuggestions>(await apiRequest<unknown>("/api/v1/inventory/reorder"));
+}
+
+/**
+ * Book delivered parts into stock.
+ */
+export async function bookGoodsReceipt(materialId: number, quantity: number, note: string): Promise<void> {
+  await apiRequest<unknown>(`/api/v1/inventory/${materialId}/receipts`, {
+    method: "POST",
+    body: { quantity, note }
+  });
 }

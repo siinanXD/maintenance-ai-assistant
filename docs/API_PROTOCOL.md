@@ -808,6 +808,48 @@ DELETE /api/v1/attachments/{id}
 
 Wird die Stoerung oder der Task geloescht, verschwinden die Anhaenge mit.
 
+## Auftrag aus Stoerung
+
+`POST /api/v1/tasks` akzeptiert `error_entry_id`. Der Task zeigt dann
+`error_entry` (`id`, `error_code`, `title`, `status`). Die Stoerung muss fuer
+den Nutzer sichtbar sein (gleiche Abteilung oder Admin, Recht `errors:view`),
+sonst `400` bzw. `403`. `GET /api/v1/errors` liefert je Eintrag
+`open_task_count` mit den offenen und laufenden Auftraegen.
+
+```http
+POST /api/v1/tasks/{task_id}/complete
+Content-Type: application/json
+
+{ "close_error_entry": true }
+```
+
+schliesst die verknuepfte Stoerung mit. Fehlt `errors:write`, antwortet der
+Endpunkt `403` und der Task bleibt offen.
+
+## Ersatzteile am Auftrag
+
+```http
+POST /api/v1/tasks/{task_id}/materials
+Content-Type: application/json
+
+{ "material_id": 7, "quantity": 2, "note": "Antriebsseite" }
+```
+
+bucht eine Entnahme (`tasks:write` und `inventory:view`). Der Bestand sinkt
+sofort; reicht er nicht, kommt `409` mit dem verfuegbaren Bestand. Fuer
+abgeschlossene Auftraege ebenfalls `409`. `GET` auf denselben Pfad listet die
+Entnahmen mit `total_value`.
+
+```http
+POST /api/v1/inventory/{material_id}/receipts   { "quantity": 10, "note": "LS 4711" }
+GET  /api/v1/inventory/{material_id}/movements
+GET  /api/v1/inventory/reorder
+```
+
+`reorder` listet alle Positionen mit `quantity <= min_quantity`. Die
+Bestellmenge fuellt auf das Doppelte des Minimums auf und deckt den Verbrauch
+der letzten 90 Tage waehrend `lead_time_days`.
+
 ## QR-Etikett je Maschine
 
 ```http

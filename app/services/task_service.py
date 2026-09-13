@@ -36,6 +36,26 @@ TASK_PRIORITY_MODES = {TASK_PRIORITY_MODE_AI, TASK_PRIORITY_MODE_LOCAL}
 # ---------------------------------------------------------------------------
 
 
+def linked_error_entry(value, user):
+    """Return the incident a work order is raised for, or ``None`` when unset.
+
+    Raises ``PermissionError`` when the user may not read incidents or the
+    incident belongs to another department, ``ValueError`` when it is unknown.
+    """
+    if value in (None, ""):
+        return None
+    try:
+        entry_id = int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("error_entry_id must be a number") from exc
+    if not has_dashboard_permission(user, "errors", "view"):
+        raise PermissionError("Keine Berechtigung fuer Stoerungen")
+    entry = visible_errors_query(user).filter(ErrorEntry.id == entry_id).first()
+    if entry is None:
+        raise ValueError("error_entry_id does not reference a visible incident")
+    return entry
+
+
 def parse_date(value):
     """Parse an ISO date string into a date object, defaulting to today."""
     if not value:
@@ -165,6 +185,7 @@ def create_task(data, user):
         validate_task_payload(data, require_title=True)
         department = get_department_for_payload(data, user)
         requested_status = parse_enum(TaskStatus, data.get("status"), TaskStatus.OPEN)
+        error_entry = linked_error_entry(data.get("error_entry_id"), user)
 
         task = Task(
             title=data["title"].strip(),
@@ -183,6 +204,7 @@ def create_task(data, user):
                 "actual_minutes",
             ),
             blocked_reason=str(data.get("blocked_reason") or "").strip(),
+            error_entry=error_entry,
         )
         update_task_status(task, requested_status, user)
     except PermissionError as exc:

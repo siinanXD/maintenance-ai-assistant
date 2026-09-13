@@ -7,7 +7,8 @@ export const EMPTY_TASK_DRAFT: TaskDraft = {
   priority: "normal",
   status: "open",
   due_date: "",
-  description: ""
+  description: "",
+  error_entry_id: ""
 };
 
 export const EMPTY_TASK_FILTERS: TaskFilters = {
@@ -42,7 +43,8 @@ export function draftFromTask(task: Task): TaskDraft {
     priority: task.priority || "normal",
     status: task.status || "open",
     due_date: task.due_date || "",
-    description: task.description || ""
+    description: task.description || "",
+    error_entry_id: ""
   };
 }
 
@@ -76,7 +78,47 @@ export function draftFromSuggestion(suggestion: TaskSuggestion): TaskDraft {
       suggestion.description,
       suggestion.possible_cause ? `Mögliche Ursache: ${suggestion.possible_cause}` : "",
       suggestion.recommended_action ? `Nächste Aktion: ${suggestion.recommended_action}` : ""
-    ].filter(Boolean).join("\n\n")
+    ].filter(Boolean).join("\n\n"),
+    error_entry_id: ""
+  };
+}
+
+const PRIORITY_BY_SEVERITY: Readonly<Record<string, TaskPriority>> = {
+  critical: "urgent",
+  high: "urgent",
+  medium: "soon",
+  low: "normal"
+};
+
+/**
+ * Build a work order draft for an incident: code and title, what was observed,
+ * the documented cause and fix, and a priority derived from the severity.
+ */
+export function draftFromIncident(entry: {
+  readonly id: number;
+  readonly error_code?: string;
+  readonly title?: string;
+  readonly machine?: string;
+  readonly severity?: string;
+  readonly symptoms?: string;
+  readonly description?: string;
+  readonly possible_causes?: string;
+  readonly solution?: string;
+  readonly department?: { readonly name: string } | null;
+}): TaskDraft {
+  return {
+    title: [entry.error_code, entry.title].filter(Boolean).join(" – ").slice(0, 160),
+    department: entry.department?.name || "",
+    priority: PRIORITY_BY_SEVERITY[entry.severity || ""] || "normal",
+    status: "open",
+    due_date: "",
+    description: [
+      entry.machine ? `Maschine: ${entry.machine}` : "",
+      entry.symptoms || entry.description ? `Befund: ${entry.symptoms || entry.description}` : "",
+      entry.possible_causes ? `Mögliche Ursache: ${entry.possible_causes}` : "",
+      entry.solution ? `Bekannte Lösung: ${entry.solution}` : ""
+    ].filter(Boolean).join("\n\n"),
+    error_entry_id: String(entry.id)
   };
 }
 
