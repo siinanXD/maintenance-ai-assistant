@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from datetime import date, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
+from zoneinfo import ZoneInfo
+
+from flask import current_app
 
 from app.services.ai_prompting import permission_denied_answer
 
@@ -133,29 +136,45 @@ def aggregate_or_row_sources(row_sources, scope, count, user):
     return [aggregate] if aggregate else []
 
 
+def plant_timezone():
+    """Return the timezone in which "today" and "tomorrow" are meant (PLANT_TIMEZONE)."""
+    return ZoneInfo(current_app.config.get("PLANT_TIMEZONE", "Europe/Berlin"))
+
+
+def plant_today():
+    """Return today's calendar date at the plant, independent of the server clock."""
+    return datetime.now(plant_timezone()).date()
+
+
+def plant_day_start_utc(day):
+    """Return the UTC timestamp (naive, like stored columns) at which a plant day starts."""
+    local_start = datetime.combine(day, time.min, tzinfo=plant_timezone())
+    return local_start.astimezone(UTC).replace(tzinfo=None)
+
+
 def day_bounds(day):
-    """Return inclusive datetime bounds for one calendar day."""
-    return datetime.combine(day, time.min), datetime.combine(day, time.max)
+    """Return UTC bounds [start, next start) of one plant calendar day for timestamp columns."""
+    return plant_day_start_utc(day), plant_day_start_utc(day + timedelta(days=1))
 
 
 def today_bounds():
-    """Return datetime bounds for today."""
-    return day_bounds(date.today())
+    """Return UTC bounds of today at the plant."""
+    return day_bounds(plant_today())
 
 
 def yesterday_bounds():
-    """Return datetime bounds for yesterday."""
-    return day_bounds(date.today() - timedelta(days=1))
+    """Return UTC bounds of yesterday at the plant."""
+    return day_bounds(plant_today() - timedelta(days=1))
 
 
 def tomorrow():
-    """Return tomorrow's date."""
-    return date.today() + timedelta(days=1)
+    """Return tomorrow's plant calendar date."""
+    return plant_today() + timedelta(days=1)
 
 
 def next_week_bounds():
     """Return the next calendar week as an inclusive date range."""
-    today = date.today()
+    today = plant_today()
     next_monday = today + timedelta(days=7 - today.weekday())
     return next_monday, next_monday + timedelta(days=6)
 

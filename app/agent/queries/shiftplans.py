@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import timedelta
 
 from app.models import ShiftPlan, ShiftPlanCoverageSlot, ShiftPlanEntry
 from app.security import employee_access_level, has_dashboard_permission
@@ -19,6 +19,7 @@ from .common import (
     build_structured_context,
     denied_outcome,
     parse_iso_date,
+    plant_today,
     tomorrow,
 )
 
@@ -66,7 +67,7 @@ def _date_for_time_range(time_range):
     """Return a work date for the supported relative ranges (default tomorrow)."""
     text = str(time_range or "").strip().lower()
     if text == "today":
-        return date.today()
+        return plant_today()
     return tomorrow()
 
 
@@ -124,7 +125,7 @@ def _shift_count(user, shift):
 
 def _understaffed_next_week(user):
     """Return visible undercoverage slots for the next calendar week."""
-    today = date.today()
+    today = plant_today()
     start_date = today + timedelta(days=7 - today.weekday())
     end_date = start_date + timedelta(days=6)
     slots = [
