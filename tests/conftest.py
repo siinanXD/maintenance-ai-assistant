@@ -30,7 +30,7 @@ _USER_COUNTER = count(1)
 @pytest.fixture(autouse=True)
 def _closed_atlas_circuit():
     """Start every test with the Atlas circuit breaker closed."""
-    from app.services.vector_store_service import reset_atlas_circuit
+    from app.services.vector_store_atlas import reset_atlas_circuit
 
     reset_atlas_circuit()
     yield

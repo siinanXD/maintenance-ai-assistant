@@ -189,10 +189,8 @@ def _embedding_model_label(provider):
 def sync_vector_store_document(document, chunks):
     """Persist indexed chunks in the configured external vector store when enabled."""
     try:
-        from app.services.vector_store_service import (
-            VectorRecord,
-            get_vector_store,
-        )
+        from app.services.vector_store_common import VectorRecord
+        from app.services.vector_store_service import get_vector_store
     except ImportError as exc:
         record_vector_sync_failure(document.id, "unavailable", exc)
         logger.warning("vector_store_import_failed document_id=%s error=%s", document.id, exc)

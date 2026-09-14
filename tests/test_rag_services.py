@@ -62,11 +62,8 @@ from app.services.retrieval_candidate_service import (
 )
 from app.services.retrieval_service import knowledge_context_for_chat, retrieve_context
 from app.services.technical_entity_service import extract_technical_entities
-from app.services.vector_store_service import (
-    _flat_metadata,
-    _rerank_candidate_limit,
-    get_vector_store,
-)
+from app.services.vector_store_common import flat_metadata, rerank_candidate_limit
+from app.services.vector_store_service import get_vector_store
 
 
 def test_validate_runtime_config_accepts_semantic_chunking_defaults():
@@ -824,7 +821,7 @@ def test_chunk_vector_metadata_includes_safe_source_scope_metadata(
 
 def test_flat_metadata_omits_none_values_for_chroma():
     """Verify Chroma metadata normalization does not emit unsupported None values."""
-    metadata = _flat_metadata(
+    metadata = flat_metadata(
         {
             "id": 7,
             "machine_id": None,
@@ -1977,8 +1974,8 @@ def test_rag_rerank_candidate_limit_fetches_more_than_final_top_k(app):
         app.config["RAG_TOP_K"] = 4
         app.config["RAG_RERANK_CANDIDATE_LIMIT"] = 20
 
-        assert _rerank_candidate_limit(app.config["RAG_TOP_K"]) == 20
-        assert _rerank_candidate_limit(30) == 30
+        assert rerank_candidate_limit(app.config["RAG_TOP_K"]) == 20
+        assert rerank_candidate_limit(30) == 30
 
 
 def test_machine_aware_retrieval_prefers_same_error_machine(
