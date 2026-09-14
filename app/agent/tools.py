@@ -574,7 +574,7 @@ register_tool(
 
 def _draft_task(user, arguments):
     """Return a non-persisted task draft from free text."""
-    from app.services.task_service import suggest_task_from_text
+    from app.services.task_ai_service import suggest_task_from_text
 
     suggestion, error, status = suggest_task_from_text({"text": arguments["text"]}, user)
     if error:
@@ -612,7 +612,7 @@ register_tool(
 
 def _prioritize_tasks(user, arguments):
     """Return read-only priority scores for visible tasks."""
-    from app.services.task_service import prioritize_visible_tasks
+    from app.services.task_ai_service import prioritize_visible_tasks
 
     payload = {"limit": arguments.get("limit") or 10}
     if arguments.get("status"):

@@ -47,8 +47,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   week", overdue) follow the plant calendar (`PLANT_TIMEZONE`, default
   Europe/Berlin) instead of comparing the server's local date with UTC timestamps
 - The shift plan publish button received its label text as CSS class
+- `success_payload` no longer lets a body key named `success` flip the
+  response envelope; a dict result is the response body (documented)
+- The "In Bearbeitung" kanban column carried the orange action colour; it is a
+  state and now uses the info blue
 
 ### Changed
+- `task_service.py` (1,300 lines) split into task CRUD, `task_ai_service.py`
+  (prioritization, suggestions) and `task_priority_context_service.py`
+  (history and evidence); `ai_observability_service.py` (2,460 lines) split
+  into dashboard, chats, sources, actions, debug and common modules
 - Frontend: every page folder has `entry.tsx`, `<Page>App.tsx`, API/type/util
   modules and `components/`; entries share `mountPage`. Pages use one
   `PageHeader` and one `StatStrip` instead of eleven header and eight stats components,

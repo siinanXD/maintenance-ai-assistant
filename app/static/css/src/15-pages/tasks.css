@@ -148,7 +148,7 @@
   }
 
   .kanban-column.is-progress {
-    border-top: 4px solid var(--color-action-primary);
+    border-top: 4px solid var(--color-status-info-text);
   }
 
   .kanban-column.is-done {
@@ -304,7 +304,7 @@
 }
 
 .task-maintenance-board .kanban-column.is-progress {
-  border-top-color: var(--color-border-focus);
+  border-top-color: var(--color-status-info-text);
 }
 
 .task-maintenance-board .kanban-column.is-done {

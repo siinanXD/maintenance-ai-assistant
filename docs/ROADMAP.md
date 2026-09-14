@@ -6,13 +6,10 @@ Living notes for maintainers. For product scope see [`FEATURES.md`](FEATURES.md)
 
 | Priority | Area | Notes |
 | --- | --- | --- |
-| Medium | `app/responses.py` | `payload.update(data)` can make root and nested `data` inconsistent |
-| Medium | `app/shiftplans/services.py` | Large module; candidate for focused sub-modules |
-| Small | Datetime usage | Replace remaining `datetime.utcnow()` with timezone-aware UTC |
-| Small | SQLAlchemy access | Prefer `db.session.get()` over legacy query `.get()` |
-| Small | Seeds | Overlap between `seed.py` and `seed_demo.py` |
-| Medium | `app/static/css/src/15-pages/` | Page styles are separated per page and read tokens, but still carry about 460 fixed colour values that `90-overrides/token-overrides.css` covers. Move one page at a time onto `20-components/` and delete its override entries; see `app/static/css/README.md` |
-| Small | `frontend/src/admin-ai/` | Largest page (views for operations, observability, answers, prompts, knowledge); the section components are still long single files |
+| Medium | Long service modules | `vector_store_service.py` (1,500 lines), `retrieval_evaluation_service.py` (1,460), `ai_service.py` (1,100), `retrieval_telemetry_service.py` (1,000) and `knowledge_gap_service.py` (990) each hold several concerns. Split the way `task_service` and `ai_observability_*` were split: one module per concern, cross-module names public, no re-exports |
+| Small | `app/docs/openapi_extensions.py` | 3,400 lines of API examples in one file; group by blueprint |
+| Small | `app/static/css/src/10-legacy/` | 3,700 lines of shared building blocks plus 340 lines in `90-overrides/token-overrides.css` that correct their token choices. Move one page at a time onto `20-components/` and delete its override entries; see `app/static/css/README.md` |
+| Small | `frontend/src/admin-ai/` | Largest page; `adminAiSourceCheckModel.ts`, `AdminAiSourceCheck.tsx` and `AdminAiEffectiveness.tsx` are still around 300 lines |
 | Small | `app/agent/mock_policy.py` | Offline keyword policy grows with every tool; keep golden cases in `app/agent/evals.py` in sync and prefer new `list_*` parameters over new keyword branches |
 
 ## New endpoint checklist
