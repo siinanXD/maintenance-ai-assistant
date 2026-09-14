@@ -203,7 +203,7 @@ def test_css_reads_design_tokens_not_legacy_variables():
 
 
 def test_page_styles_take_colors_from_tokens_so_dark_mode_follows():
-    """Verify page CSS has no fixed colors; only dark shadows, scrims and sidebar highlights stay."""
+    """Verify page CSS has no fixed colors; dark shadows, scrims and sidebar highlights stay."""
     palette = re.compile(
         r"\b(?:bg|text|border|ring|outline|divide|from|via|to)-(?:white|black|"
         r"(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|"
