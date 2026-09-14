@@ -6,35 +6,35 @@
   }
 
   .review-check-item {
-    @apply flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4;
+    @apply flex items-start gap-3 rounded-2xl border border-border-subtle bg-bg-surface p-4;
   }
 
   .review-check-marker {
-    @apply mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-slate-300 bg-white text-sm font-black text-slate-600;
+    @apply mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border border-border-default bg-bg-surface text-sm font-black text-text-secondary;
   }
 
   .review-check-item.is-good .review-check-marker {
-    @apply border-green-200 bg-green-50 text-green-700;
+    @apply border-status-success-border bg-status-success-bg text-status-success-text;
   }
 
   .review-check-item.is-warning .review-check-marker {
-    @apply border-amber-200 bg-amber-50 text-amber-800;
+    @apply border-status-warning-border bg-status-warning-bg text-status-warning-text;
   }
 
   .review-check-item.is-critical .review-check-marker {
-    @apply border-red-200 bg-red-50 text-red-700;
+    @apply border-status-danger-border bg-status-danger-bg text-status-danger-text;
   }
 
   .review-check-content strong {
-    @apply block text-sm font-black text-slate-950;
+    @apply block text-sm font-black text-text-primary;
   }
 
   .review-check-content span {
-    @apply mt-1 block text-sm leading-6 text-slate-600;
+    @apply mt-1 block text-sm leading-6 text-text-secondary;
   }
 
   .review-check-content small {
-    @apply mt-2 block text-xs font-bold uppercase tracking-normal text-slate-500;
+    @apply mt-2 block text-xs font-bold uppercase tracking-normal text-text-secondary;
   }
 
   .documents-work-grid {

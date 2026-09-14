@@ -184,7 +184,7 @@
     justify-content: space-between;
     gap: 1rem;
     margin-bottom: 1rem;
-    border-bottom: 1px solid #e5edf4;
+    border-bottom: 1px solid var(--color-border-subtle);
     padding-bottom: 0.85rem;
   }
 
@@ -280,25 +280,25 @@
   }
 
   .badge-ai {
-    border-color: #bce3e2;
-    background: #e9fbfa;
-    color: #087b78;
+    border-color: var(--color-border-default);
+    background: var(--color-bg-canvas);
+    color: var(--color-text-secondary);
   }
 
   .badge-priority.is-urgent,
   .badge-status.is-open,
   .ops-status-pill.is-critical,
   .status-pill.is-error {
-    border-color: #f3bdc4;
-    background: #fff1f3;
+    border-color: var(--color-status-danger-border);
+    background: var(--color-status-danger-bg);
     color: var(--color-status-danger-solid);
   }
 
   .badge-priority.is-soon,
   .ops-status-pill.is-warning,
   .status-pill.is-stale {
-    border-color: #f2d29c;
-    background: #fff8eb;
+    border-color: var(--color-status-warning-border);
+    background: var(--color-status-warning-bg);
     color: var(--color-status-warning-solid);
   }
 
@@ -306,13 +306,13 @@
   .badge-status.is-done,
   .ops-status-pill.is-good,
   .status-pill.is-active {
-    border-color: #b8dec8;
-    background: #effaf4;
+    border-color: var(--color-status-success-border);
+    background: var(--color-status-success-bg);
     color: var(--color-status-success-solid);
   }
 
   .badge-status.is-progress {
-    border-color: #bdd8f2;
+    border-color: var(--color-border-default);
     background: var(--color-bg-canvas);
     color: var(--color-action-primary);
   }
@@ -365,7 +365,7 @@
     z-index: 2;
     border-bottom: 1px solid var(--color-border-default);
     background: var(--color-bg-canvas);
-    color: #4b5e72;
+    color: var(--color-text-secondary);
     font-size: 0.7rem;
     font-weight: 950;
     letter-spacing: 0;
@@ -375,7 +375,7 @@
   .data-table th,
   .data-table td {
     padding: 0.82rem 0.9rem;
-    border-bottom: 1px solid #e7eef5;
+    border-bottom: 1px solid var(--color-border-subtle);
     vertical-align: top;
   }
 
@@ -475,8 +475,8 @@
   .guided-empty-state {
     border-left: 4px solid var(--color-action-primary);
     background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(243, 248, 252, 0.98)),
-    #ffffff;
+    linear-gradient(135deg, color-mix(in srgb, var(--color-bg-surface) 96%, transparent), color-mix(in srgb, var(--color-bg-surface) 98%, transparent)),
+    var(--color-bg-surface);
     color: var(--color-text-secondary);
     box-shadow: var(--elevation-xs);
   }

@@ -19,6 +19,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   with result, follow-up orders, re-test after a failed inspection
 - Availability, MTBF and MTTR per machine over 90 days
 - Static assets are versioned by content hash instead of manual `?v=` strings
+- Dark design: follows the system setting, switchable in the user menu, set
+  before the first paint. About 460 fixed color values and 400 Tailwind palette
+  utilities in the page styles now read the design tokens
 
 ### Removed
 - Dead code found by AST, import-graph and CSS scans: 44 unused Python

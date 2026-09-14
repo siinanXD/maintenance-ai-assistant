@@ -6,7 +6,12 @@ import { currentPathWithSearch, displayStoredUserName, loginUrlForPath } from ".
 import { userInitials, userRoleLabel } from "../auth/userLabels";
 import { ShellGlobalSearch } from "./ShellGlobalSearch";
 import { ShellMobileNavigation } from "./ShellNavigation";
-import { useHighContrastPreference, useNotificationBadge, useShellShiftState } from "./shellTopbarState";
+import {
+  useDarkThemePreference,
+  useHighContrastPreference,
+  useNotificationBadge,
+  useShellShiftState
+} from "./shellTopbarState";
 
 type ShellTopbarProps = {
   readonly currentPath: string;
@@ -17,7 +22,7 @@ type ShellTopbarProps = {
  * Render the topbar and global search hooks for the React shell.
  *
  * One row at desktop widths: title, search, the current shift with date, notifications
- * and a compact user menu. Contrast and logout live inside the user menu instead of
+ * and a compact user menu. Contrast, light/dark design and logout live inside the user menu instead of
  * taking two permanent buttons in the bar.
  */
 export function ShellTopbar({ currentPath, title }: ShellTopbarProps): ReactNode {
@@ -25,6 +30,7 @@ export function ShellTopbar({ currentPath, title }: ShellTopbarProps): ReactNode
   const session = useAuthSession();
   const shiftState = useShellShiftState();
   const [highContrastEnabled, toggleHighContrast] = useHighContrastPreference();
+  const [darkThemeEnabled, toggleDarkTheme] = useDarkThemePreference();
   const isLoggedIn = Boolean(session.token);
   const [unreadNotifications, markNotificationsRead] = useNotificationBadge(isLoggedIn);
   const sessionName = displayStoredUserName(session.user);
@@ -130,6 +136,15 @@ export function ShellTopbar({ currentPath, title }: ShellTopbarProps): ReactNode
                 onClick={toggleHighContrast}
               >
                 {highContrastEnabled ? "Standard-Kontrast" : "Hoher Kontrast"}
+              </button>
+              <button
+                className="user-menu-item"
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={darkThemeEnabled}
+                onClick={toggleDarkTheme}
+              >
+                {darkThemeEnabled ? "Helles Design" : "Dunkles Design"}
               </button>
               <button
                 className="user-menu-item is-danger"

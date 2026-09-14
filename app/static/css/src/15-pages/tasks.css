@@ -2,7 +2,7 @@
 
 @layer components {
   .task-card {
-    @apply flex min-h-36 flex-col rounded-2xl border border-slate-200 bg-white p-3.5 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/5 sm:min-h-40 sm:p-4;
+    @apply flex min-h-36 flex-col rounded-2xl border border-border-subtle bg-bg-surface p-3.5 text-left shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-border-default hover:shadow-lg hover:shadow-blue-950/5 sm:min-h-40 sm:p-4;
   }
 
   button.task-card {
@@ -14,19 +14,19 @@
   }
 
   .task-card-title {
-    @apply text-base font-bold leading-6 text-slate-950;
+    @apply text-base font-bold leading-6 text-text-primary;
   }
 
   .task-card-description {
-    @apply text-sm leading-6 text-slate-600 sm:min-h-12;
+    @apply text-sm leading-6 text-text-secondary sm:min-h-12;
   }
 
   .task-card-meta {
-    @apply mt-3 flex flex-wrap gap-2 text-xs font-medium text-slate-500 sm:mt-4;
+    @apply mt-3 flex flex-wrap gap-2 text-xs font-medium text-text-secondary sm:mt-4;
   }
 
   .task-card-meta span {
-    @apply rounded-full bg-slate-100 px-2.5 py-1;
+    @apply rounded-full bg-bg-canvas px-2.5 py-1;
   }
 
   .task-card-actions {
@@ -46,15 +46,15 @@
   }
 
   .task-detail-row {
-    @apply rounded-2xl border border-slate-200 bg-slate-50 p-4;
+    @apply rounded-2xl border border-border-subtle bg-bg-surface p-4;
   }
 
   .task-detail-row span {
-    @apply block text-xs font-bold uppercase text-slate-500;
+    @apply block text-xs font-bold uppercase text-text-secondary;
   }
 
   .task-detail-row strong {
-    @apply mt-1 block break-words text-sm font-semibold text-slate-950;
+    @apply mt-1 block break-words text-sm font-semibold text-text-primary;
   }
 
   .priority-score-list {
@@ -62,23 +62,23 @@
   }
 
   .priority-score-card {
-    @apply flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:border-blue-100 hover:shadow-md hover:shadow-blue-950/5;
+    @apply flex gap-4 rounded-2xl border border-border-subtle bg-bg-surface p-4 shadow-sm transition duration-200 hover:border-border-subtle hover:shadow-md hover:shadow-blue-950/5;
   }
 
   .priority-score-num {
-    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xl font-black text-slate-950;
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg-canvas text-xl font-black text-text-primary;
   }
 
   .priority-score-num.is-high {
-    @apply bg-red-50 text-red-700;
+    @apply bg-status-danger-bg text-status-danger-text;
   }
 
   .priority-score-num.is-medium {
-    @apply bg-amber-50 text-amber-800;
+    @apply bg-status-warning-bg text-status-warning-text;
   }
 
   .priority-score-num.is-low {
-    @apply bg-green-50 text-green-700;
+    @apply bg-status-success-bg text-status-success-text;
   }
 
   .priority-score-body {
@@ -90,15 +90,15 @@
   }
 
   .priority-score-title {
-    @apply text-sm font-bold leading-5 text-slate-950;
+    @apply text-sm font-bold leading-5 text-text-primary;
   }
 
   .priority-score-reason {
-    @apply mt-1.5 text-sm leading-5 text-slate-500;
+    @apply mt-1.5 text-sm leading-5 text-text-secondary;
   }
 
   .priority-score-action {
-    @apply mt-1 text-sm font-semibold text-blue-700;
+    @apply mt-1 text-sm font-semibold text-text-link;
   }
 
   .task-workflow-grid {
@@ -160,7 +160,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 0.8rem;
-    border-bottom: 1px solid #e2ebf4;
+    border-bottom: 1px solid var(--color-border-subtle);
     padding: 0.9rem;
   }
 
@@ -300,15 +300,15 @@
 }
 
 .task-maintenance-board .kanban-column.is-open {
-  border-top-color: #ef4444;
+  border-top-color: var(--color-status-danger-solid);
 }
 
 .task-maintenance-board .kanban-column.is-progress {
-  border-top-color: #14b8a6;
+  border-top-color: var(--color-border-focus);
 }
 
 .task-maintenance-board .kanban-column.is-done {
-  border-top-color: #22c55e;
+  border-top-color: var(--color-status-success-solid);
 }
 
 .task-maintenance-board .kanban-column-header small {
@@ -332,20 +332,20 @@
 
 .task-card.is-priority-urgent,
 .task-card.is-overdue {
-  border-left-color: #ef4444;
+  border-left-color: var(--color-status-danger-solid);
 }
 
 .task-card.is-priority-soon,
 .task-card.is-due-today {
-  border-left-color: #f59e0b;
+  border-left-color: var(--color-status-warning-solid);
 }
 
 .task-card.is-in_progress {
-  border-left-color: #14b8a6;
+  border-left-color: var(--color-border-focus);
 }
 
 .task-card.is-done {
-  border-left-color: #22c55e;
+  border-left-color: var(--color-status-success-solid);
 }
 
 .task-card-heading {
@@ -399,9 +399,9 @@
 }
 
 .task-card-meta span.is-risk {
-  border-color: rgba(239, 68, 68, 0.3);
-  background: #fff5f5;
-  color: #991b1b;
+  border-color: color-mix(in srgb, var(--color-status-danger-solid) 30%, transparent);
+  background: var(--color-status-danger-bg);
+  color: var(--color-status-danger-text);
 }
 
 .task-card-timeline span {
@@ -430,7 +430,7 @@
 .task-card-actions {
   flex-wrap: wrap;
   align-items: center;
-  border-top: 1px solid #e6eef6;
+  border-top: 1px solid var(--color-border-subtle);
   padding-top: 0.75rem;
 }
 

@@ -1,8 +1,9 @@
 /*
  * Token-Farben über gewachsenen Regeln.
  *
- * Ältere Seitenstile in 10-legacy und 15-pages tragen noch feste Farben,
- * Verläufe und Radien. Diese Regeln setzen dort die Werkbank-Token durch.
+ * Ältere Seitenstile in 10-legacy und 15-pages lesen zwar Token, wählen aber
+ * teils andere Rollen, Verläufe und Radien. Diese Regeln setzen dort das
+ * Werkbank-Design durch.
  * Sie liegen am Ende der Kaskade und gewinnen deshalb ohne !important.
  *
  * Neue Regeln gehören nicht hierher: neues CSS liest die Token direkt.

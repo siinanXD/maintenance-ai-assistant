@@ -14,7 +14,7 @@
   }
 
   .action-dialog-message {
-    @apply whitespace-pre-wrap text-sm leading-6 text-slate-600;
+    @apply whitespace-pre-wrap text-sm leading-6 text-text-secondary;
   }
 
   .action-dialog-field {
@@ -22,7 +22,7 @@
   }
 
   .action-dialog-field > span {
-    @apply text-sm font-black text-slate-700;
+    @apply text-sm font-black text-text-secondary;
   }
 
   .action-dialog-field[hidden],
@@ -125,19 +125,19 @@
 
   .action-hint-item.is-active,
   .action-hint-item.is-warning {
-    border-left-color: #f59e0b;
-    background: #fffdf7;
+    border-left-color: var(--color-status-warning-solid);
+    background: var(--color-status-warning-bg);
   }
 
   .action-hint-item.is-error {
-    border-left-color: #ef4444;
-    background: #fffafb;
+    border-left-color: var(--color-status-danger-solid);
+    background: var(--color-bg-surface);
   }
 
   .action-hint-item.is-muted,
   .action-hint-item.is-good {
-    border-left-color: #22c55e;
-    background: #fbfffd;
+    border-left-color: var(--color-status-success-solid);
+    background: var(--color-bg-surface);
   }
 
   .action-hint-copy {
@@ -177,7 +177,7 @@
   }
 
   .admin-technical-nav .action-hint-item:hover {
-    border-color: #bfd7ff;
+    border-color: var(--color-border-default);
     text-decoration: none;
   }
 }

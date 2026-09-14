@@ -47,18 +47,20 @@ App-Regeln.
 
 ## Dunkel
 
-Der dunkle Satz wird unter `:root[data-theme="maintenance-dark"]` erzeugt, ist
-aber **nirgends eingeschaltet**. Rund 460 fest eingetragene Farbwerte in den
-älteren Seitenstilen würden einem Umschalter nicht folgen. Die Tailwind-Farben verweisen
-bereits auf die Custom Properties und würden mitziehen.
+Der dunkle Satz steht unter `:root[data-theme="maintenance-dark"]`. `base.html`
+setzt das Attribut vor dem ersten Paint: gespeicherte Wahl aus dem Benutzermenü
+(`localStorage.maintenance_theme`), sonst die Systemeinstellung. Die Seitenstile
+tragen keine festen Farben mehr, nur Schatten, Abdunklungen hinter Dialogen und
+halbtransparente Weißkanten auf der Sidebar (in beiden Designs dunkel) bleiben
+Literale. `tests/test_design_tokens.py` hält das fest.
 
 ## Ältere Seitenstile
 
 Alle Stylesheets lesen die Token direkt. Die früheren `--ui-*`- und
 `--ops-*`-Variablen wurden durch die Token ersetzt, auf die sie zeigten.
 `app/static/css/src/90-overrides/token-overrides.css` setzt die Token dort
-durch, wo ältere Regeln noch feste Blautöne tragen: Shell-Flächen, aktive
-Navigation, Zähler, Kartenleisten, Verweise, Status-Badges.
+durch, wo ältere Regeln andere Token wählen als das Werkbank-Design:
+Shell-Flächen, aktive Navigation, Zähler, Kartenleisten, Verweise, Status-Badges.
 
 Neue Regeln gehören nicht dorthin. Neues CSS liest die Token direkt.
 
