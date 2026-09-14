@@ -26,9 +26,10 @@ to prevent duplicate retrieval paths from reappearing.
   pipeline.
 - `app/services/sql_keyword_retrieval_service.py` remains a fallback only. It is
   not a primary retrieval path.
-- `app/services/vector_store_service.py` owns vector-store adapters and fallback
-  behavior. Local, pgvector, Chroma and Atlas-compatible paths must stay
-  available while configured deployments rely on them.
+- `app/services/vector_store_service.py` picks the vector store; the adapters
+  live in `vector_store_sql.py`, `vector_store_chroma.py` and
+  `vector_store_atlas.py`. Local, pgvector, Chroma and Atlas-compatible paths
+  must stay available while configured deployments rely on them.
 - Vector-store candidates are never authoritative by themselves. SQL remains the
   system of record for permissions, visibility, document status, quality gates
   and source-card metadata.
@@ -125,7 +126,7 @@ Current implementation:
 - Nach Änderung des Embedding Providers müssen Knowledge-Dokumente neu indexiert werden.
 - Nach Änderung von Chunking-Modus oder Chunking-Schema müssen Knowledge-Dokumente neu indexiert werden.
 - See `docs/RAG_SEMANTIC_CHUNKING_MIGRATION.md` for the semantic chunking rollout and fallback plan.
-- `vector_store_service.py` abstracts vector backends. It uses PostgreSQL pgvector when available, with local SQLAlchemy, optional Chroma and optional MongoDB Atlas Vector Search fallbacks.
+- `vector_store_service.py` picks the vector backend: PostgreSQL pgvector when available, with local SQLAlchemy, optional Chroma and optional MongoDB Atlas Vector Search fallbacks. The backends live in `vector_store_sql.py`, `vector_store_chroma.py` and `vector_store_atlas.py` (with the Atlas circuit breaker); `vector_store_common.py` holds the result types, thresholds and the visibility filter they share.
 - `RAG_VECTOR_STORE=mongodb_atlas` enables Atlas as an external candidate store. Atlas stores synchronized Knowledge chunks only: `record_id`, `document_id`, `chunk_id`, `text`, `embedding` and safe flat metadata. SQL remains the source of record for permissions, document status, visibility, quality gates and source cards.
 - Atlas Vector Search requires an infrastructure-managed index: collection `knowledge_vectors`, path `embedding`, dimensions `1536`, similarity `cosine`. The app does not create this index on startup.
 - Atlas retrieval uses OpenAI `text-embedding-3-small` vectors. If Atlas is unavailable, missing `pymongo`, misconfigured or timing out, retrieval falls back visibly to the local SQL vector path and exposes `fallback_active`, `fallback_reason`, `vector_store_diagnostics` and Atlas observability counters.

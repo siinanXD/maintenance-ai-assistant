@@ -56,7 +56,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `task_service.py` (1,300 lines) split into task CRUD, `task_ai_service.py`
   (prioritization, suggestions) and `task_priority_context_service.py`
   (history and evidence); `ai_observability_service.py` (2,460 lines) split
-  into dashboard, chats, sources, actions, debug and common modules
+  into dashboard, chats, sources, actions, debug and common modules;
+  `vector_store_service.py` (1,500 lines) split into the store picker and one
+  module per backend (`vector_store_sql`, `vector_store_chroma`,
+  `vector_store_atlas`) plus shared types in `vector_store_common`
 - Frontend: every page folder has `entry.tsx`, `<Page>App.tsx`, API/type/util
   modules and `components/`; entries share `mountPage`. Pages use one
   `PageHeader` and one `StatStrip` instead of eleven header and eight stats components,

@@ -36,7 +36,7 @@ from app.services.retrieval_evaluation_service import (
     persist_retrieval_evaluation_result,
     retrieval_evaluation_history,
 )
-from app.services.vector_store_service import VectorSearchResult
+from app.services.vector_store_common import VectorSearchResult
 
 
 def test_evaluation_quality_gate_warns_on_missing_chunk_structure_metadata():

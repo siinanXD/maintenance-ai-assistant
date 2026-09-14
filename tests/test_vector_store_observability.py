@@ -9,14 +9,12 @@ import pytest
 from app.domain_models.common import utc_now
 from app.extensions import db
 from app.models import KnowledgeChunk, KnowledgeDocument, Role
-from app.services import vector_store_service
+from app.services import vector_store_atlas
 from app.services.knowledge_indexing_service import sync_vector_store_document
 from app.services.knowledge_service import knowledge_index_status
-from app.services.vector_store_service import (
-    MongoAtlasVectorStore,
-    VectorRecord,
-    get_vector_store,
-)
+from app.services.vector_store_atlas import MongoAtlasVectorStore
+from app.services.vector_store_common import VectorRecord
+from app.services.vector_store_service import get_vector_store
 from app.services.vector_sync_status_service import (
     clear_vector_sync_observability,
     record_atlas_error,
@@ -291,9 +289,9 @@ def test_unreachable_atlas_is_tried_once_then_skipped_until_cooldown_ends(app, m
 
     assert len(attempts) == 1
     assert all(store.name == "local_knowledge" for store in stores)
-    assert vector_store_service.atlas_circuit_open() is True
+    assert vector_store_atlas.atlas_circuit_open() is True
 
-    vector_store_service.reset_atlas_circuit()
+    vector_store_atlas.reset_atlas_circuit()
     with app.app_context():
         get_vector_store()
 
@@ -308,7 +306,7 @@ def test_missing_atlas_config_does_not_open_the_circuit(app):
     with app.app_context():
         get_vector_store()
 
-    assert vector_store_service.atlas_circuit_open() is False
+    assert vector_store_atlas.atlas_circuit_open() is False
 
 
 def test_atlas_upsert_contains_safe_payload_and_existing_embedding(app, monkeypatch):
