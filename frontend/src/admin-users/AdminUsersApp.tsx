@@ -1,31 +1,21 @@
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
-import { AdminUserEditDialog } from "./AdminUserEditDialog";
-import { AdminUsersPageHeader } from "./AdminUsersPageHeader";
-import { AiAnalyticsPanel, AuditLogPanel, BackupPanel } from "./AdminUsersSidePanels";
-import { AdminUsersTable } from "./AdminUsersTable";
+import { PageHeader } from "../components/ui/PageHeader";
+import { AdminUserEditDialog } from "./components/AdminUserEditDialog";
+import { AiAnalyticsPanel, AuditLogPanel, BackupPanel } from "./components/AdminUsersSidePanels";
+import { AdminUsersTable } from "./components/AdminUsersTable";
 import { downloadBackup } from "./adminUserUtils";
 import { useAdminUsersData } from "./useAdminUsersData";
 
-const ADMIN_USERS_ISLAND = {
-  mountedFlag: "maintenanceAdminUsersReactMounted",
-  mountEvent: "maintenance-admin-users-react-mounted"
-};
-
 /**
- * Render the admin users React island.
+ * User administration: accounts, permissions, AI usage, audit log and backups.
  */
 export function AdminUsersApp(): ReactNode {
   const adminUsers = useAdminUsersData();
 
-  useEffect(() => {
-    markIslandMounted(ADMIN_USERS_ISLAND);
-  }, []);
-
   return (
     <>
-      <AdminUsersPageHeader />
+      <PageHeader title="Nutzerverwaltung" description="Nutzer anzeigen, sperren, entsperren, Passwort zurücksetzen und löschen." />
       <section className="dashboard-grid">
         {adminUsers.aiSummary ? (
           <AiAnalyticsPanel

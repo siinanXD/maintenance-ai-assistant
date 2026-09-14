@@ -83,7 +83,7 @@ export function loginUrlForPath(path: string): string {
 }
 
 /**
- * Return the user label used by the legacy auth shell.
+ * Return the short user label shown in the topbar.
  */
 export function displayStoredUserName(user: MaintenanceUser | null): string {
   if (!user) return "Benutzer";

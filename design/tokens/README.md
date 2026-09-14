@@ -13,9 +13,9 @@ design/tokens/tokens.json            Export, nicht von Hand ändern
 design/tokens/app.json               App-eigene Namen, von Hand gepflegt
   │  npm run build:tokens
   ▼
-app/static/css/src/00-shell-tokens.css   CSS-Custom-Properties, hell und dunkel
+app/static/css/src/00-foundation/tokens.css   CSS-Custom-Properties, hell und dunkel
 design/tokens/generated/tailwind.cjs     Tailwind-Farben, Breakpoints, Schriften
-  │  98-legacy-token-bridge.css
+  │  90-overrides/legacy-token-bridge.css
   ▼
 das gewachsene Feature-CSS (--ui-*, --ops-*)
 ```
@@ -54,7 +54,7 @@ bereits auf die Custom Properties und würden mitziehen.
 
 ## Brücke zum Bestand
 
-`app/static/css/src/98-legacy-token-bridge.css` biegt die 49 gewachsenen
+`app/static/css/src/90-overrides/legacy-token-bridge.css` biegt die 49 gewachsenen
 `--ui-*`- und `--ops-*`-Variablen (601 Verwendungen) auf Token-Rollen um und
 überschreibt gezielt die Stellen, an denen fest eingetragene Blautöne über den
 Variablen liegen: Shell-Flächen, aktive Navigation, Zähler, Kartenleisten,
@@ -77,7 +77,7 @@ bei). Kein Aufruf von fonts.googleapis.com, die App bleibt ohne Internet lesbar.
 `tests/test_design_tokens.py` leitet die erwartete Ausgabe in reinem Python neu
 her, weil die CI den Node-Generator nicht ausführt. Er schlägt an, wenn
 
-- `00-shell-tokens.css` hell oder dunkel nicht exakt zu `tokens.json` passt,
+- `00-foundation/tokens.css` hell oder dunkel nicht exakt zu `tokens.json` passt,
 - Tailwind-Farben, Breakpoints oder Schriften von den Token abweichen,
 - gedämpfter oder sekundärer Text auf Seiten-, Karten- oder abgesenktem
   Hintergrund unter **4,5:1** Kontrast fällt (hell und dunkel),

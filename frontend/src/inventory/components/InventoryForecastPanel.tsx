@@ -89,7 +89,7 @@ export function InventoryForecastPanel({
             <p className="panel-meta">Riskante Aufgaben mit Lagerbestand und Maschinenbezug abgleichen.</p>
           </div>
         </div>
-        <form className="toolbar form-actions" id="inventory-forecast-command-form" data-inventory-forecast-form onSubmit={handleSubmit}>
+        <form className="toolbar form-actions" id="inventory-forecast-command-form" onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="react-forecast-threshold">Mindestbestand</label>
             <input className="input input-bordered" id="react-forecast-threshold" min="0" name="low_stock_threshold" onChange={(event) => onThresholdChange(Number(event.target.value || 0))} type="number" value={threshold} />
@@ -97,7 +97,7 @@ export function InventoryForecastPanel({
           <button className="btn btn-primary" disabled={busy} type="submit">
             {busy ? "Berechnet..." : "Prognose berechnen"}
           </button>
-          <span className={`panel-meta${message.error ? " is-error" : ""}`} data-inventory-forecast-message>
+          <span className={`panel-meta${message.error ? " is-error" : ""}`}>
             {summaryText}
           </span>
         </form>
@@ -114,7 +114,7 @@ export function InventoryForecastPanel({
                 <th scope="col">Empfehlung</th>
               </tr>
             </thead>
-            <tbody data-inventory-forecast-list>
+            <tbody>
               {items.length ? (
                 items.map((item, index) => <ForecastRow item={item} key={`${item.material?.name || "material"}-${index}`} />)
               ) : (
@@ -125,7 +125,7 @@ export function InventoryForecastPanel({
             </tbody>
           </table>
         </div>
-        <div className="forecast-unmatched-list" data-inventory-forecast-unmatched>
+        <div className="forecast-unmatched-list">
           {unmatchedTasks.length ? (
             <>
               <h3 className="panel-title">Aufgaben ohne Maschinenbezug</h3>

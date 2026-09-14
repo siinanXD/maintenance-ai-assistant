@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import type { CreateActionDefinition } from "./createActionSchema";
 
-type PageActionBarAction = {
+export type PageAction = {
   readonly disabled?: boolean;
   readonly hidden?: boolean;
   readonly label?: string;
@@ -13,7 +13,7 @@ type PageActionBarAction = {
 };
 
 type PageActionBarProps = {
-  readonly actions: readonly PageActionBarAction[];
+  readonly actions: readonly PageAction[];
   readonly label: string;
 };
 
@@ -34,7 +34,7 @@ export function PageActionBar({ actions, label }: PageActionBarProps): ReactNode
         const actionLabel = action.label ?? action.schema?.primaryLabel ?? action.schema?.title ?? "";
         if (action.href) {
           return (
-            <a className={className} data-create-action={action.schema?.key} href={action.href} key={actionLabel}>
+            <a className={className} href={action.href} key={actionLabel}>
               {actionLabel}
             </a>
           );
@@ -43,7 +43,6 @@ export function PageActionBar({ actions, label }: PageActionBarProps): ReactNode
         return (
           <button
             className={className}
-            data-create-action={action.schema?.key}
             disabled={action.disabled}
             key={actionLabel}
             onClick={action.onClick}

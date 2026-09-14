@@ -4,16 +4,15 @@ import {
   type ReactNode
 } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import { loadGeneratedDocuments, loadMachineManuals, loadMachines } from "./documentApi";
 import { DocumentFilterPanel } from "./components/DocumentFilterPanel";
-import { DocumentHeader } from "./components/DocumentHeader";
 import { DocumentInsightPanels } from "./components/DocumentInsightPanels";
 import { GeneratedDocumentList, ManualList } from "./components/DocumentLists";
-import { DocumentStats } from "./components/DocumentStats";
 import {
   ManualUploadPanel,
   UploadCheckPanel
@@ -28,11 +27,6 @@ import type {
   MessageState
 } from "./documentTypes";
 import { documentErrorMessage, emptyDocumentFilters } from "./documentUtils";
-
-const DOCUMENTS_ISLAND = {
-  mountedFlag: "maintenanceDocumentsReactMounted",
-  mountEvent: "maintenance-documents-react-mounted"
-};
 
 /**
  * Render the React documents workflow island.
@@ -81,10 +75,6 @@ export function DocumentsApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(DOCUMENTS_ISLAND);
-  }, []);
-
-  useEffect(() => {
     Promise.all([refreshDocuments(), refreshManuals()])
       .then(() => {
         setMessage({ text: "Dokumentaktionen bereit.", error: false });
@@ -96,13 +86,22 @@ export function DocumentsApp(): ReactNode {
 
   return (
     <>
-      <DocumentHeader
-        onFilterOpen={() => setActiveDrawer("filter")}
-        onManualUploadOpen={() => setActiveDrawer("manual")}
-        onUploadCheckOpen={() => setActiveDrawer("upload-check")}
-        writable={writable}
+      <PageHeader
+        title="Dokumente"
+        description="Berichte und Handbücher als Wissensbasis prüfen, freigeben und herunterladen."
+        actions={[
+          { hidden: !writable, onClick: () => setActiveDrawer("manual"), schema: createActionDefinition("documentManualUpload"), variant: "primary" },
+          { hidden: !writable, onClick: () => setActiveDrawer("upload-check"), schema: createActionDefinition("documentUploadCheck") },
+          { onClick: () => setActiveDrawer("filter"), schema: createActionDefinition("documentFilter"), variant: "ghost" }
+        ]}
       />
-      <DocumentStats documents={documents} manuals={manuals} />
+      <StatStrip
+        label="Dokumentenstatus"
+        stats={[
+          { label: "Berichte", value: documents.length, meta: "generierte Wartungsberichte" },
+          { label: "Handbücher", value: manuals.length, meta: "Maschinenwissen mit Quellenangabe" }
+        ]}
+      />
       <DocumentInsightPanels review={review} summary={summary} />
       <section className="dashboard-grid documents-work-grid">
         <GeneratedDocumentList

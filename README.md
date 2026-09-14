@@ -126,9 +126,10 @@ flowchart LR
   read/write rights apply the same way to pages, API and assistant tools.
 - **The assistant has no side door.** Every tool calls the same service a page
   would; write tools return a signed pending action that the user confirms.
-- **Frontend:** Jinja renders the shell, each page is a React island built by
-  Vite into `app/static/react`. Styles come from design tokens exported from
-  Figma (`design/tokens`) and Tailwind.
+- **Frontend:** Jinja renders the shell, each page is a React app with its own
+  Vite entry, built into `app/static/react`. Pages share one header, stat strip
+  and dialog. Styles come from design tokens exported from Figma
+  (`design/tokens`) and Tailwind. See [`frontend/README.md`](frontend/README.md).
 
 Deeper reading: [`docs/AI_AGENT.md`](docs/AI_AGENT.md) (agent and tools),
 [`docs/AI_RAG_ARCHITECTURE.md`](docs/AI_RAG_ARCHITECTURE.md) (retrieval),
@@ -145,8 +146,8 @@ app/
   <area>/routes.py   HTTP endpoints per area: tasks, errors, machines,
                      inventory, attachments, documents, shiftplans, ...
   templates/         Jinja shell and page mount points
-  static/css/src/    CSS sources, built into output.css
-frontend/src/        React pages and shared components (Vite)
+  static/css/src/    CSS sources by cascade layer, built into output.css
+frontend/src/        React pages (one folder per page) and shared components
 design/tokens/       design tokens and generated Tailwind/CSS output
 migrations/          Alembic migrations
 tests/               pytest suite (in-memory SQLite, mock AI)

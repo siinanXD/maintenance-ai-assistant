@@ -107,9 +107,9 @@ export function TaskFormPanel({
   return (
     <details
       className={`task-action-panel app-card${drawerMode ? " is-drawer-panel" : ""}`}
-      data-default-collapsed="true"
-      data-mobile-collapsible
-      data-permission-write="tasks"
+     
+     
+     
       hidden={hidden}
       id="task-create"
       onToggle={(event) => handleToggle(event.currentTarget.open)}
@@ -121,7 +121,7 @@ export function TaskFormPanel({
           <small>Bereich, Priorität, Status und Fälligkeit setzen</small>
         </span>
       </summary>
-      <form data-task-form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="task-form-body">
           <div className="form-grid">
             <div className="field">
@@ -209,12 +209,11 @@ export function TaskFormPanel({
             </div>
           </div>
           <div className="toolbar form-actions">
-            <button className="btn btn-primary" data-task-submit-button disabled={busy} type="submit">
+            <button className="btn btn-primary" disabled={busy} type="submit">
               {busy ? (editingTaskId ? "Aktualisiert..." : "Speichert...") : (editingTaskId ? "Aufgabe aktualisieren" : "Aufgabe speichern")}
             </button>
             <button
               className="btn btn-ghost"
-              data-task-edit-cancel
               hidden={!editingTaskId}
               onClick={onCancelEdit}
               type="button"
@@ -223,7 +222,6 @@ export function TaskFormPanel({
             </button>
             <span
               className={`panel-meta${message.error ? " is-error" : ""}`}
-              data-task-message
               role="status"
               aria-live="polite"
             >

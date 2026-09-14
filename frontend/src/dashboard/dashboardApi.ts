@@ -229,28 +229,4 @@ export async function updateDashboardTask(
   ) ?? {};
 }
 
-/**
- * Create a task from a React dashboard suggestion draft.
- */
-export async function createDashboardTask(payload: DashboardTaskMutation): Promise<DashboardPayload> {
-  return objectData(
-    await apiRequest<unknown>("/api/v1/tasks", {
-      body: payload,
-      method: "POST"
-    })
-  ) ?? {};
-}
-
-/**
- * Ask the existing task suggestion API for a dashboard task draft.
- */
-export async function suggestDashboardTask(text: string): Promise<DashboardPayload> {
-  return objectData(
-    await apiRequest<unknown>("/api/v1/tasks/suggest", {
-      body: { text },
-      method: "POST"
-    })
-  ) ?? {};
-}
-
 export { EMPTY_DASHBOARD_DATA };

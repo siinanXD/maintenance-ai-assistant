@@ -1,6 +1,6 @@
 import { apiRequest } from "../api/client";
 import { listData, unwrapData } from "../api/payload";
-import type { HandoverFilters, HandoverPayload, HandoverRecord, Machine } from "./HandoverTypes";
+import type { HandoverFilters, HandoverPayload, HandoverRecord, Machine } from "./handoverTypes";
 
 const HANDOVER_BASE = "/api/v1/handover";
 

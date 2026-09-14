@@ -1,14 +1,7 @@
 ﻿import { safeErrorMessage } from "../utils/errors";
 import { type AdminAiPayload } from "./adminAiApi";
-import {
-  moneyText,
-  numberField,
-  numberText,
-  percentText,
-  recordField,
-  stringField,
-  toneForStatus
-} from "./adminAiOverviewHelpers";
+import { numberField, recordField, stringField, toneForStatus } from "./adminAiOverviewHelpers";
+import { moneyText, numberText, percentText } from "./adminAiFormat";
 
 export type AdminAiOverviewLoadState = {
   readonly aiStatus: AdminAiPayload | null;

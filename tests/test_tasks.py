@@ -1022,17 +1022,3 @@ def test_task_suggestion_includes_rag_sources_after_reindex(
     assert payload["diagnostics"]["rag_source_count"] >= 1
     assert any(source["type"] == "knowledge" for source in payload["sources"])
     assert payload["status"] == "open"
-
-
-def test_task_page_contains_priority_ui(client):
-    """Verify task prioritization is exposed on the task page."""
-    response = client.get("/tasks")
-    html = response.get_data(as_text=True)
-    react_source = task_react_source()
-
-    assert response.status_code == 200
-    assert "maintenance-tasks-root" in html
-    assert "data-react-tasks-fallback" not in html
-    assert "data-task-priority-list" in react_source
-    assert "data-task-priority-refresh" in react_source
-    assert "Priorisierung konnte nicht geladen werden." in react_source

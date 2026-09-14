@@ -1,8 +1,8 @@
 # Feature Inventory
 
-This document records the current product features and their isolation boundary.
-The frontend source of truth is `app/static/core/feature-registry.js`; backend
-permissions remain in `app/permissions.py`.
+This document records the current product features and their boundaries.
+Backend permissions live in `app/permissions.py`; the frontend structure is
+described in [`frontend/README.md`](../frontend/README.md).
 
 ## Features
 
@@ -20,7 +20,7 @@ permissions remain in `app/permissions.py`.
 | Vacations | `/vacations` | `employees` | Requests, approval, rejection, balance |
 | Documents | `/documents` | `documents` | Generated reports, filters, download, quality review |
 | Admin users | `/admin/users` | `admin_users` | User list and dashboard permission management |
-| Admin AI | `/admin/ai` | `admin_users` | AI audit, chats, manual training CRUD, RAG status, source filters, stale/reindex jobs |
+| Admin AI | `/admin/ai` | `admin_ai` (API: master admin) | AI audit, chats, manual training CRUD, RAG status, source filters, stale/reindex jobs |
 
 ## Cross-Cutting Features
 
@@ -32,21 +32,16 @@ permissions remain in `app/permissions.py`.
 - Operations readiness: health checks, database schema checks, worker queue,
   AI/RAG diagnostics and runtime operations metrics.
 
-## Isolation Rules
+## Adding a page
 
-- New navigation entries must be added to `app/static/core/feature-registry.js`
-  first, then wired to templates with `data-feature-key`.
-- The registry owns permission metadata. Shared workflow pages use
-  `module: "workflows"` and `initializers`; larger standalone pages use
-  `module: "page"` plus `moduleUrl` for dedicated modules in
-  `app/static/pages/`.
-- If a feature reuses another permission, set `permissionKey` explicitly instead
-  of duplicating permission checks in templates or scripts.
-- New frontend code should live behind one feature initializer, one small shell
-  helper, or one React route island in `frontend/src`; avoid adding feature
-  logic to the core `app/static/app.js` bootstrap.
-- Login, handover, shift plans, Admin AI and the other larger screens are
-  loaded as route-specific React islands or page modules. Do not reintroduce
-  large inline scripts in templates.
-- Dynamic API data should be rendered with DOM APIs and `textContent` unless the
-  string is a static, trusted empty-state fragment.
+1. Web route in `app/web/routes.py` and a template that extends `base.html`
+   with one root element and `react_entrypoint("src/<page>/entry.tsx")`.
+2. `frontend/src/<page>/entry.tsx`, `<Page>App.tsx`, API and type modules, UI
+   pieces in `components/`; the entry goes into `frontend/vite.config.ts`.
+3. The route and its permission area in `app/static/core/feature-registry.js`
+   (login redirect) and the link in `frontend/src/layout/ShellNavigationModel.ts`.
+4. Use `PageHeader` and `StatStrip` from `frontend/src/components/ui/` and
+   `confirmAction` for confirmations; styles for new building blocks go into
+   `app/static/css/src/20-components/`.
+
+`tests/test_frontend_structure.py` checks these rules.

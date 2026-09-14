@@ -1,6 +1,6 @@
 import { canViewStoredDashboard } from "../auth/permissions";
 import type { MaintenanceUser } from "../auth/session";
-import type { ShellNavigationLink, ShellNavigationSection } from "./ShellNavigationTypes";
+import type { ShellNavigationLink, ShellNavigationSection } from "./shellNavigationTypes";
 
 export const SHELL_NAVIGATION_SECTIONS: readonly ShellNavigationSection[] = [
   {
@@ -108,12 +108,3 @@ export function canViewNavigationSection(section: ShellNavigationSection, user: 
   return section.links.some((link) => canViewNavigationLink(link, user));
 }
 
-/**
- * Build the shared navigation attributes used by permissions and active-state code.
- */
-export function navigationDataAttributes(link: ShellNavigationLink): Record<string, string> {
-  return {
-    "data-dashboard-nav": link.dashboardKey,
-    ...(link.featureKey ? { "data-feature-key": link.featureKey } : {})
-  };
-}

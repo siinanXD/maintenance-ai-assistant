@@ -31,14 +31,14 @@ export function DocumentFilterPanel({ drawerMode = false, filters, message, onFi
   }
 
   return (
-    <details className="card app-card mobile-action-section lg:order-3 lg:col-span-12" data-default-collapsed="true" data-mobile-collapsible open={drawerMode}>
+    <details className="card app-card mobile-action-section lg:order-3 lg:col-span-12" open={drawerMode}>
       <summary className="mobile-action-summary">
         <span>
           <span className="mobile-action-title">Filter</span>
           <span className="mobile-action-meta">Dokumente gezielt eingrenzen</span>
         </span>
       </summary>
-      <form data-document-filter-form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="card-body">
           <div className="panel-header">
             <div>
@@ -55,8 +55,8 @@ export function DocumentFilterPanel({ drawerMode = false, filters, message, onFi
           </div>
           <div className="toolbar form-actions">
             <button className="btn btn-primary" type="submit">Filtern</button>
-            <button className="btn btn-ghost" data-document-filter-reset type="button" onClick={() => onFiltersChange(emptyDocumentFilters())}>Zurücksetzen</button>
-            <span className={`panel-meta${message.error ? " is-error" : ""}`} data-document-message>{message.text}</span>
+            <button className="btn btn-ghost" type="button" onClick={() => onFiltersChange(emptyDocumentFilters())}>Zurücksetzen</button>
+            <span className={`panel-meta${message.error ? " is-error" : ""}`}>{message.text}</span>
           </div>
         </div>
       </form>

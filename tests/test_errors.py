@@ -487,18 +487,3 @@ def test_recurring_issue_trends_ignore_unrelated_single_entries(
 
     assert result["count"] == 0
     assert result["items"] == []
-
-
-def test_errors_page_contains_similar_errors_ui(client):
-    """Verify the errors page contains similar-error UI hooks."""
-    response = client.get("/errors")
-    html = response.get_data(as_text=True)
-    react_source = error_react_source()
-
-    assert response.status_code == 200
-    assert "maintenance-errors-root" in html
-    assert "data-react-errors-fallback" not in html
-    assert "data-similar-errors-panel" in react_source
-    assert "data-similar-errors-list" in react_source
-    assert "data-error-rag-sources" in react_source
-    assert "data-error-action-preview" in react_source

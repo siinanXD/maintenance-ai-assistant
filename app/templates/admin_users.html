@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}Nutzer - Maintenance Assistant{% endblock %}
+{% block header_title %}Nutzerverwaltung{% endblock %}
 
 {% block content %}
 <div id="maintenance-admin-users-root"></div>
-{{ react_entrypoint("src/admin-users/adminUsersEntrypoint.tsx") }}
+{{ react_entrypoint("src/admin-users/entry.tsx") }}
 {% endblock %}

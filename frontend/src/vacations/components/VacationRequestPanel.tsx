@@ -86,25 +86,25 @@ export function VacationRequestPanel(props: VacationRequestPanelProps): ReactNod
           <p>Zeitraum, Schichtbezug und Vertreter werden direkt gegen Resturlaub und Teamlage geprüft.</p>
         </div>
       </header>
-      <form className="vacation-form" data-vac-form onSubmit={submitVacation}>
+      <form className="vacation-form" onSubmit={submitVacation}>
         <div className="field is-full">
           <label htmlFor="vac-employee">Mitarbeiter *</label>
-          <select className="select select-bordered" data-vac-employee id="vac-employee" required value={props.draft.employeeId} onChange={(event) => updateDraft("employeeId", event.currentTarget.value)}>
+          <select className="select select-bordered" id="vac-employee" required value={props.draft.employeeId} onChange={(event) => updateDraft("employeeId", event.currentTarget.value)}>
             <option value="" disabled>Bitte wählen...</option>
             {props.employees.map((employee) => <option key={employee.id} value={employee.id}>{employeeOptionLabel(employee)}</option>)}
           </select>
         </div>
         <div className="field">
           <label htmlFor="vac-start">Von *</label>
-          <input className="input input-bordered" data-vac-start id="vac-start" min={today} required type="date" value={props.draft.startDate} onChange={(event) => updateDraft("startDate", event.currentTarget.value)} />
+          <input className="input input-bordered" id="vac-start" min={today} required type="date" value={props.draft.startDate} onChange={(event) => updateDraft("startDate", event.currentTarget.value)} />
         </div>
         <div className="field">
           <label htmlFor="vac-end">Bis *</label>
-          <input className="input input-bordered" data-vac-end id="vac-end" min={today} required type="date" value={props.draft.endDate} onChange={(event) => updateDraft("endDate", event.currentTarget.value)} />
+          <input className="input input-bordered" id="vac-end" min={today} required type="date" value={props.draft.endDate} onChange={(event) => updateDraft("endDate", event.currentTarget.value)} />
         </div>
         <div className="field">
           <label htmlFor="vac-shift">Schichtbezug</label>
-          <select className="select select-bordered" data-vac-shift id="vac-shift" value={props.draft.shiftType} onChange={(event) => updateDraft("shiftType", event.currentTarget.value)}>
+          <select className="select select-bordered" id="vac-shift" value={props.draft.shiftType} onChange={(event) => updateDraft("shiftType", event.currentTarget.value)}>
             <option value="">Keine feste Schicht</option>
             <option value="Frueh">Früh</option>
             <option value="Spaet">Spät</option>
@@ -115,30 +115,30 @@ export function VacationRequestPanel(props: VacationRequestPanelProps): ReactNod
         </div>
         <div className="field">
           <label htmlFor="vac-representative">Vertreter</label>
-          <select className="select select-bordered" data-vac-representative id="vac-representative" value={props.draft.representativeEmployeeId} onChange={(event) => updateDraft("representativeEmployeeId", event.currentTarget.value)}>
+          <select className="select select-bordered" id="vac-representative" value={props.draft.representativeEmployeeId} onChange={(event) => updateDraft("representativeEmployeeId", event.currentTarget.value)}>
             <option value="">Noch nicht festgelegt</option>
             {props.employees.filter((employee) => representativeAllowed(props.selectedEmployee, employee)).map((employee) => <option key={employee.id} value={employee.id}>{employeeOptionLabel(employee)}</option>)}
           </select>
         </div>
         <div className="field is-full">
           <label htmlFor="vac-reason">Grund</label>
-          <input className="input input-bordered" data-vac-reason id="vac-reason" maxLength={160} placeholder="Optional, z. B. Erholungsurlaub" type="text" value={props.draft.reason} onChange={(event) => updateDraft("reason", event.currentTarget.value)} />
+          <input className="input input-bordered" id="vac-reason" maxLength={160} placeholder="Optional, z. B. Erholungsurlaub" type="text" value={props.draft.reason} onChange={(event) => updateDraft("reason", event.currentTarget.value)} />
         </div>
         <div className="field is-full">
           <label htmlFor="vac-notes">Notiz</label>
-          <input className="input input-bordered" data-vac-notes id="vac-notes" maxLength={500} placeholder="Optionaler Hinweis für Genehmiger" type="text" value={props.draft.notes} onChange={(event) => updateDraft("notes", event.currentTarget.value)} />
+          <input className="input input-bordered" id="vac-notes" maxLength={500} placeholder="Optionaler Hinweis für Genehmiger" type="text" value={props.draft.notes} onChange={(event) => updateDraft("notes", event.currentTarget.value)} />
         </div>
         <BalancePreview draft={props.draft} selectedBalance={props.selectedBalance} selectedEmployee={props.selectedEmployee} />
-        <div className={`vacation-impact-preview is-full${props.impactMessage.type ? ` is-${props.impactMessage.type}` : props.impact?.level ? ` is-${props.impact.level}` : ""}`} data-vac-impact>
+        <div className={`vacation-impact-preview is-full${props.impactMessage.type ? ` is-${props.impactMessage.type}` : props.impact?.level ? ` is-${props.impact.level}` : ""}`}>
           {props.impactMessage.text}
         </div>
-        <div className="field is-full" data-vac-days-wrap hidden={days === null}>
+        <div className="field is-full" hidden={days === null}>
           <span className="panel-meta">Arbeitstage: </span>
-          <span className="badge badge-neutral" data-vac-days-count>{days === null ? "-" : `${days} Arbeitstage`}</span>
+          <span className="badge badge-neutral">{days === null ? "-" : `${days} Arbeitstage`}</span>
         </div>
         <div className="vacation-form-footer">
-          <button className="btn btn-primary" data-vac-submit disabled={props.submitDisabled} type="submit">Antrag stellen</button>
-          <p className={`form-message${props.message.type ? ` is-${props.message.type}` : ""}`} data-vac-msg role="status" aria-live="polite">{props.message.text}</p>
+          <button className="btn btn-primary" disabled={props.submitDisabled} type="submit">Antrag stellen</button>
+          <p className={`form-message${props.message.type ? ` is-${props.message.type}` : ""}`} role="status" aria-live="polite">{props.message.text}</p>
         </div>
       </form>
     </article>

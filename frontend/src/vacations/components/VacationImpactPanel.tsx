@@ -42,10 +42,10 @@ export function VacationImpactPanel(props: VacationImpactPanelProps): ReactNode 
         <div>
           <p className="section-kicker">Betrieb</p>
           <h2>Auswirkungen</h2>
-          <p data-vac-team-status>{teamStatusText(props.requests)}</p>
+          <p>{teamStatusText(props.requests)}</p>
         </div>
       </header>
-      <div className="vacation-calendar-list" data-vac-calendar-list>
+      <div className="vacation-calendar-list">
         {activeRequests.length ? activeRequests.map((request) => (
           <article className={`vacation-calendar-item is-${request.impact_level || "ok"}`} key={request.id}>
             <strong>{request.employee?.name || String(request.employee_id)}</strong>

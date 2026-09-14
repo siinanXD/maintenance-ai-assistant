@@ -112,7 +112,7 @@ export function TaskBoard({
         visible={tasks.length}
       />
 
-      <div className="kanban-board task-maintenance-board bounded-list-scroll" data-list-search-items=".task-card" data-task-kanban-board>
+      <div className="kanban-board task-maintenance-board bounded-list-scroll">
         {COLUMN_META.map((column) => {
           const columnTasks = [...buckets[column.bucket]].sort((first, second) => (
             taskSortScore(first).localeCompare(taskSortScore(second))
@@ -126,9 +126,9 @@ export function TaskBoard({
                   <h3 id={`react-task-kanban-${column.bucket}`}>{column.title}</h3>
                   <small>{column.hint}</small>
                 </div>
-                <span className="kanban-count" data-kanban-count={column.bucket}>{columnTasks.length}</span>
+                <span className="kanban-count">{columnTasks.length}</span>
               </header>
-              <div className="kanban-list" data-kanban-list={column.bucket}>
+              <div className="kanban-list">
                 {columnTasks.length ? (
                   columnTasks.map((task) => (
                     <TaskCard
@@ -149,7 +149,6 @@ export function TaskBoard({
           );
         })}
       </div>
-      <div data-task-list hidden />
     </article>
   );
 }

@@ -64,11 +64,10 @@ jobs:
 
       - name: Check JavaScript syntax
         run: |
-          node --check app/static/core/api-client.js
           node --check app/static/auth.js
           node --check app/static/app.js
-          node --check app/static/pages/react-island-loader.js
-          node --check app/static/pages/dashboard-island.js
+          node --check app/static/core/feature-registry.js
+          node --check app/static/core/action-dialogs.js
 
       - name: Migration smoke test
         env:

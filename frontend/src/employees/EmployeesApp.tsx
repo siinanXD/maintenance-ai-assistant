@@ -1,22 +1,16 @@
 import { useEffect, useState, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
 import { canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import { loadEmployees } from "./employeeApi";
 import { EmployeeEditDialog } from "./components/EmployeeEditDialog";
 import { EmployeeFormPanel } from "./components/EmployeeFormPanel";
-import { EmployeeHeader } from "./components/EmployeeHeader";
 import { EmployeeList } from "./components/EmployeeList";
-import { EmployeeStats } from "./components/EmployeeStats";
 import type { Employee, EmployeeDraft, MessageState } from "./employeeTypes";
 import { canManageEmployees, EMPTY_EMPLOYEE_DRAFT, employeeErrorMessage } from "./employeeUtils";
-
-const EMPLOYEES_ISLAND = {
-  mountedFlag: "maintenanceEmployeesReactMounted",
-  mountEvent: "maintenance-employees-react-mounted"
-};
 
 /**
  * Render the React employees workflow island.
@@ -38,10 +32,6 @@ export function EmployeesApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(EMPLOYEES_ISLAND);
-  }, []);
-
-  useEffect(() => {
     refreshEmployees().catch((error: unknown) => {
       setMessage({ text: employeeErrorMessage(error), error: true });
     });
@@ -52,13 +42,34 @@ export function EmployeesApp(): ReactNode {
 
   return (
     <>
-      <EmployeeHeader manageable={manageable} onCreateEmployee={() => setIsCreateDrawerOpen(true)} />
-      <EmployeeStats employees={employees} />
+      <PageHeader
+        title="Mitarbeiter"
+        description="Mitarbeiterdaten erfassen und Dokumente direkt an der Person ablegen."
+        actions={[
+          { hidden: !manageable, onClick: () => setIsCreateDrawerOpen(true), schema: createActionDefinition("employeeCreate"), variant: "primary" }
+        ]}
+      />
+      <StatStrip
+        label="Personalstatus"
+        stats={[
+          { label: "Mitarbeitende", value: employees.length, meta: "sichtbar für dich" },
+          {
+            label: "Abteilungen",
+            value: new Set(employees.map((employee) => employee.department).filter(Boolean)).size,
+            meta: "mit zugeordneten Personen"
+          },
+          {
+            label: "Qualifiziert",
+            value: employees.filter((employee) => Boolean(employee.qualifications?.trim())).length,
+            meta: "mit hinterlegten Qualifikationen"
+          }
+        ]}
+      />
       <section className="dashboard-grid">
         {!manageable && message.text ? (
           <section className="card app-card lg:col-span-12" role="status">
             <div className="card-body">
-              <p className={`panel-meta${message.error ? " is-error" : ""}`} data-employee-message>{message.text}</p>
+              <p className={`panel-meta${message.error ? " is-error" : ""}`}>{message.text}</p>
             </div>
           </section>
         ) : null}

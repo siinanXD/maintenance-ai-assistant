@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 
+import { confirmAction } from "../../app/runtimeBridge";
 import {
   analyzeMachineManual,
   changeDocumentStatus,
@@ -21,7 +22,6 @@ import {
   documentErrorMessage,
   documentStatusText,
   generatedDocumentSearchText,
-  manualSearchText,
   statusBadgeClass,
   triggerDownload
 } from "../documentUtils";
@@ -72,7 +72,7 @@ export function GeneratedDocumentList(props: GeneratedDocumentListProps): ReactN
             <h2 className="panel-title">Generierte Dokumente</h2>
             <p className="panel-meta">HTML-Berichte aus abgeschlossenen Aufgaben mit Prüfstatus</p>
           </div>
-          <span className="badge badge-status is-open" data-document-count>{props.documents.length} Dokumente</span>
+          <span className="badge badge-status is-open">{props.documents.length} Dokumente</span>
         </div>
         <details className="help-disclosure ui-secondary-panel document-list-help">
           <summary>Hinweis zum Prüfstatus</summary>
@@ -86,10 +86,10 @@ export function GeneratedDocumentList(props: GeneratedDocumentListProps): ReactN
         <div className="list-toolbar">
           <label className="compact-search-field" htmlFor="document-list-search">
             <span>Dokumente suchen</span>
-            <input className="input input-bordered input-sm" data-list-search data-list-search-target="[data-document-list]" id="document-list-search" placeholder="Titel, Aufgabe, Bereich, Maschine" value={search} onChange={(event) => setSearch(event.currentTarget.value)} />
+            <input className="input input-bordered input-sm" id="document-list-search" placeholder="Titel, Aufgabe, Bereich, Maschine" value={search} onChange={(event) => setSearch(event.currentTarget.value)} />
           </label>
         </div>
-        <div className="record-card-grid document-record-grid" data-document-list data-list-search-items=".record-card">
+        <div className="record-card-grid document-record-grid">
           {visibleDocuments.length ? visibleDocuments.map((document) => <GeneratedDocumentCard {...props} document={document} key={document.id} />) : (
             <article className="guided-empty-state empty-state">
               <strong>Keine Dokumente gefunden.</strong>
@@ -118,7 +118,7 @@ function GeneratedDocumentCard(props: GeneratedDocumentListProps & { readonly do
   }
 
   return (
-    <article className="record-card document-record-card" data-search-text={generatedDocumentSearchText(props.document)}>
+    <article className="record-card document-record-card">
       <div className="record-card-header">
         <div>
           <h3 className="record-card-title">{props.document.title || "Wartungsbericht"}</h3>
@@ -157,7 +157,7 @@ export function ManualList(props: ManualListProps): ReactNode {
             <h2 className="panel-title">Maschinenhandbücher</h2>
             <p className="panel-meta">Gespeicherte Handbücher mit Analyse- und Zusammenfassungsstatus</p>
           </div>
-          <span className="badge badge-status is-open" data-manual-count>{props.manuals.length} Handbücher</span>
+          <span className="badge badge-status is-open">{props.manuals.length} Handbücher</span>
         </div>
         <details className="help-disclosure ui-secondary-panel document-list-help">
           <summary>Hinweis zu Maschinenhandbüchern</summary>
@@ -168,7 +168,7 @@ export function ManualList(props: ManualListProps): ReactNode {
             </p>
           </div>
         </details>
-        <div className="record-card-grid document-record-grid" data-manual-list data-list-search-items=".record-card">
+        <div className="record-card-grid document-record-grid">
           {props.manuals.length ? props.manuals.map((manual) => <ManualCard {...props} key={manual.id} manual={manual} />) : (
             <article className="guided-empty-state empty-state">
               <strong>Keine Handbücher vorhanden.</strong>
@@ -193,7 +193,7 @@ function ManualCard(props: ManualListProps & { readonly manual: MachineManual })
   }
 
   return (
-    <article className="record-card document-record-card" data-search-text={manualSearchText(props.manual)}>
+    <article className="record-card document-record-card">
       <div className="record-card-header">
         <div>
           <h3 className="record-card-title">{props.manual.title || props.manual.original_filename || "Handbuch"}</h3>
@@ -210,7 +210,7 @@ function ManualCard(props: ManualListProps & { readonly manual: MachineManual })
         <button className="btn btn-outline btn-sm" type="button" onClick={() => triggerDownload(props.manual.download_url, props.manual.original_filename || "handbuch")}>Download</button>
         <button className="btn btn-outline btn-sm" type="button" onClick={() => run(async () => { props.onSummary(await analyzeMachineManual(props.manual.id)); await props.onRefresh(); })}>Analysieren</button>
         <button className="btn btn-outline btn-sm" type="button" onClick={() => run(async () => { props.onSummary(await summarizeMachineManual(props.manual.id)); await props.onRefresh(); })}>Zusammenfassen</button>
-        {props.writable ? <button className="btn btn-ghost btn-sm" type="button" onClick={() => run(async () => { if (!window.confirm(`${props.manual.title || props.manual.original_filename || "Handbuch"} wirklich löschen?`)) return; await deleteMachineManual(props.manual.id); await props.onRefresh(); })}>Löschen</button> : null}
+        {props.writable ? <button className="btn btn-ghost btn-sm" type="button" onClick={() => run(async () => { if (!(await confirmAction({ title: "Handbuch löschen", message: `${props.manual.title || props.manual.original_filename || "Handbuch"} wirklich löschen?`, confirmText: "Löschen" }))) return; await deleteMachineManual(props.manual.id); await props.onRefresh(); })}>Löschen</button> : null}
       </div>
     </article>
   );

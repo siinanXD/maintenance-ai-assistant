@@ -64,7 +64,6 @@ export function ActionDrawer({
         aria-labelledby={titleId}
         aria-modal="true"
         className="action-drawer"
-        data-action-drawer-key={definition?.key}
         role="dialog"
       >
         <header className="action-drawer-header">

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { confirmAction } from "../../app/runtimeBridge";
 import { AttachmentPanel } from "../../components/attachments/AttachmentPanel";
 import { canWriteDashboard } from "../../auth/permissions";
 import { closeErrorEntry, deleteErrorEntry, loadSimilarErrors } from "../errorApi";
@@ -83,7 +84,7 @@ function ErrorCardActions(props: {
    * Delete the selected error after confirmation.
    */
   async function handleDelete(): Promise<void> {
-    if (!window.confirm(`Fehler '${props.entry.title || props.entry.error_code || props.entry.id}' wirklich löschen?`)) return;
+    if (!(await confirmAction({ title: "Störung löschen", message: `„${props.entry.title || props.entry.error_code || props.entry.id}“ wirklich löschen?`, confirmText: "Löschen" }))) return;
     try {
       await deleteErrorEntry(props.entry.id);
       await props.onMutated();
@@ -96,7 +97,7 @@ function ErrorCardActions(props: {
   return (
     <div className="error-card-actions">
       {status !== "closed" && canWriteDashboard("tasks") ? (
-        <a className="btn btn-primary btn-sm" data-error-work-order href={`/tasks?from_error=${props.entry.id}`}>Auftrag anlegen</a>
+        <a className="btn btn-primary btn-sm" href={`/tasks?from_error=${props.entry.id}`}>Auftrag anlegen</a>
       ) : null}
       {props.entry.open_task_count ? (
         <a className="btn btn-ghost btn-sm" href={`/tasks?search=${encodeURIComponent(props.entry.error_code || props.entry.title || "")}`}>
@@ -119,7 +120,7 @@ function ErrorCard(props: ErrorCatalogProps & { readonly entry: ErrorEntry }): R
   const severity = props.entry.severity || "medium";
 
   return (
-    <article className={`error-card incident-card is-status-${status} is-severity-${severity}`} data-search-text={props.entry.title || ""}>
+    <article className={`error-card incident-card is-status-${status} is-severity-${severity}`}>
       <div className="error-card-header">
         <div>
           <h3 className="error-card-title">{props.entry.title || "Unbenannter Fehler"}</h3>
@@ -193,7 +194,7 @@ export function ErrorCatalog(props: ErrorCatalogProps): ReactNode {
           <h2>Fehlerkatalog durchsuchen</h2>
           <p className="panel-meta">Code, Maschine, Symptom, Ursache, Lösung oder Auswirkung finden.</p>
         </div>
-        <button className="btn btn-outline btn-sm" data-error-similar-focus type="button" onClick={findSimilarFromSearch}>Ähnliche Fehler finden</button>
+        <button className="btn btn-outline btn-sm" type="button" onClick={findSimilarFromSearch}>Ähnliche Fehler finden</button>
       </header>
       <div className="incident-catalog-search">
         <label className="compact-search-field" htmlFor="error-search">
@@ -207,7 +208,7 @@ export function ErrorCatalog(props: ErrorCatalogProps): ReactNode {
             onChange={(event) => props.onFiltersChange({ ...props.filters, search: event.currentTarget.value })}
           />
         </label>
-        <span className="incident-filter-summary" data-error-filter-summary>
+        <span className="incident-filter-summary">
           {visibleErrors.length} von {props.errors.length} Einträgen sichtbar
         </span>
       </div>
@@ -217,7 +218,7 @@ export function ErrorCatalog(props: ErrorCatalogProps): ReactNode {
           <section className="incident-filter-bar" aria-label="Fehlerkatalog filtern">
             <label className="incident-filter-field" htmlFor="error-status-filter">
               <span>Status</span>
-              <select className="select select-bordered select-sm" data-error-status-filter id="error-status-filter" value={props.filters.status} onChange={(event) => props.onFiltersChange({ ...props.filters, status: event.currentTarget.value })}>
+              <select className="select select-bordered select-sm" id="error-status-filter" value={props.filters.status} onChange={(event) => props.onFiltersChange({ ...props.filters, status: event.currentTarget.value })}>
                 <option value="">Alle</option>
                 <option value="open">Offen</option>
                 <option value="in_progress">In Bearbeitung</option>
@@ -226,7 +227,7 @@ export function ErrorCatalog(props: ErrorCatalogProps): ReactNode {
             </label>
             <label className="incident-filter-field" htmlFor="error-severity-filter">
               <span>Schwere</span>
-              <select className="select select-bordered select-sm" data-error-severity-filter id="error-severity-filter" value={props.filters.severity} onChange={(event) => props.onFiltersChange({ ...props.filters, severity: event.currentTarget.value })}>
+              <select className="select select-bordered select-sm" id="error-severity-filter" value={props.filters.severity} onChange={(event) => props.onFiltersChange({ ...props.filters, severity: event.currentTarget.value })}>
                 <option value="">Alle</option>
                 <option value="critical">Kritisch</option>
                 <option value="high">Hoch</option>
@@ -236,22 +237,22 @@ export function ErrorCatalog(props: ErrorCatalogProps): ReactNode {
             </label>
             <label className="incident-filter-field" htmlFor="error-category-filter">
               <span>Kategorie</span>
-              <select className="select select-bordered select-sm" data-error-category-filter id="error-category-filter" value={props.filters.category} onChange={(event) => props.onFiltersChange({ ...props.filters, category: event.currentTarget.value })}>
+              <select className="select select-bordered select-sm" id="error-category-filter" value={props.filters.category} onChange={(event) => props.onFiltersChange({ ...props.filters, category: event.currentTarget.value })}>
                 <option value="">Alle Kategorien</option>
                 {categories.map((category) => <option key={category} value={category}>{category}</option>)}
               </select>
             </label>
-            <button className="btn btn-ghost btn-sm" data-error-filter-reset type="button" onClick={resetFilters}>Zurücksetzen</button>
+            <button className="btn btn-ghost btn-sm" type="button" onClick={resetFilters}>Zurücksetzen</button>
           </section>
           <div className="filter-chip-row incident-category-chips" aria-label="Schnellfilter Fehlerkatalog">
-            <button className={`filter-chip${props.filters.quick === "all" ? " is-active" : ""}`} data-error-filter="all" type="button" onClick={() => props.onFiltersChange({ ...props.filters, quick: "all" })}>Alle</button>
+            <button className={`filter-chip${props.filters.quick === "all" ? " is-active" : ""}`} type="button" onClick={() => props.onFiltersChange({ ...props.filters, quick: "all" })}>Alle</button>
             {QUICK_FILTERS.map((filter) => (
-              <button className={`filter-chip${props.filters.quick === filter ? " is-active" : ""}`} data-error-filter={filter} key={filter} type="button" onClick={() => props.onFiltersChange({ ...props.filters, quick: filter })}>{filter}</button>
+              <button className={`filter-chip${props.filters.quick === filter ? " is-active" : ""}`} key={filter} type="button" onClick={() => props.onFiltersChange({ ...props.filters, quick: filter })}>{filter}</button>
             ))}
           </div>
         </div>
       </details>
-      <div className="error-card-grid incident-card-grid" data-error-list>
+      <div className="error-card-grid incident-card-grid">
         {visibleErrors.length ? visibleErrors.map((entry) => <ErrorCard {...props} entry={entry} key={entry.id} />) : (
           <div className="guided-empty-state">
             <strong>Keine passenden Fehler gefunden</strong>

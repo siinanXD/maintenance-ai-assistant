@@ -10,15 +10,20 @@ const GENERATED_INPUT = join(GENERATED_DIR, "input.css");
 const OUTPUT_CSS = join(ROOT_DIR, "app", "static", "css", "output.css");
 
 /**
- * Return sorted CSS source part filenames.
+ * Return all CSS sources in cascade order: folders and files sorted by path
+ * (00-foundation, 10-legacy, 20-components, 90-overrides).
  *
+ * @param {string} directory Directory to scan.
  * @returns {string[]} Sorted CSS source paths.
  */
-function cssSourceFiles() {
-  return readdirSync(SOURCE_DIR)
-    .filter((name) => name.endsWith(".css"))
-    .sort()
-    .map((name) => join(SOURCE_DIR, name));
+function cssSourceFiles(directory = SOURCE_DIR) {
+  return readdirSync(directory, { withFileTypes: true })
+    .sort((first, second) => first.name.localeCompare(second.name))
+    .flatMap((entry) => {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) return cssSourceFiles(path);
+      return entry.name.endsWith(".css") ? [path] : [];
+    });
 }
 
 /**

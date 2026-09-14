@@ -1,8 +1,9 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 
+import { confirmAction } from "../../app/runtimeBridge";
 import { bookGoodsReceipt, deleteInventoryMaterial } from "../inventoryApi";
 import type { InventoryMaterial } from "../inventoryTypes";
-import { formatMoney } from "../../formatters/number";
+import { formatMoney } from "../../utils/number";
 import { materialSearchText, searchText } from "../inventoryUtils";
 
 type InventoryListProps = {
@@ -53,7 +54,7 @@ function MaterialCard({
    * Delete a material after user confirmation.
    */
   async function handleDelete(): Promise<void> {
-    if (!window.confirm(`${material.name} wirklich löschen?`)) {
+    if (!(await confirmAction({ title: "Material löschen", message: `${material.name} wirklich löschen?`, confirmText: "Löschen" }))) {
       return;
     }
 
@@ -67,7 +68,7 @@ function MaterialCard({
   }
 
   return (
-    <article className={`record-card inventory-card${isLow ? " is-low-stock" : ""}`} data-search-text={searchText(materialSearchText(material))}>
+    <article className={`record-card inventory-card${isLow ? " is-low-stock" : ""}`}>
       <div className="record-card-header">
         <div>
           <h3 className="record-card-title">{material.name || "Material"}</h3>
@@ -149,10 +150,10 @@ export function InventoryList({ materials, writable, onRefresh }: InventoryListP
         <div className="list-toolbar">
           <label className="compact-search-field" htmlFor="react-inventory-list-search">
             <span>Material suchen</span>
-            <input className="input input-bordered input-sm" data-list-search data-list-search-target="[data-inventory-list]" id="react-inventory-list-search" onChange={(event) => setQuery(event.target.value)} placeholder="Name, Maschine, Hersteller" value={query} />
+            <input className="input input-bordered input-sm" id="react-inventory-list-search" onChange={(event) => setQuery(event.target.value)} placeholder="Name, Maschine, Hersteller" value={query} />
           </label>
         </div>
-        <div className="record-card-grid inventory-card-grid bounded-list-scroll" data-inventory-list data-list-search-items=".inventory-card">
+        <div className="record-card-grid inventory-card-grid bounded-list-scroll">
           {filteredMaterials.length ? (
             filteredMaterials.map((material) => (
               <MaterialCard key={material.id} material={material} onChanged={onRefresh} writable={writable} />

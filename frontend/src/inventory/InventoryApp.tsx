@@ -1,13 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 
-import { markIslandMounted } from "../app/islandMount";
-import { canWriteDashboard } from "../auth/permissions";
+import { canViewDashboard, canWriteDashboard } from "../auth/permissions";
 import { ActionDrawer } from "../components/ui/ActionDrawer";
 import { createActionDefinition } from "../components/ui/createActionSchema";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatStrip } from "../components/ui/StatStrip";
 import { InventoryForecastPanel } from "./components/InventoryForecastPanel";
-import { InventoryHeader } from "./components/InventoryHeader";
 import { InventoryList } from "./components/InventoryList";
-import { InventoryStats } from "./components/InventoryStats";
 import { MaterialForm } from "./components/MaterialForm";
 import { ReorderPanel } from "./components/ReorderPanel";
 import {
@@ -17,12 +16,7 @@ import {
   loadReorderSuggestions
 } from "./inventoryApi";
 import type { InventoryForecast, InventoryMaterial, Machine, ReorderSuggestions } from "./inventoryTypes";
-import { inventoryErrorMessage } from "./inventoryUtils";
-
-const INVENTORY_ISLAND = {
-  mountedFlag: "maintenanceInventoryReactMounted",
-  mountEvent: "maintenance-inventory-react-mounted"
-};
+import { inventoryErrorMessage, inventoryStats } from "./inventoryUtils";
 
 /**
  * Render the React inventory workflow island.
@@ -36,6 +30,7 @@ export function InventoryApp(): ReactNode {
   const [threshold, setThreshold] = useState(5);
   const [loadError, setLoadError] = useState("");
   const [reorder, setReorder] = useState<ReorderSuggestions | null>(null);
+  const stats = inventoryStats(materials);
 
   /**
    * Refresh inventory and machine data in parallel.
@@ -64,10 +59,6 @@ export function InventoryApp(): ReactNode {
   }
 
   useEffect(() => {
-    markIslandMounted(INVENTORY_ISLAND);
-  }, []);
-
-  useEffect(() => {
     refreshInventory().catch((error: unknown) => {
       setLoadError(inventoryErrorMessage(error));
     });
@@ -78,7 +69,15 @@ export function InventoryApp(): ReactNode {
 
   return (
     <>
-      <InventoryHeader onCreateMaterial={() => setIsCreateDrawerOpen(true)} writable={writable} />
+      <PageHeader
+        title="Lager"
+        description="Materialien mit Kosten, Anzahl, Hersteller und verbauter Maschine verwalten."
+        actions={[
+          { hidden: !writable, onClick: () => setIsCreateDrawerOpen(true), schema: createActionDefinition("inventoryMaterialCreate"), variant: "primary" },
+          { label: "Prognose berechnen", onClick: () => void runForecast(threshold) },
+          { hidden: !canViewDashboard("machines"), href: "/machines", label: "Maschinen", variant: "ghost" }
+        ]}
+      />
       {loadError ? (
         <section className="card app-card" role="alert">
           <div className="card-body">
@@ -86,7 +85,14 @@ export function InventoryApp(): ReactNode {
           </div>
         </section>
       ) : null}
-      <InventoryStats materials={materials} />
+      <StatStrip
+        label="Lagerstatus"
+        stats={[
+          { label: "Positionen", value: stats.count, meta: "Materialien mit Hersteller und Maschine" },
+          { label: "Mindestbestand", value: stats.lowStock, meta: "auf oder unter dem Mindestbestand", tone: stats.lowStock ? "warning" : "neutral" },
+          { label: "Lagerwert", value: stats.totalValue, meta: "Bestand × Einzelkosten" }
+        ]}
+      />
       <section className="dashboard-grid">
         <ReorderPanel suggestions={reorder} />
         <InventoryForecastPanel

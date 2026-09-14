@@ -79,7 +79,7 @@ function groupedSearchResults(
 }
 
 /**
- * Render the global search panel body while preserving legacy CSS classes.
+ * Render the result panel of the global search.
  */
 function ShellGlobalSearchResults({
   message,
@@ -201,11 +201,10 @@ export function ShellGlobalSearch({ inputId, isMobile = false }: ShellGlobalSear
   }
 
   return (
-    <form className={className} data-global-search-form role="search" autoComplete="off" onSubmit={handleSubmit} ref={formRef}>
+    <form className={className} role="search" autoComplete="off" onSubmit={handleSubmit} ref={formRef}>
       <label className="sr-only" htmlFor={inputId}>Globale Suche</label>
       <input
         id={inputId}
-        data-global-search-input
         type="search"
         placeholder="Aufgaben, Fehler, Dokumente suchen"
         aria-label="Globale Suche"
@@ -218,8 +217,8 @@ export function ShellGlobalSearch({ inputId, isMobile = false }: ShellGlobalSear
           if (event.key === "Escape") setIsOpen(false);
         }}
       />
-      <div className="global-search-panel" data-global-search-panel hidden={!isOpen}>
-        <div className="global-search-results" data-global-search-results>
+      <div className="global-search-panel" hidden={!isOpen}>
+        <div className="global-search-results">
           <ShellGlobalSearchResults message={message} query={activeQuery || query} results={results} />
         </div>
       </div>

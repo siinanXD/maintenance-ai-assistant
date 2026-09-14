@@ -1,0 +1,411 @@
+/*
+ * Bruecke von den gewachsenen Variablen zu den Design-Token.
+ *
+ * Das Feature-CSS liest an 601 Stellen --ui-* und --ops-*. Diese Variablen
+ * waren in vier Dateien mit abweichenden Werten auf :root deklariert. Hier
+ * zeigen sie alle auf eine Token-Rolle aus 00-shell-tokens.css, damit die
+ * Werkbank-Palette ohne Eingriff in 12.000 Zeilen Feature-CSS greift.
+ *
+ * Die Datei sortiert nach allen Feature-Dateien und liegt im selben Layer wie
+ * deren :root-Bloecke, gewinnt also ohne !important.
+ *
+ * Nicht erfasst sind die rund 1.370 fest eingetragenen Farbwerte im Feature-CSS.
+ * Die bleiben bis zum Abbau der Dateien, wie sie sind.
+ *
+ * Neue Regeln gehoeren nicht hierher: neues CSS liest die Token direkt.
+ */
+
+@layer components {
+  :root {
+    /* Flaechen */
+    --ui-bg: var(--color-bg-canvas);
+    --ui-bg-strong: var(--color-bg-surface-sunken);
+    --ui-surface: var(--color-bg-surface);
+    --ui-surface-muted: var(--color-bg-canvas);
+    --ui-surface-soft: var(--color-bg-canvas);
+    --ui-surface-tint: var(--color-bg-hover);
+    --ui-row-hover: var(--color-bg-hover);
+    --ui-sidebar: var(--color-bg-sidebar);
+    --ui-sidebar-deep: var(--color-bg-sidebar);
+    --ops-bg: var(--color-bg-canvas);
+    --ops-panel: var(--color-bg-surface);
+    --ops-sidebar: var(--color-bg-sidebar);
+
+    /* Linien */
+    --ui-border: var(--color-border-default);
+    --ui-border-strong: var(--color-border-strong);
+    --ops-border: var(--color-border-default);
+
+    /* Text */
+    --ui-text: var(--color-text-primary);
+    --ui-text-soft: var(--color-text-secondary);
+    --ui-muted: var(--color-text-muted);
+    --ops-text: var(--color-text-primary);
+    --ops-muted: var(--color-text-muted);
+
+    /* Aktion: Orange ausschliesslich fuer Handlung und aktive Position */
+    --ui-primary: var(--color-action-primary);
+    --ui-primary-dark: var(--color-action-primary-hover);
+    --ui-blue: var(--color-action-primary);
+    --ops-blue: var(--color-action-primary);
+    --ui-focus: var(--elevation-focus);
+
+    /* Zustand */
+    --ui-green: var(--color-status-success-solid);
+    --ui-amber: var(--color-status-warning-solid);
+    --ui-orange: var(--color-status-warning-solid);
+    --ui-red: var(--color-status-danger-solid);
+    --ui-danger: var(--color-status-danger-solid);
+    --ops-green: var(--color-status-success-solid);
+    --ops-orange: var(--color-status-warning-solid);
+    --ops-red: var(--color-status-danger-solid);
+    --ui-success-soft: var(--color-status-success-bg);
+    --ui-warning-soft: var(--color-status-warning-bg);
+    --ui-danger-soft: var(--color-status-danger-bg);
+    --ui-cyan: var(--color-status-info-text);
+    --ops-cyan: var(--color-status-info-text);
+
+    /* KI: kein Tuerkis und kein Violett mehr, Kennzeichnung ueber Form statt Farbe */
+    --ui-teal: var(--color-ai-accent);
+    --ui-purple: var(--color-ai-knowledge);
+
+    /* Radien: von 6-10px auf die Werkbank-Skala */
+    --ui-radius: var(--radius-lg);
+    --ui-radius-md: var(--radius-lg);
+    --ui-radius-sm: var(--radius-md);
+    --ui-radius-xs: var(--radius-sm);
+
+    /* Schatten: Trennung ueber Linien, Schatten nur noch angedeutet */
+    --ui-shadow-xs: var(--elevation-xs);
+    --ui-shadow-sm: var(--elevation-xs);
+    --ui-shadow-md: var(--elevation-sm);
+    --ui-shadow-lg: var(--elevation-md);
+    --ui-shadow-work: var(--elevation-sm);
+  }
+
+  /*
+   * Shell-Flaechen. Hintergrund, Layout und Sidebar legen fest eingetragene
+   * blaue Verlaeufe ueber die Variablen (09-dashboard-cockpit-01, 13-activity-
+   * feed-02); ohne diese Regeln bliebe ein Blauschleier ueber der neuen Palette.
+   */
+  .app-body {
+    background: var(--color-bg-canvas);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+  }
+
+  .app-shell-layout {
+    background: var(--color-bg-canvas);
+  }
+
+  .app-sidebar {
+    background: var(--color-bg-sidebar);
+    border-right: 1px solid var(--color-border-sidebar);
+    box-shadow: none;
+  }
+
+  .app-main h1,
+  .app-main h2,
+  .app-main h3,
+  .topbar-title,
+  .sidebar-brand-title {
+    font-family: var(--font-display);
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+  }
+
+  /*
+   * Aktive Position in der Navigation: ruhige Flaeche plus 3px-Markierung in
+   * Signalorange, wie der Nav Item in Figma. Ersetzt den blau-tuerkisen
+   * Verlauf aus 13-activity-feed-02. Die Markierung ist ein inset-Schatten,
+   * damit sich die Breite des Eintrags nicht aendert.
+   */
+  .app-sidebar .nav-link.is-active,
+  .app-sidebar .nav-link[aria-current="page"] {
+    background: var(--color-bg-sidebar-active);
+    border-color: transparent;
+    box-shadow: inset 3px 0 0 var(--color-action-primary);
+    color: var(--color-text-sidebar-active);
+  }
+
+  /* Zaehler: neutral, nur Stoerungen sind ein Alarm (09-dashboard-cockpit-01). */
+  .app-sidebar .nav-count {
+    background: var(--color-status-neutral-bg);
+    color: var(--color-status-neutral-text);
+  }
+
+  .app-sidebar .nav-count.is-alert {
+    background: var(--color-status-danger-solid);
+    color: var(--color-text-inverse);
+  }
+
+  /*
+   * Seitenleisten an Karten und Kopfbereichen lesen --ui-blue bzw. --ui-primary
+   * und waeren ueber diese Bruecke orange. Orange ist Handlung, nicht Dekoration:
+   * die Leiste bleibt als ruhige Kante stehen, der Kopfbereich verliert seinen
+   * hellblauen Verlauf.
+   */
+  .page-hero,
+  .ai-admin-hero,
+  .machine-profile-hero {
+    background: var(--color-bg-surface);
+    border-left-color: var(--color-border-strong);
+  }
+
+  /* Blaues Streifenmuster im Kopfbereich (13-activity-feed-03). */
+  .page-hero::after,
+  .ai-admin-hero::after {
+    background: none;
+  }
+
+  /*
+   * Kennzahlen-Leisten (13-activity-feed-03): Standard, KI und neutral werden
+   * zur ruhigen Kante. Farbig bleiben nur Zustaende -- Warnung und Stoerung.
+   */
+  .surface-stat-card::before,
+  .executive-kpi-card::before,
+  .metric-card::before,
+  .ai-status-overview-card::before,
+  .surface-stat-card.is-ai::before,
+  .surface-stat-card.is-neutral::before,
+  .executive-kpi-card.is-cyan::before,
+  .executive-kpi-card.is-teal::before,
+  .executive-kpi-card.is-slate::before {
+    background: var(--color-border-strong);
+  }
+
+  .executive-kpi-card.is-blue::before {
+    background: var(--color-border-strong);
+  }
+
+  /* Verweise in Panels und Karten waren fest #006de5. */
+  .app-main .panel-link,
+  .app-main a:not([class]),
+  .app-main .situation-action,
+  .app-main .cockpit-focus-action {
+    color: var(--color-text-link);
+  }
+
+  .app-main .checkbox-primary {
+    accent-color: var(--color-action-primary);
+  }
+
+  .app-main .panel-link:hover,
+  .app-main a:not([class]):hover {
+    color: var(--color-action-primary-hover);
+  }
+
+  /*
+   * Restliche Blautoene aus dem Seiten-Scan (13.09.2026, alle 12 Routen).
+   * "In Arbeit" / "In Pruefung" ist ein Zustand, keine Handlung: Info-Stahlblau
+   * statt Orange-Text auf Hellblau.
+   */
+  .status-badge.is-progress,
+  .badge-status.is-progress,
+  .badge-info {
+    border-color: var(--color-status-info-border);
+    background: var(--color-status-info-bg);
+    color: var(--color-status-info-text);
+  }
+
+  /*
+   * Abschnitts-Kicker ("Heute zuerst", "Anlagen", "Maintenance Control Center") waren
+   * ueber --ui-primary orange. Sie ordnen, sie handeln nicht: Typenschild-Label in
+   * gedaempftem Grau, wie im Werkbank-Brief.
+   */
+  .page-kicker,
+  .section-kicker,
+  .control-center-topbar .page-kicker {
+    /* !important nur, weil eine Legacy-Regel die Farbe bereits mit !important auf --ui-primary setzt. */
+    color: var(--color-text-muted) !important;
+    font-family: var(--font-label);
+    letter-spacing: 0.08em;
+  }
+
+  /* Aktiver Filter ist aktive Position: Signalrand statt Blau. */
+  .filter-chip.is-active {
+    border-color: var(--color-border-focus);
+  }
+
+  /* Mobile Navigation: dieselbe Logik wie die Sidebar, ohne Cyan. */
+  .app-header .top-nav-link.is-active,
+  .app-header .top-nav-link.is-admin-link.is-active {
+    border-color: var(--color-bg-inverse);
+    background: var(--color-bg-inverse);
+    box-shadow: inset 3px 0 0 var(--color-action-primary);
+    color: var(--color-text-inverse);
+  }
+
+  .app-header .top-nav-link.is-admin-link:not(.is-active):hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+
+  /* Logo und Chat-Schalter: flaches Signalorange statt Verlauf mit blauem Leuchten. */
+  .app-body .sidebar-brand-mark,
+  .app-body .chat-toggle {
+    background: var(--color-action-primary);
+    box-shadow: var(--elevation-sm);
+  }
+
+  /* Wertfelder in Karten: hellblau (#f4f8fc/#dbe6f0) in sieben Kartentypen. */
+  .record-card-meta span,
+  .error-card-meta span,
+  .task-card-meta span,
+  .machine-profile-record-metrics span,
+  .incident-card-metrics span,
+  .handover-record-metrics span {
+    background: var(--color-bg-canvas);
+    border-color: var(--color-border-subtle);
+  }
+
+  .record-card,
+  .ai-clarity-panel,
+  .ai-reindex-command-panel,
+  .ai-observability-panel {
+    border-left-color: var(--color-border-strong);
+  }
+}
+
+/*
+ * Ungelayert, weil die Quellregeln es sind: Stoerungs- und Uebergabe-Karten
+ * (Fragmente aus 16-responsive-rules / 17-errors-incidents) stehen ausserhalb
+ * jeder @layer und schlagen damit jede gelayerte Regel unabhaengig von der
+ * Spezifitaet. Diese Ueberschreibungen muessen deshalb selbst ungelayert und
+ * spaeter stehen.
+ */
+
+/* Inhaltskategorien sind keine Zustaende: ruhige Kante statt Himmelblau/Violett. */
+
+.knowledge-block.is-symptom,
+.knowledge-block.is-impact,
+.handover-block.is-machine,
+.handover-block.is-material {
+  border-left-color: var(--color-border-strong);
+  background: var(--color-bg-canvas);
+}
+
+/* Kopf der Stoerungszentrale: rosa Verlauf und rote Leiste sind Dekoration. */
+
+.filter-chip.is-active {
+  background: var(--color-bg-selected);
+}
+
+/* Chat-Widget: Kopfzeile und Verlaufszaehler waren fest Blau. */
+
+.chat-panel-header .chat-panel-kicker {
+  color: var(--color-text-muted);
+}
+
+.chat-history-panel .chat-history-summary span {
+  background: var(--color-status-neutral-bg);
+  color: var(--color-status-neutral-text);
+}
+
+/* Fortschrittsbalken der neutralen Kennzahl und Info-Badge (Quellregeln ungelayert). */
+
+.executive-kpi-card.is-blue .kpi-progress span {
+  background: var(--color-text-secondary);
+}
+
+.badge.badge-info {
+  border-color: var(--color-status-info-border);
+  background: var(--color-status-info-bg);
+  color: var(--color-status-info-text);
+}
+
+/* Chat: eigene Frage in Tinte statt Himmelblau, Antwort-Metadaten ruhig. */
+
+.chat-message.is-user {
+  border-color: var(--color-bg-inverse);
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+}
+
+.chat-answer-meta span,
+.chat-answer-meta span:first-child {
+  border-color: var(--color-border-default);
+  background: var(--color-bg-surface-sunken);
+  color: var(--color-text-secondary);
+}
+
+.chat-answer-meta span:first-child {
+  color: var(--color-text-primary);
+}
+
+.help-disclosure summary {
+  color: var(--color-text-secondary);
+}
+
+/* Kennzahl-Beschriftungen (Nutzerverwaltung) waren Marineblau. */
+
+.kpi-label {
+  color: var(--color-text-muted);
+}
+
+/* Hilfe-Disclosures und Chat-Kopf: Flaeche statt kuehlem Verlauf. */
+
+.chat-panel-header {
+  background: var(--color-bg-surface);
+}
+
+/* Karten-Kennzahlen: lange Beschriftungen (PRODUKTIONSVERLUST) brechen statt ueberzulaufen. */
+
+.incident-card-metrics small,
+.handover-record-metrics small,
+.machine-profile-record-metrics small,
+.record-card-meta small {
+  hyphens: auto;
+  overflow-wrap: break-word;
+  letter-spacing: 0.02em;
+}
+
+/* Status-Badges in Kartenkoepfen behalten ihre Hoehe statt sich zu strecken. */
+
+.incident-card-badges {
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+/* Topbar-Schichtchip: alte Regel machte die Schichtzeit zum Grid und brach die Datumszeile um. */
+
+#maintenance-shell-topbar-root .shift-select small span {
+  display: inline;
+}
+
+/* Störungskarten im Raster: Inhalt oben ausrichten statt Zeilen auf Kartenhöhe zu strecken. */
+
+.incident-card {
+  align-content: start;
+}
+
+/* Seitenköpfe: Titel und ein Satz, keine Bühne. Die Topbar nennt die Seite bereits. */
+
+.page-hero,
+.page-hero.is-compact {
+  margin-bottom: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  border-left-width: 1px;
+  box-shadow: none;
+}
+
+.page-hero .page-title {
+  font-size: clamp(1.5rem, 1.1rem + 1vw, 1.875rem);
+}
+
+.page-hero .page-description {
+  max-width: 70ch;
+  font-size: 0.875rem;
+}
+
+/* Kennzahlenleisten füllen die Breite, egal ob drei oder fünf Werte. */
+
+.surface-stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}

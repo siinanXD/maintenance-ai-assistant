@@ -1,5 +1,5 @@
 import { readStoredSession, type MaintenanceUser } from "./session";
-import { legacyAuthRuntime } from "../app/runtimeBridge";
+import { authRuntime } from "../app/runtimeBridge";
 
 export type MaintenanceAuthRuntime = {
   readonly clearSession?: (options?: { readonly redirect?: boolean }) => void;
@@ -9,8 +9,8 @@ export type MaintenanceAuthRuntime = {
   readonly destinationForUserOrNext?: (user: MaintenanceUser, nextPath: string | null) => string;
   readonly employeeAccessLevel?: () => string;
   readonly ensureReady?: () => Promise<MaintenanceUser | null>;
+  readonly logout?: () => Promise<void>;
   readonly refreshUser?: () => Promise<MaintenanceUser | null>;
-  readonly refreshUserInBackground?: () => Promise<MaintenanceUser | null>;
   readonly token?: () => string | null;
   readonly user?: () => MaintenanceUser | null;
 };
@@ -58,7 +58,7 @@ export function canViewStoredDashboard(user: MaintenanceUser | null, dashboard: 
  * Return whether the current user may view a dashboard area.
  */
 export function canViewDashboard(dashboard: string): boolean {
-  const maintenanceAuth = legacyAuthRuntime();
+  const maintenanceAuth = authRuntime();
   if (maintenanceAuth && typeof maintenanceAuth.canView === "function") {
     return maintenanceAuth.canView(dashboard);
   }
@@ -70,7 +70,7 @@ export function canViewDashboard(dashboard: string): boolean {
  * Return whether the current user may write to a dashboard area.
  */
 export function canWriteDashboard(dashboard: string): boolean {
-  const maintenanceAuth = legacyAuthRuntime();
+  const maintenanceAuth = authRuntime();
   if (maintenanceAuth && typeof maintenanceAuth.canWrite === "function") {
     return maintenanceAuth.canWrite(dashboard);
   }

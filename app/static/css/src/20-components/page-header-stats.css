@@ -1,0 +1,102 @@
+/*
+ * Seitenkopf und Kennzahlenleiste, gemeinsam für alle Fachseiten
+ * (frontend/src/components/ui/PageHeader.tsx und StatStrip.tsx).
+ * Farbig ist nur die obere Kante und nur bei Zuständen.
+ */
+
+@layer components {
+  .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5) var(--space-8);
+    margin-bottom: var(--space-6);
+  }
+
+  .page-header-text {
+    min-width: min(100%, 20rem);
+    flex: 1 1 24rem;
+  }
+
+  .page-header-title {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 0.8vw, 1.875rem);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  .page-header-description {
+    max-width: 70ch;
+    margin: var(--space-3) 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .page-header .page-action-bar {
+    justify-content: flex-start;
+  }
+
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+
+  .stat-tile {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-6);
+    border: 1px solid var(--color-border-default);
+    border-top: 3px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+  }
+
+  .stat-tile.is-primary {
+    border-top-color: var(--color-action-primary);
+  }
+
+  .stat-tile.is-warning {
+    border-top-color: var(--color-status-warning-solid);
+  }
+
+  .stat-tile.is-danger {
+    border-top-color: var(--color-status-danger-solid);
+  }
+
+  .stat-tile.is-success {
+    border-top-color: var(--color-status-success-solid);
+  }
+
+  .stat-tile-label {
+    color: var(--color-text-muted);
+    font-family: var(--font-label);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .stat-tile-value {
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    font-size: 1.625rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .stat-tile-meta {
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+}

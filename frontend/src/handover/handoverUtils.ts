@@ -4,8 +4,8 @@ import {
   MACHINE_STATUS_OPTIONS,
   PRODUCTION_STATUS_OPTIONS,
   SHIFT_OPTIONS,
-} from "./HandoverOptions";
-import type { HandoverFilters, HandoverRecord, HandoverStats } from "./HandoverTypes";
+} from "./handoverOptions";
+import type { HandoverFilters, HandoverRecord, HandoverStats } from "./handoverTypes";
 
 export const EMPTY_HANDOVER_FILTERS: HandoverFilters = {
   department: "",

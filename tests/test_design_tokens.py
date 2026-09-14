@@ -17,8 +17,8 @@ TOKENS_DIR = REPO_ROOT / "design" / "tokens"
 TOKENS_FILE = TOKENS_DIR / "tokens.json"
 APP_FILE = TOKENS_DIR / "app.json"
 CSS_SRC = REPO_ROOT / "app" / "static" / "css" / "src"
-TOKEN_CSS = CSS_SRC / "00-shell-tokens.css"
-BRIDGE_CSS = CSS_SRC / "98-legacy-token-bridge.css"
+TOKEN_CSS = CSS_SRC / "00-foundation" / "tokens.css"
+BRIDGE_CSS = CSS_SRC / "90-overrides" / "legacy-token-bridge.css"
 TAILWIND_FILE = TOKENS_DIR / "generated" / "tailwind.cjs"
 TAILWIND_CONFIG = REPO_ROOT / "tailwind.config.js"
 
@@ -123,7 +123,7 @@ def test_light_tokens_reach_the_generated_css_exactly():
 
     assert (
         _css_block(":root") == expected
-    ), "00-shell-tokens.css passt nicht zu design/tokens/. Neu erzeugen mit: npm run build:tokens"
+    ), "tokens.css passt nicht zu design/tokens/. Neu erzeugen mit: npm run build:tokens"
 
 
 def test_dark_tokens_cover_exactly_the_light_semantic_roles():
@@ -149,7 +149,7 @@ def test_shell_layout_tokens_keep_the_names_the_application_reads():
     assert properties["topbar-height"] == "64px"
 
     base_html = (REPO_ROOT / "app" / "templates" / "base.html").read_text(encoding="utf-8")
-    shell_layout = (CSS_SRC / "99-shell-layout.css").read_text(encoding="utf-8")
+    shell_layout = (CSS_SRC / "90-overrides" / "shell-layout.css").read_text(encoding="utf-8")
 
     assert "var(--sidebar-width)_minmax(0,1fr)" in base_html
     assert "--sidebar-width: var(--sidebar-width-collapsed);" in shell_layout
@@ -196,7 +196,7 @@ def test_muted_text_meets_wcag_aa_on_every_ground():
 def test_legacy_bridge_points_every_legacy_variable_at_an_existing_token():
     """Verify each --ui-*/--ops-* the feature CSS defines is redirected to a token."""
     defined = set()
-    for path in CSS_SRC.glob("*.css"):
+    for path in CSS_SRC.rglob("*.css"):
         if path.name == BRIDGE_CSS.name:
             continue
         defined.update(

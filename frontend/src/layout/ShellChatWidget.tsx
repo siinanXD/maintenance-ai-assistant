@@ -417,7 +417,7 @@ function ShellChatMessageBubble({
         </div>
       ) : null}
       {message.pendingAction && onConfirm ? (
-        <div className="chat-pending-action" data-chat-pending-action>
+        <div className="chat-pending-action">
           <span>Aktion wartet auf Bestätigung: {message.pendingAction.label || message.pendingAction.tool}</span>
           <button className="btn btn-sm btn-primary" type="button" onClick={() => onConfirm(message)}>
             Aktion bestätigen
@@ -598,7 +598,7 @@ export function ShellChatWidget(): ReactNode {
             &times;
           </button>
         </div>
-        <div className="chat-panel-body" data-chat-messages role="log" aria-live="polite" aria-relevant="additions text">
+        <div className="chat-panel-body" role="log" aria-live="polite" aria-relevant="additions text">
           {messages.map((message) => (
             <ShellChatMessageBubble key={message.id} message={message} onConfirm={confirmAction} />
           ))}
@@ -607,17 +607,7 @@ export function ShellChatWidget(): ReactNode {
           <summary>Worauf basiert die Antwort?</summary>
           <p>Der Assistant nutzt freigegebene App-Daten und, wenn aktiv, passende Dokumentquellen. Quellen, Konfidenz und Unsicherheit werden in der Antwortkarte angezeigt.</p>
         </details>
-        <details className="chat-history-panel" data-chat-history-panel hidden>
-          <summary className="chat-history-summary" data-chat-history-summary>
-            Chat-Historie
-            <span data-chat-history-count>0</span>
-          </summary>
-          <label className="sr-only" htmlFor="chat-history-search-react">Chat-Historie durchsuchen</label>
-          <input className="input input-bordered w-full" id="chat-history-search-react" data-chat-history-search autoComplete="off" placeholder="Historie durchsuchen" />
-          <div className="chat-history-list" data-chat-history-list />
-        </details>
-        <div className="chat-suggestions" data-chat-suggestions hidden />
-        <form className="chat-panel-form" data-chat-form aria-describedby="chat-input-help-react" aria-busy={isSending} onSubmit={handleSubmit}>
+        <form className="chat-panel-form" aria-describedby="chat-input-help-react" aria-busy={isSending} onSubmit={handleSubmit}>
           <label className="sr-only" htmlFor="chat-message-input-react">Nachricht an den AI Assistant</label>
           <input
             className="input input-bordered w-full"

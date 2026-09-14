@@ -40,9 +40,6 @@ export function TaskFiltersBar({
         <span>Suche</span>
         <input
           className="input input-bordered input-sm"
-          data-list-search
-          data-list-search-target="[data-task-kanban-board]"
-          data-task-filter-search
           id="react-task-list-search"
           onChange={(event) => updateFilter("search", event.target.value)}
           placeholder="Titel, Maschine, Bereich, Status"
@@ -51,7 +48,7 @@ export function TaskFiltersBar({
       </label>
       <label className="task-filter-field" htmlFor="react-task-status-filter">
         <span>Status</span>
-        <select className="select select-bordered select-sm" data-task-filter-status id="react-task-status-filter" onChange={(event) => updateFilter("status", event.target.value)} value={filters.status}>
+        <select className="select select-bordered select-sm" id="react-task-status-filter" onChange={(event) => updateFilter("status", event.target.value)} value={filters.status}>
           <option value="">Alle</option>
           <option value="open">Offen</option>
           <option value="in_progress">In Arbeit</option>
@@ -61,7 +58,7 @@ export function TaskFiltersBar({
       </label>
       <label className="task-filter-field" htmlFor="react-task-priority-filter">
         <span>Priorität</span>
-        <select className="select select-bordered select-sm" data-task-filter-priority id="react-task-priority-filter" onChange={(event) => updateFilter("priority", event.target.value)} value={filters.priority}>
+        <select className="select select-bordered select-sm" id="react-task-priority-filter" onChange={(event) => updateFilter("priority", event.target.value)} value={filters.priority}>
           <option value="">Alle</option>
           <option value="urgent">Kritisch</option>
           <option value="soon">Bald</option>
@@ -70,7 +67,7 @@ export function TaskFiltersBar({
       </label>
       <label className="task-filter-field" htmlFor="react-task-department-filter">
         <span>Bereich</span>
-        <select className="select select-bordered select-sm" data-task-filter-department id="react-task-department-filter" onChange={(event) => updateFilter("department", event.target.value)} value={filters.department}>
+        <select className="select select-bordered select-sm" id="react-task-department-filter" onChange={(event) => updateFilter("department", event.target.value)} value={filters.department}>
           <option value="">Alle Bereiche</option>
           {departments.map((department) => (
             <option key={department} value={department}>{department}</option>
@@ -79,17 +76,17 @@ export function TaskFiltersBar({
       </label>
       <label className="task-filter-field" htmlFor="react-task-due-filter">
         <span>Fälligkeit</span>
-        <select className="select select-bordered select-sm" data-task-filter-due id="react-task-due-filter" onChange={(event) => updateFilter("due", event.target.value)} value={filters.due}>
+        <select className="select select-bordered select-sm" id="react-task-due-filter" onChange={(event) => updateFilter("due", event.target.value)} value={filters.due}>
           <option value="">Alle</option>
           <option value="overdue">Überfällig</option>
           <option value="today">Heute</option>
           <option value="planned">Geplant</option>
         </select>
       </label>
-      <button className="btn btn-ghost btn-sm" data-task-filter-reset onClick={resetFilters} type="button">
+      <button className="btn btn-ghost btn-sm" onClick={resetFilters} type="button">
         Zurücksetzen
       </button>
-      <span className="task-filter-summary" data-task-filter-summary>
+      <span className="task-filter-summary">
         {total ? `${visible} von ${total} Aufgaben sichtbar` : "Noch keine Aufgaben vorhanden."}
       </span>
     </section>

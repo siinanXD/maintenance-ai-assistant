@@ -1,4 +1,4 @@
-import { formatMoney } from "../formatters/number";
+import { formatMoney } from "../utils/number";
 import { safeErrorMessage } from "../utils/errors";
 import type { InventoryMaterial } from "./inventoryTypes";
 
@@ -25,7 +25,7 @@ export function searchText(value: unknown): string {
 }
 
 /**
- * Return a forecast risk badge class matching the legacy UI.
+ * Return the badge class for a forecast risk level.
  */
 export function forecastRiskBadgeClass(riskLevel: string | undefined): string {
   if (riskLevel === "critical") return "badge badge-error text-white";
@@ -44,7 +44,7 @@ export function materialSearchText(material: InventoryMaterial): string {
 }
 
 /**
- * Return KPI values for the inventory status cards.
+ * Return the figures for the inventory stat strip.
  */
 export function inventoryStats(materials: readonly InventoryMaterial[]) {
   const totalValue = materials.reduce((sum, material) => sum + Number(material.total_value || 0), 0);
@@ -52,9 +52,5 @@ export function inventoryStats(materials: readonly InventoryMaterial[]) {
     Number(material.min_quantity || 0) > 0 && Number(material.quantity || 0) <= Number(material.min_quantity)
   )).length;
 
-  return {
-    count: `${materials.length} Artikel`,
-    lowStock: `${lowStock} nachbestellen`,
-    totalValue: formatMoney(totalValue)
-  };
+  return { count: materials.length, lowStock, totalValue: formatMoney(totalValue) };
 }

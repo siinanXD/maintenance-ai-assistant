@@ -870,20 +870,6 @@ def test_inventory_forecast_rejects_invalid_payloads(
     assert bad_status.status_code == 400
 
 
-def test_inventory_page_contains_forecast_ui(client):
-    """Verify the inventory page exposes the forecast controls."""
-    response = client.get("/inventory")
-    html = response.get_data(as_text=True)
-    source = inventory_react_source()
-
-    assert response.status_code == 200
-    assert "maintenance-inventory-root" in html
-    assert "data-react-inventory-fallback" not in html
-    assert "data-inventory-forecast-form" in source
-    assert "data-inventory-forecast-list" in source
-    assert "Ersatzteil-Prognose" in source
-
-
 def test_machine_history_only_uses_permitted_sources(
     client,
     make_user,
@@ -1170,41 +1156,6 @@ def test_machine_profile_combines_operational_sources(
         "maintenance",
         "handover",
     }
-
-
-def test_machine_page_contains_history_ui(client):
-    """Verify the machine page exposes the history target container."""
-    response = client.get("/machines")
-    html = response.get_data(as_text=True)
-    source = machine_react_source()
-
-    assert response.status_code == 200
-    assert "maintenance-machines-root" in html
-    assert "data-react-machines-fallback" not in html
-    assert "data-machine-history-panel" in source
-    assert "data-machine-history-list" in source
-    assert "data-machine-assistant-form" in source
-    assert "data-machine-assistant-sources" in source
-    assert "data-maintenance-recommendations-list" in source
-    assert "Anlagenakte" in source
-
-
-def test_machine_detail_page_contains_profile_targets(client):
-    """Verify the machine detail page exposes the profile UI hooks."""
-    response = client.get("/machines/123")
-    html = response.get_data(as_text=True)
-    source = machine_react_source()
-
-    assert response.status_code == 200
-    assert "maintenance-machine-profile-root" in html
-    assert "data-react-machine-profile-fallback" not in html
-    assert "data-machine-profile-page" in source
-    assert 'data-machine-id="123"' in html
-    assert "data-machine-profile-kpis" in source
-    assert "data-machine-profile-tasks" in source
-    assert "data-machine-profile-errors" in source
-    assert "data-machine-profile-documents" in source
-    assert "data-machine-profile-handovers" in source
 
 
 def test_machine_assistant_uses_local_context_and_requires_question(

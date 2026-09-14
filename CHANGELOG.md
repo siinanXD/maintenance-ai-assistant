@@ -27,8 +27,34 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `/ai/chat/templates`, `/ai/incident-timeline` and `/ai/order-plan` endpoints;
   legacy Admin-AI redirects
 - Help boxes and placeholder KPI cards without real data on list pages
+- The second JavaScript layer next to React: `app/static/pages/*` (14 mount
+  watchers), `app/static/shared/*`, `core/api-client.js`, the page loader in
+  `app.js`, DOM list filtering and permission toggling in `auth.js`, 432 `data-*`
+  hook attributes that nothing read, hidden dashboard forms and counters, the
+  unused React demo app and five pass-through provider and markup components
+- About 1,800 lines of source-snapshot tests that pinned those hooks; replaced by
+  `tests/test_frontend_structure.py`
+
+### Fixed
+- Logging out from the topbar now revokes the token on the server; the React
+  handler cleared the session but stopped the click before `auth.js` saw it
+- Shift plan and user administration pages showed "Maintenance Assistant" as
+  topbar title
+- The assistant's "uploaded this week" document filter compared the local date
+  with UTC timestamps
+- The shift plan publish button received its label text as CSS class
 
 ### Changed
+- Frontend: every page folder has `entry.tsx`, `<Page>App.tsx`, API/type/util
+  modules and `components/`; entries share `mountPage`. Pages use one
+  `PageHeader` and one `StatStrip` instead of eleven header and eight stats components,
+  and one confirmation dialog instead of `window.confirm`. Admin-AI: eight API
+  modules and three barrels merged, one access check, the view switch lives in
+  `AdminAiApp`
+- CSS sources are grouped by cascade layer (`00-foundation`, `10-legacy`,
+  `20-components`, `90-overrides`) instead of 70 fragments split mid-block;
+  389 overridden declarations and 312 unused selectors removed, built
+  declarations verified identical apart from those
 - The chat is agent-only: `POST /api/v1/ai/chat` and `POST /api/v1/ai/agent`
   run the same LangGraph tool loop. The rule-based router (`app/ai/intent.py`,
   `app/ai/context.py`, `app/ai/chat_answers.py`, `app/ai/handlers/`, the

@@ -69,9 +69,9 @@ export function TaskSuggestionPanel({ hidden, onApplySuggestion }: TaskSuggestio
   return (
     <details
       className="task-action-panel app-card"
-      data-default-collapsed="true"
-      data-mobile-collapsible
-      data-permission-write="tasks"
+     
+     
+     
       hidden={hidden}
       onToggle={(event) => setOpen(event.currentTarget.open)}
       open={open}
@@ -83,7 +83,7 @@ export function TaskSuggestionPanel({ hidden, onApplySuggestion }: TaskSuggestio
         </span>
       </summary>
       <div className="task-form-body">
-        <form data-task-suggest-form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="react-task-suggest-text">Beschreibung</label>
             <textarea
@@ -102,7 +102,6 @@ export function TaskSuggestionPanel({ hidden, onApplySuggestion }: TaskSuggestio
             </button>
             <span
               className={`panel-meta${message.error ? " is-error" : ""}`}
-              data-task-suggest-message
               role="status"
               aria-live="polite"
             >
@@ -110,21 +109,21 @@ export function TaskSuggestionPanel({ hidden, onApplySuggestion }: TaskSuggestio
             </span>
           </div>
         </form>
-        <div className="suggestion-box task-suggestion-box" data-task-suggestion hidden={!suggestion}>
+        <div className="suggestion-box task-suggestion-box" hidden={!suggestion}>
           {suggestion ? (
             <>
               <div className="form-grid">
                 <div className="field">
                   <label htmlFor="react-suggest-title">Titel</label>
-                  <input className="input input-bordered" data-suggest-field="title" id="react-suggest-title" onChange={(event) => updateSuggestion("title", event.target.value)} value={suggestion.title} />
+                  <input className="input input-bordered" id="react-suggest-title" onChange={(event) => updateSuggestion("title", event.target.value)} value={suggestion.title} />
                 </div>
                 <div className="field">
                   <label htmlFor="react-suggest-department">Bereich</label>
-                  <input className="input input-bordered" data-suggest-field="department" id="react-suggest-department" onChange={(event) => updateSuggestion("department", event.target.value)} value={suggestion.department} />
+                  <input className="input input-bordered" id="react-suggest-department" onChange={(event) => updateSuggestion("department", event.target.value)} value={suggestion.department} />
                 </div>
                 <div className="field">
                   <label htmlFor="react-suggest-priority">Priorität</label>
-                  <select className="select select-bordered" data-suggest-field="priority" id="react-suggest-priority" onChange={(event) => updateSuggestion("priority", event.target.value)} value={suggestion.priority}>
+                  <select className="select select-bordered" id="react-suggest-priority" onChange={(event) => updateSuggestion("priority", event.target.value)} value={suggestion.priority}>
                     <option value="urgent">Kritisch</option>
                     <option value="soon">Bald</option>
                     <option value="normal">Normal</option>
@@ -132,7 +131,7 @@ export function TaskSuggestionPanel({ hidden, onApplySuggestion }: TaskSuggestio
                 </div>
                 <div className="field">
                   <label htmlFor="react-suggest-status">Status</label>
-                  <select className="select select-bordered" data-suggest-field="status" id="react-suggest-status" onChange={(event) => updateSuggestion("status", event.target.value)} value={suggestion.status}>
+                  <select className="select select-bordered" id="react-suggest-status" onChange={(event) => updateSuggestion("status", event.target.value)} value={suggestion.status}>
                     <option value="open">Offen</option>
                     <option value="in_progress">In Arbeit</option>
                     <option value="done">Erledigt</option>
@@ -141,19 +140,19 @@ export function TaskSuggestionPanel({ hidden, onApplySuggestion }: TaskSuggestio
                 </div>
                 <div className="field is-full">
                   <label htmlFor="react-suggest-description">Beschreibung</label>
-                  <textarea className="textarea textarea-bordered" data-suggest-field="description" id="react-suggest-description" onChange={(event) => updateSuggestion("description", event.target.value)} value={suggestion.description} />
+                  <textarea className="textarea textarea-bordered" id="react-suggest-description" onChange={(event) => updateSuggestion("description", event.target.value)} value={suggestion.description} />
                 </div>
                 <div className="field">
                   <label htmlFor="react-suggest-cause">Mögliche Ursache</label>
-                  <textarea className="textarea textarea-bordered" data-suggest-field="possible_cause" id="react-suggest-cause" onChange={(event) => updateSuggestion("possible_cause", event.target.value)} value={suggestion.possible_cause || ""} />
+                  <textarea className="textarea textarea-bordered" id="react-suggest-cause" onChange={(event) => updateSuggestion("possible_cause", event.target.value)} value={suggestion.possible_cause || ""} />
                 </div>
                 <div className="field">
                   <label htmlFor="react-suggest-action">Nächste Aktion</label>
-                  <textarea className="textarea textarea-bordered" data-suggest-field="recommended_action" id="react-suggest-action" onChange={(event) => updateSuggestion("recommended_action", event.target.value)} value={suggestion.recommended_action || ""} />
+                  <textarea className="textarea textarea-bordered" id="react-suggest-action" onChange={(event) => updateSuggestion("recommended_action", event.target.value)} value={suggestion.recommended_action || ""} />
                 </div>
               </div>
               <div className="toolbar form-actions">
-                <button className="btn btn-primary" data-apply-task-suggestion onClick={handleApply} type="button">
+                <button className="btn btn-primary" onClick={handleApply} type="button">
                   In Aufgabenformular übernehmen
                 </button>
               </div>

@@ -1,7 +1,7 @@
 import { formatGermanDateTime } from "../utils/date";
 import { safeErrorMessage } from "../utils/errors";
 import { type AdminAiPayload } from "./adminAiApi";
-export { capabilityGroups } from "./adminAiCapabilityModel";
+import { moneyText, numberText, percentText } from "./adminAiFormat";
 
 type AdminAiUserCostRow = {
   readonly estimated_cost_usd?: unknown;
@@ -21,7 +21,7 @@ export type AdminAiEffectivenessState = {
   readonly isLoading: boolean;
 };
 
-export type AdminAiMetricRow = {
+type AdminAiMetricRow = {
   readonly label: string;
   readonly value: string;
 };
@@ -30,7 +30,7 @@ export type AdminAiBarRow = AdminAiMetricRow & {
   readonly width: string;
 };
 
-export type AdminAiCapabilityGroup = {
+type AdminAiCapabilityGroup = {
   readonly key: "partial" | "supported" | "unsupported";
   readonly items: readonly AdminAiMetricRow[];
   readonly tone: "is-active" | "is-muted" | "is-stale";
@@ -81,30 +81,6 @@ function text(value: unknown, fallback = "-"): string {
 function numeric(value: unknown): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-/**
- * Format a plain number for German UI.
- */
-export function numberText(value: unknown): string {
-  return numeric(value).toLocaleString("de-DE");
-}
-
-/**
- * Format a ratio as whole percent.
- */
-export function percentText(value: unknown): string {
-  return `${Math.round(numeric(value) * 100)}%`;
-}
-
-/**
- * Format an estimated USD value like the legacy Admin-AI views.
- */
-export function moneyText(value: unknown): string {
-  return `$${numeric(value).toLocaleString("de-DE", {
-    maximumFractionDigits: 6,
-    minimumFractionDigits: 0
-  })}`;
 }
 
 /**
@@ -282,4 +258,41 @@ export function failedEffectivenessState(error: unknown): Pick<AdminAiEffectiven
   return {
     errorMessage: safeErrorMessage(error, "AI-Admin Effektivität konnte nicht komplett geladen werden.")
   };
+}
+
+/**
+ * Return what the assistant supports, supports partly and refuses by design.
+ */
+export function capabilityGroups(): AdminAiCapabilityGroup[] {
+  return [
+    {
+      key: "supported",
+      tone: "is-active",
+      items: [
+        { label: "Permission-aware Quellenabruf", value: "Quellen werden rollen- und berechtigungsbewusst gefiltert." },
+        { label: "Fehlerkatalog-Assistenz", value: "Fehlercodes, Ursachen und Lösungen bleiben strukturiert nutzbar." },
+        { label: "Konfidenz & Nachvollziehbarkeit", value: "Antworten zeigen Score, Begründung und verwendete Quellen." },
+        { label: "Sicherheitsprüfungen", value: "Riskante Wartungshinweise werden vor und nach der Generierung geprüft." }
+      ]
+    },
+    {
+      key: "partial",
+      tone: "is-stale",
+      items: [
+        { label: "RAG & Dokumentwissen", value: "Aktiv, aber abhängig von Indexfrische und Quellenqualität." },
+        { label: "Golden Quellenabruf Evaluation", value: "Historie ist vorhanden, benötigt regelmäßige Runs für Trends." },
+        { label: "OpenAI-Anbindung", value: "Konfiguriert; Fallbacks bleiben möglich." },
+        { label: "Wissensnetz", value: "Nur-Lese Analyse verfügbar; keine GraphDB erforderlich." }
+      ]
+    },
+    {
+      key: "unsupported",
+      tone: "is-muted",
+      items: [
+        { label: "Autonome Maschinenfreigaben", value: "Die KI darf keine sicherheitskritischen Freigaben erteilen." },
+        { label: "Arbeiten unter Spannung", value: "Gefährliche Schritt-für-Schritt-Anleitungen werden entschärft." },
+        { label: "Ungefilterte Prompt-/Textabschnitt-Einsicht", value: "Admin-Debug bleibt prompt-sicher und zeigt keine sensiblen Rohtexte." }
+      ]
+    }
+  ];
 }

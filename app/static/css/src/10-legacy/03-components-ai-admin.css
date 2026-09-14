@@ -1,0 +1,506 @@
+@layer components {
+.data-table tbody tr.is-selected {
+    background: var(--color-bg-canvas);
+  }
+
+.chat-panel {
+    width: min(31rem, calc(100vw - 2rem));
+    height: min(42rem, calc(100vh - 6.5rem));
+  }
+
+.chat-panel-kicker {
+    color: var(--ui-cyan);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+.chat-panel-title {
+    font-size: 1rem;
+  }
+
+.chat-clear,
+  .chat-close {
+    transition: background 150ms ease, color 150ms ease;
+  }
+
+.chat-clear:hover,
+  .chat-close:hover {
+    background: var(--color-bg-canvas);
+    color: var(--ui-text);
+  }
+
+.chat-panel-body {
+    background: var(--color-bg-surface);
+  }
+
+.chat-message {
+    border-radius: 0.55rem;
+    box-shadow: none;
+  }
+
+.chat-suggestions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+.chat-panel-form {
+    align-items: center;
+  }
+
+@keyframes chat-loading {
+    from {
+      background-position: 200% 0;
+    }
+
+    to {
+      background-position: 0 0;
+    }
+  }
+
+@keyframes chat-loading-sweep {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+@media (prefers-reduced-motion: reduce) {
+    .app-shell-layout,
+    .kpi-card,
+    .training-card,
+    .chat-panel {
+      transition: none;
+      animation: none;
+    }
+  }
+
+@media (max-width: 1180px) {
+    .ai-admin-hero,
+    .ai-capability-grid,
+    .ai-safety-grid,
+    .ops-dashboard-grid,
+    .admin-training-workflow,
+    .knowledge-network-layout,
+    .retrieval-flow-summary,
+    .content-grid.two-columns {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-training-editor {
+      position: static;
+    }
+
+    .ai-admin-actions {
+      justify-content: flex-start;
+      max-width: none;
+    }
+
+    .ai-admin-hero-status {
+      justify-items: start;
+      text-align: left;
+    }
+
+    .admin-ai-toolbar {
+      justify-content: flex-start;
+      max-width: none;
+    }
+
+    .ai-status-overview {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+  }
+
+@media (max-width: 900px) {
+
+    .chat-widget {
+      right: 0.75rem;
+      bottom: 0.75rem;
+    }
+  }
+
+@media (max-width: 640px) {
+    .ai-admin-hero,
+    .ai-admin-area,
+    .panel {
+      padding: 0.85rem;
+    }
+
+    .ai-admin-nav {
+      position: static;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .ai-status-overview {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-status-overview-card {
+      padding: 0.75rem;
+    }
+
+    .ai-admin-nav a {
+      text-align: center;
+    }
+
+    .admin-ai-toolbar,
+    .admin-ai-toolbar .inline-form {
+      display: grid;
+      width: 100%;
+    }
+
+    .admin-ai-toolbar .input,
+    .admin-ai-toolbar .inline-form {
+      max-width: none;
+    }
+
+    .ai-source-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard-kpi-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .chat-widget.is-open .chat-panel {
+      height: min(86vh, 42rem);
+    }
+  }
+
+}
+
+@layer components {
+  /* Ops Polish accessibility and component refinements. */
+  .skip-link {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    z-index: 80;
+    transform: translateY(-160%);
+    border-radius: var(--ui-radius-sm, 0.5rem);
+    background: var(--color-bg-surface);
+    color: var(--ui-blue, #0a67d8);
+    font-weight: 800;
+    padding: 0.7rem 1rem;
+    box-shadow: var(--ui-shadow-lg, 0 20px 45px rgba(15, 23, 42, 0.14));
+    transition: transform 140ms ease;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+    outline: none;
+    box-shadow: var(--ui-focus, 0 0 0 3px rgba(10, 103, 216, 0.22));
+  }
+
+  .nav-link[aria-current="page"] {
+    background: var(--color-bg-surface);
+    color: #0c2441;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .app-card,
+  .panel,
+  .ops-panel,
+  .metric-card,
+  .kpi-card,
+  .task-card,
+  .resource-card,
+  .modal-box,
+  .suggestion-box,
+  .upload-check-panel,
+  .review-score-card,
+  .forecast-unmatched-list {
+    border: 1px solid var(--ui-border, #d6e0ec);
+    border-radius: var(--ui-radius-sm, 0.5rem);
+    background: var(--ui-surface, #ffffff);
+    box-shadow: var(--ui-shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.06));
+  }
+
+  .input[aria-invalid="true"],
+  .select[aria-invalid="true"],
+  .textarea[aria-invalid="true"] {
+    border-color: var(--ui-red, #c81e35);
+    box-shadow: 0 0 0 3px rgba(200, 30, 53, 0.15);
+  }
+
+  .data-table caption,
+  .table caption,
+  .sp-excel-table caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .notification-button svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+
+  .chat-panel {
+    width: min(32rem, calc(100vw - 2rem));
+    height: min(43rem, calc(100vh - 6rem));
+  }
+
+  @media (max-width: 640px) {
+    .chat-widget.is-open .chat-panel {
+      height: min(86vh, 42rem);
+      border-inline: 0;
+    }
+  }
+}
+
+@layer components {
+
+  .app-card,
+  .ops-panel,
+  .metric-card,
+  .kpi-card,
+  .table-wrap {
+    border-color: rgba(219, 228, 239, 0.95);
+  }
+
+  .btn.is-busy::before {
+    content: "";
+    width: 0.9rem;
+    height: 0.9rem;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 999px;
+    animation: action-spin 0.7s linear infinite;
+  }
+
+  .panel-meta.is-info,
+  .form-message.is-info {
+    color: #0b72e7;
+  }
+
+  .panel-meta.is-success,
+  .form-message.is-success {
+    color: #178b45;
+  }
+
+  .panel-meta.is-error,
+  .form-message.is-error {
+    color: #dc2638;
+  }
+
+  .workflow-status {
+    margin-bottom: 1rem;
+    border: 1px solid #bfd7ff;
+    border-radius: var(--ui-radius-sm);
+    background: var(--color-bg-canvas);
+    color: #0b4fa8;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 850;
+  }
+
+  .workflow-status.is-success {
+    border-color: #b7e2c6;
+    background: #ecfdf3;
+    color: #178b45;
+  }
+
+  .workflow-status.is-error {
+    border-color: #fecaca;
+    background: #fff1f2;
+  }
+
+  .workflow-status[hidden] {
+    display: none;
+  }
+}
+
+@layer components {
+:root {
+    --ui-radius-xs: 0.35rem;
+    --ui-radius-sm: 0.5rem;
+    --ui-radius-md: 0.65rem;
+    --ui-focus: 0 0 0 3px rgba(11, 114, 231, 0.16);
+    --ui-shadow-work: 0 10px 28px rgba(15, 23, 42, 0.08);
+    --ui-row-hover: #f6faff;
+    --ui-success-soft: #ecfdf3;
+    --ui-warning-soft: #fff7ed;
+    --ui-danger-soft: #fff1f2;
+  }
+
+.app-main {
+    margin-inline: auto;
+    padding-bottom: 2.25rem;
+  }
+
+.app-body.is-workflow-loading .app-main::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 80;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #0b72e7, #0891a8, #178b45);
+    background-size: 200% 100%;
+    animation: page-loading-bar 1.1s linear infinite;
+  }
+
+.page-hero {
+    border: 1px solid rgba(219, 228, 239, 0.85);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 252, 0.98)),
+      #ffffff;
+  }
+
+.app-card,
+  .ops-panel,
+  .metric-card,
+  .kpi-card,
+  .table-wrap {
+    border-radius: var(--ui-radius-md);
+    border: 1px solid rgba(219, 228, 239, 0.95);
+    background: var(--color-bg-surface);
+    box-shadow: var(--ui-shadow-sm);
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+.app-card:hover,
+  .ops-panel:hover,
+  .metric-card:hover,
+  .kpi-card:hover {
+    border-color: #c8d8ea;
+    box-shadow: var(--ui-shadow-work);
+  }
+
+.data-table tbody tr {
+    transition: background-color 120ms ease;
+  }
+
+.btn,
+  .input,
+  .select,
+  .textarea,
+  .topbar-select,
+  .notification-button {
+    border-radius: var(--ui-radius-sm);
+  }
+
+.btn:focus-visible,
+  .input:focus-visible,
+  .select:focus-visible,
+  .textarea:focus-visible,
+  .chat-toggle:focus-visible,
+  .nav-link:focus-visible,
+  .top-nav-link:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus);
+  }
+
+.empty-state,
+  .interface-toast {
+    border-radius: var(--ui-radius-sm);
+  }
+
+.status-explainer,
+  .guided-empty-state {
+    border-radius: var(--ui-radius-sm);
+    border: 1px solid #cfe2ff;
+  }
+
+.guided-empty-state strong,
+  .status-explainer strong {
+    color: #142337;
+  }
+
+.guided-empty-state p,
+  .status-explainer p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+  }
+
+.help-disclosure {
+    border-radius: var(--ui-radius-sm);
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    color: var(--color-text-secondary);
+  }
+
+.help-disclosure > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    min-height: 2.25rem;
+    padding: 0.55rem 0.75rem;
+    cursor: pointer;
+    font-weight: 800;
+    color: #1f3b57;
+    list-style: none;
+  }
+
+.help-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+
+.help-disclosure > summary::after {
+    content: "+";
+    display: inline-grid;
+    width: 1.4rem;
+    height: 1.4rem;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--color-bg-canvas);
+    color: #0b72e7;
+    font-weight: 900;
+  }
+
+.help-disclosure > p {
+    padding: 0 0.75rem 0.75rem;
+  }
+
+.guided-empty-state {
+    display: grid;
+    gap: 0.65rem;
+    padding: 1rem;
+    border-style: dashed;
+    text-align: left;
+  }
+
+.guided-empty-state .btn {
+    justify-self: start;
+  }
+
+.status-explainer {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.86rem;
+  }
+
+.status-explainer::before {
+    content: "i";
+    display: inline-grid;
+    flex: 0 0 auto;
+    width: 1.35rem;
+    height: 1.35rem;
+    place-items: center;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #0b72e7;
+    font-weight: 900;
+    font-style: normal;
+  }
+
+}

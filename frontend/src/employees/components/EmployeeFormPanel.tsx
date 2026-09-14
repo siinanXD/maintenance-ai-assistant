@@ -36,14 +36,14 @@ export function EmployeeFormPanel(props: EmployeeFormPanelProps): ReactNode {
   }
 
   return (
-    <details className="card app-card mobile-action-section lg:col-span-12" data-mobile-collapsible data-permission-write="employees" hidden={props.hidden} open={props.drawerMode ?? true}>
+    <details className="card app-card mobile-action-section lg:col-span-12" hidden={props.hidden} open={props.drawerMode ?? true}>
       <summary className="mobile-action-summary">
         <span>
           <span className="mobile-action-title">Mitarbeiter anlegen</span>
           <span className="mobile-action-meta">Stammdaten und Qualifikationen erfassen</span>
         </span>
       </summary>
-      <form data-employee-form onSubmit={submitEmployee}>
+      <form onSubmit={submitEmployee}>
         <div className="card-body">
           <div className="panel-header">
             <div>
@@ -54,7 +54,7 @@ export function EmployeeFormPanel(props: EmployeeFormPanelProps): ReactNode {
           <EmployeeFormFields draft={props.draft} onDraftChange={props.onDraftChange} />
           <div className="toolbar form-actions">
             <button className="btn btn-primary" type="submit">Mitarbeiter speichern</button>
-            <span className={`panel-meta${props.message.error ? " is-error" : ""}`} data-employee-message>{props.message.text}</span>
+            <span className={`panel-meta${props.message.error ? " is-error" : ""}`}>{props.message.text}</span>
           </div>
         </div>
       </form>

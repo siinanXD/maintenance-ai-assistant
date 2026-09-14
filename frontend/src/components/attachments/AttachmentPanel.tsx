@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
+import { confirmAction } from "../../app/runtimeBridge";
 import {
   attachmentObjectUrl,
   deleteAttachment,
@@ -124,7 +125,7 @@ export function AttachmentPanel({ entityType, entityId, writable }: AttachmentPa
    * Delete one attachment after confirmation.
    */
   async function handleDelete(attachment: Attachment): Promise<void> {
-    if (!window.confirm(`„${attachment.filename}“ entfernen?`)) return;
+    if (!(await confirmAction({ title: "Anhang entfernen", message: `„${attachment.filename}“ entfernen?`, confirmText: "Entfernen" }))) return;
     try {
       await deleteAttachment(attachment.id);
       setStatus({ text: "Entfernt.", error: false });

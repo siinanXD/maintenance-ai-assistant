@@ -7,7 +7,7 @@ type SimilarErrorsPanelProps = {
 };
 
 /**
- * Render similar error matches in the legacy table shape.
+ * Render catalog entries similar to the current description.
  */
 export function SimilarErrorsPanel({ result }: SimilarErrorsPanelProps): ReactNode {
   const matches = result?.results || [];
@@ -17,7 +17,7 @@ export function SimilarErrorsPanel({ result }: SimilarErrorsPanelProps): ReactNo
   }
 
   return (
-    <details className="help-disclosure ui-secondary-panel incident-similar-disclosure" data-similar-errors-panel open>
+    <details className="help-disclosure ui-secondary-panel incident-similar-disclosure" open>
       <summary>
         Ähnliche Fehler
         {matches.length ? ` (${matches.length})` : ""}
@@ -36,7 +36,7 @@ export function SimilarErrorsPanel({ result }: SimilarErrorsPanelProps): ReactNo
               <th scope="col">Grund</th>
             </tr>
           </thead>
-          <tbody data-similar-errors-list>
+          <tbody>
             {matches.length ? matches.map((match) => (
               <tr key={`${match.entry.id}-${match.score}`}>
                 <td>{match.score}</td>

@@ -27,7 +27,6 @@ type ProfileCardData = {
 };
 
 type ProfilePanelProps = {
-  readonly selector: string;
   readonly kicker: string;
   readonly title: string;
   readonly actionHref?: string;
@@ -39,7 +38,6 @@ type ProfilePanelProps = {
  * Render one machine profile panel shell.
  */
 export function ProfilePanel({
-  selector,
   kicker,
   title,
   actionHref,
@@ -47,7 +45,7 @@ export function ProfilePanel({
   children
 }: ProfilePanelProps): ReactNode {
   return (
-    <article className="machine-profile-panel" {...{ [selector]: true }}>
+    <article className="machine-profile-panel">
       <div className="machine-profile-panel-header">
         <div>
           <p className="page-kicker">{kicker}</p>
