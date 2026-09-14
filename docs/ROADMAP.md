@@ -6,7 +6,7 @@ Living notes for maintainers. For product scope see [`FEATURES.md`](FEATURES.md)
 
 | Priority | Area | Notes |
 | --- | --- | --- |
-| Medium | Long service modules | `retrieval_telemetry_service.py` (1,000 lines) and `knowledge_gap_service.py` (990) each hold several concerns. Split the way `task_service` and `ai_observability_*` were split: one module per concern, cross-module names public, no re-exports |
+| Medium | Long service modules | `knowledge_gap_service.py` (990 lines) holds several concerns. Split the way `task_service` and `ai_observability_*` were split: one module per concern, cross-module names public, no re-exports |
 | Small | `app/docs/openapi_extensions.py` | 3,400 lines of API examples in one file; group by blueprint |
 | Small | `app/static/css/src/10-legacy/` | 3,700 lines of shared building blocks plus 340 lines in `90-overrides/token-overrides.css` that correct their token choices. Move one page at a time onto `20-components/` and delete its override entries; see `app/static/css/README.md` |
 | Small | `frontend/src/admin-ai/` | Largest page; `adminAiSourceCheckModel.ts`, `AdminAiSourceCheck.tsx` and `AdminAiEffectiveness.tsx` are still around 300 lines |

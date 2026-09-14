@@ -63,7 +63,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `retrieval_evaluation_service.py` (1,460 lines) split into the harness,
   retrieved sources, metrics, run history with quality gate, and common helpers;
   `ai_service.py` (1,100 lines) keeps the provider contract and selection,
-  `ai_provider_openai.py` and `ai_provider_mock.py` hold the two providers
+  `ai_provider_openai.py` and `ai_provider_mock.py` hold the two providers;
+  `retrieval_telemetry_service.py` (1,000 lines) split into analytics, per-source
+  telemetry, SLO metrics and common helpers
 - Frontend: every page folder has `entry.tsx`, `<Page>App.tsx`, API/type/util
   modules and `components/`; entries share `mountPage`. Pages use one
   `PageHeader` and one `StatStrip` instead of eleven header and eight stats components,
