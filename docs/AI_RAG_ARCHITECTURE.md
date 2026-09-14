@@ -114,7 +114,7 @@ flowchart LR
     Embeddings --> VectorStore["vector_store_service.py"]
     VectorStore --> Retrieval["retrieval_service.py"]
     Retrieval --> RAG["rag_service.py"]
-    RAG --> Provider["ai_service.py\nOpenAI, OpenAI-compatible, mock"]
+    RAG --> Provider["ai_service.py\nai_provider_openai.py, ai_provider_mock.py"]
     Provider --> Answer["Answer with sources"]
 ```
 

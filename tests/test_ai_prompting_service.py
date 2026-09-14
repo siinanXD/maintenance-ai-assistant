@@ -1,7 +1,7 @@
 """Tests for grounded AI prompt construction."""
 
 from app.services.ai_prompting import build_json_prompt, build_text_messages, text_system_prompt
-from app.services.ai_service import OpenAIProvider
+from app.services.ai_provider_openai import OpenAIProvider
 from app.services.document_text_service import summarize_text
 
 

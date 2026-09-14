@@ -594,7 +594,7 @@ def _try_ai_enhance(query, matches):
 def _task_draft_from_fault(query, user, causes, fixes):
     """Return a read-only task draft for a fault query when permitted."""
     from app.security import has_dashboard_permission
-    from app.services.ai_service import MockAIProvider
+    from app.services.ai_provider_mock import MockAIProvider
 
     if not has_dashboard_permission(user, "tasks", "write"):
         return None

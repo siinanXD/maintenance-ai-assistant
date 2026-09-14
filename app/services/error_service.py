@@ -13,7 +13,8 @@ from sqlalchemy.orm import joinedload
 from app.extensions import db
 from app.models import Department, ErrorEntry, Machine, Role, Task, TaskStatus
 from app.security import has_dashboard_permission
-from app.services.ai_service import AIServiceError, MockAIProvider, get_ai_provider
+from app.services.ai_provider_mock import MockAIProvider
+from app.services.ai_service import AIServiceError, get_ai_provider
 from app.services.knowledge_service import mark_error_entry_knowledge_stale
 from app.services.maintenance_tag_service import suggest_tags_for_error_payload
 from app.services.missing_information_service import missing_information_for_error_entry
