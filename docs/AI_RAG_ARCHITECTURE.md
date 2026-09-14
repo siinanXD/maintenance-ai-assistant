@@ -141,7 +141,7 @@ Current implementation:
 - See `docs/MONGODB_ATLAS_VECTOR_SEARCH.md` for Atlas Vector Search setup, index configuration and fallback behavior.
 - `ai_traceability_service.py` stores metadata-only answer traces connected to chat messages and AI audit events. See `docs/AI_ANSWER_TRACEABILITY.md`.
 - `ai_observability_service.py` and its `ai_observability_*` companions aggregate existing audit, chat and retrieval telemetry for the AI Admin dashboard. See `docs/AI_OBSERVABILITY.md`.
-- `knowledge_gap_service.py` records open `KnowledgeGap` entries when AI chat cannot find reliable RAG/source context; recent duplicate questions are folded into one gap.
+- `knowledge_gap_service.py` records open `KnowledgeGap` entries when AI chat cannot find reliable RAG/source context; recent duplicate questions are folded into one gap. `knowledge_gap_rows.py` clusters gaps per machine, error and department against the indexed documents; `knowledge_gap_actions.py` turns them into recommended actions.
 - `maintenance_tag_service.py` provides the seeded maintenance taxonomy for Fehlerarten, Ursachen, Loesungen, Maschinenbereiche and Risiko/Prioritaet, and returns local keyword-based tag suggestions without requiring an AI key.
 - Generated maintenance reports and uploaded machine manuals are processed automatically into `KnowledgeDocument` rows, summaries, metadata hints and searchable `KnowledgeChunk` records.
 - `POST /api/v1/admin/ai/knowledge/reindex` runs the current ingestion workflow and registers generated reports, error catalog entries, tasks, maintenance plans, machine manuals, and shift handovers as RAG sources.
