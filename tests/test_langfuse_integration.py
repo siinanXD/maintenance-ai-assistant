@@ -10,9 +10,9 @@ from urllib.parse import parse_qs, urlparse
 
 from app.ai.status import ai_diagnostics, ai_status
 from app.services.ai_audit_service import ai_analytics_summary
+from app.services.ai_provider_openai import OpenAIProvider
 from app.services.ai_provider_readiness_service import ai_readiness_summary
 from app.services.ai_routing import workflow_profile
-from app.services.ai_service import OpenAIProvider
 from app.services.langfuse_eval_score_service import (
     submit_automatic_eval_scores,
     submit_user_feedback_score,
@@ -345,7 +345,7 @@ def test_openai_provider_keeps_langfuse_disabled_calls_standard(app, monkeypatch
             self.kwargs.update(kwargs)
             return self
 
-    monkeypatch.setattr("app.services.ai_service.openai_client_class", lambda: FakeClient)
+    monkeypatch.setattr("app.services.ai_provider_openai.openai_client_class", lambda: FakeClient)
 
     with app.app_context():
         provider = OpenAIProvider(api_key="test-key", model="test-model")

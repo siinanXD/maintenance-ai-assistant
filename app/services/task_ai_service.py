@@ -3,7 +3,8 @@
 import logging
 
 from app.models import Department, Priority, Role, Task, TaskStatus
-from app.services.ai_service import AIServiceError, MockAIProvider, get_ai_provider
+from app.services.ai_provider_mock import MockAIProvider
+from app.services.ai_service import AIServiceError, get_ai_provider
 from app.services.maintenance_tag_service import suggest_tags_for_task_payload
 from app.services.task_priority_context_service import (
     empty_task_priority_history,

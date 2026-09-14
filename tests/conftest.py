@@ -37,6 +37,16 @@ def _closed_atlas_circuit():
     reset_atlas_circuit()
 
 
+@pytest.fixture(autouse=True)
+def _no_last_ai_error():
+    """Start every test without a remembered provider error in the AI status."""
+    from app.ai import status
+
+    status.LAST_OPENAI_ERROR = None
+    yield
+    status.LAST_OPENAI_ERROR = None
+
+
 @pytest.fixture()
 def app(tmp_path):
     """Create an isolated Flask app with an in-memory test database."""
