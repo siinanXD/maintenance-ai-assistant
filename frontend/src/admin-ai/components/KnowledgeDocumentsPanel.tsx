@@ -2,14 +2,7 @@ import { type FormEvent, useState, type ReactNode } from "react";
 import { ActionDrawer } from "../../components/ui/ActionDrawer";
 import { PageActionBar } from "../../components/ui/PageActionBar";
 import { createActionDefinition } from "../../components/ui/createActionSchema";
-import {
-  type AdminAiRagBoardProps,
-  QUALITY_STATUSES,
-  qualityStatusClass,
-  qualityStatusLabel,
-  ragText,
-  sourceTypeLabel
-} from "../adminAiRagBoardModel";
+import { type AdminAiRagBoardProps, QUALITY_STATUSES, ragText } from "../adminAiRagBoardModel";
 import {
   filterChange,
   onUpdateQualityClick,
@@ -19,6 +12,7 @@ import {
   submitUpload
 } from "./AdminAiRagBoardShared";
 import { numberText } from "../adminAiFormat";
+import { qualityStatusClass, qualityStatusLabel, sourceTypeLabel } from "../adminAiRagLabels";
 
 /**
  * Render the knowledge database filters and table.

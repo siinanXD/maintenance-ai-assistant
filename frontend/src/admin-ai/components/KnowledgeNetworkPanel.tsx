@@ -1,15 +1,9 @@
 import { type ReactNode } from "react";
-import {
-  type AdminAiRagBoardProps,
-  networkTypeLabel,
-  objectPayload,
-  ragText,
-  sourceTypeLabel,
-  truncateLabel
-} from "../adminAiRagBoardModel";
+import { type AdminAiRagBoardProps, objectPayload, ragText } from "../adminAiRagBoardModel";
 import { filterChange, isPayload, QUALITY_OPTIONS, SelectFilter, SOURCE_OPTIONS } from "./AdminAiRagBoardShared";
 import { numberText } from "../adminAiFormat";
 import { StatRow } from "./AdminAiShared";
+import { networkTypeLabel, sourceTypeLabel, truncateLabel } from "../adminAiRagLabels";
 
 /**
  * Render the knowledge network inspector.

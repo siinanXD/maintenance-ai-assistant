@@ -1,16 +1,11 @@
 import { type ReactNode } from "react";
-
 import { AdminAiSourceTestPanel } from "./AdminAiSourceCheck";
 import { type AdminAiRagBoardProps } from "../adminAiRagBoardModel";
 import { KnowledgeDocumentsPanel } from "./KnowledgeDocumentsPanel";
 import { KnowledgeNetworkPanel } from "./KnowledgeNetworkPanel";
-import {
-  KnowledgeStatusPanel,
-  RagHealthRail,
-  RagIndexTrack,
-  SourceHealthBoard
-} from "./KnowledgeStatusPanel";
+import { KnowledgeStatusPanel } from "./KnowledgeStatusPanel";
 import { TrainingEntriesPanel } from "./TrainingEntriesPanel";
+import { RagHealthRail, RagIndexTrack, SourceHealthBoard } from "./KnowledgeHealthBoards";
 
 /**
  * Render knowledge maintenance and source testing in a simple two-column ops layout.

@@ -1,12 +1,7 @@
 import { type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode } from "react";
-
 import { type AdminAiPayload } from "../adminAiApi";
-import {
-  type AdminAiRagBoardFilters,
-  type AdminAiTrainingForm,
-  QUALITY_STATUSES,
-  qualityStatusLabel
-} from "../adminAiRagBoardModel";
+import { type AdminAiRagBoardFilters, type AdminAiTrainingForm, QUALITY_STATUSES } from "../adminAiRagBoardModel";
+import { qualityStatusLabel } from "../adminAiRagLabels";
 
 export const QUALITY_OPTIONS = [
   ["", "Alle Qualitätsstatus"],
