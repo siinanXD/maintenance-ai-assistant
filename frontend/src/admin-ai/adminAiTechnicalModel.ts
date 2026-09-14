@@ -25,6 +25,16 @@ export type AdminAiTechnicalState = {
   readonly statusMessage: string;
 };
 
+export type AdminAiTechnicalProps = {
+  readonly onFilterChange: (key: keyof AdminAiTechnicalFilters, value: string) => void;
+  readonly onQueueStale: () => void;
+  readonly onRefresh: () => void;
+  readonly onReindexAll: () => void;
+  readonly onReindexStale: () => void;
+  readonly onRunEvaluation: () => void;
+  readonly technicalState: AdminAiTechnicalState;
+};
+
 export const EMPTY_ADMIN_AI_TECHNICAL_STATE: AdminAiTechnicalState = {
   aiStatus: null,
   errorMessage: "",

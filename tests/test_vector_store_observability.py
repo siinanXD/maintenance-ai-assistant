@@ -209,7 +209,7 @@ def test_admin_ai_dashboard_contains_atlas_metric_hooks():
     """Verify the Admin AI technical dashboard renders Atlas KPI hooks."""
     root = Path(__file__).resolve().parents[1]
     section_source = (
-        root / "frontend" / "src" / "admin-ai" / "components" / "AdminAiTechnical.tsx"
+        root / "frontend" / "src" / "admin-ai" / "components" / "AdminAiTechnicalDiagnostics.tsx"
     ).read_text(encoding="utf-8")
     model_source = (root / "frontend" / "src" / "admin-ai" / "adminAiTechnicalModel.ts").read_text(
         encoding="utf-8"
