@@ -51,6 +51,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   and one confirmation dialog instead of `window.confirm`. Admin-AI: eight API
   modules and three barrels merged, one access check, the view switch lives in
   `AdminAiApp`
+- Page styles live in `app/static/css/src/15-pages/` (one file per page and for
+  the shell); `10-legacy` keeps only shared building blocks (9,400 → 3,700 lines).
+  Stylesheets read design tokens directly: 411 uses of the 49 `--ui-*`/`--ops-*`
+  variables replaced and their definitions removed. Computed styles of all pages
+  (desktop, tablet, phone) compared before and after: identical
 - CSS sources are grouped by cascade layer (`00-foundation`, `10-legacy`,
   `20-components`, `90-overrides`) instead of 70 fragments split mid-block;
   389 overridden declarations and 312 unused selectors removed, built

@@ -1,88 +1,15 @@
 /*
- * Bruecke von den gewachsenen Variablen zu den Design-Token.
+ * Token-Farben über gewachsenen Regeln.
  *
- * Das Feature-CSS liest an 601 Stellen --ui-* und --ops-*. Diese Variablen
- * waren in vier Dateien mit abweichenden Werten auf :root deklariert. Hier
- * zeigen sie alle auf eine Token-Rolle aus 00-shell-tokens.css, damit die
- * Werkbank-Palette ohne Eingriff in 12.000 Zeilen Feature-CSS greift.
+ * Ältere Seitenstile in 10-legacy und 15-pages tragen noch feste Farben,
+ * Verläufe und Radien. Diese Regeln setzen dort die Werkbank-Token durch.
+ * Sie liegen am Ende der Kaskade und gewinnen deshalb ohne !important.
  *
- * Die Datei sortiert nach allen Feature-Dateien und liegt im selben Layer wie
- * deren :root-Bloecke, gewinnt also ohne !important.
- *
- * Nicht erfasst sind die rund 1.370 fest eingetragenen Farbwerte im Feature-CSS.
- * Die bleiben bis zum Abbau der Dateien, wie sie sind.
- *
- * Neue Regeln gehoeren nicht hierher: neues CSS liest die Token direkt.
+ * Neue Regeln gehören nicht hierher: neues CSS liest die Token direkt.
+ * Wird eine Seite nach 20-components umgebaut, entfallen ihre Einträge hier.
  */
 
 @layer components {
-  :root {
-    /* Flaechen */
-    --ui-bg: var(--color-bg-canvas);
-    --ui-bg-strong: var(--color-bg-surface-sunken);
-    --ui-surface: var(--color-bg-surface);
-    --ui-surface-muted: var(--color-bg-canvas);
-    --ui-surface-soft: var(--color-bg-canvas);
-    --ui-surface-tint: var(--color-bg-hover);
-    --ui-row-hover: var(--color-bg-hover);
-    --ui-sidebar: var(--color-bg-sidebar);
-    --ui-sidebar-deep: var(--color-bg-sidebar);
-    --ops-bg: var(--color-bg-canvas);
-    --ops-panel: var(--color-bg-surface);
-    --ops-sidebar: var(--color-bg-sidebar);
-
-    /* Linien */
-    --ui-border: var(--color-border-default);
-    --ui-border-strong: var(--color-border-strong);
-    --ops-border: var(--color-border-default);
-
-    /* Text */
-    --ui-text: var(--color-text-primary);
-    --ui-text-soft: var(--color-text-secondary);
-    --ui-muted: var(--color-text-muted);
-    --ops-text: var(--color-text-primary);
-    --ops-muted: var(--color-text-muted);
-
-    /* Aktion: Orange ausschliesslich fuer Handlung und aktive Position */
-    --ui-primary: var(--color-action-primary);
-    --ui-primary-dark: var(--color-action-primary-hover);
-    --ui-blue: var(--color-action-primary);
-    --ops-blue: var(--color-action-primary);
-    --ui-focus: var(--elevation-focus);
-
-    /* Zustand */
-    --ui-green: var(--color-status-success-solid);
-    --ui-amber: var(--color-status-warning-solid);
-    --ui-orange: var(--color-status-warning-solid);
-    --ui-red: var(--color-status-danger-solid);
-    --ui-danger: var(--color-status-danger-solid);
-    --ops-green: var(--color-status-success-solid);
-    --ops-orange: var(--color-status-warning-solid);
-    --ops-red: var(--color-status-danger-solid);
-    --ui-success-soft: var(--color-status-success-bg);
-    --ui-warning-soft: var(--color-status-warning-bg);
-    --ui-danger-soft: var(--color-status-danger-bg);
-    --ui-cyan: var(--color-status-info-text);
-    --ops-cyan: var(--color-status-info-text);
-
-    /* KI: kein Tuerkis und kein Violett mehr, Kennzeichnung ueber Form statt Farbe */
-    --ui-teal: var(--color-ai-accent);
-    --ui-purple: var(--color-ai-knowledge);
-
-    /* Radien: von 6-10px auf die Werkbank-Skala */
-    --ui-radius: var(--radius-lg);
-    --ui-radius-md: var(--radius-lg);
-    --ui-radius-sm: var(--radius-md);
-    --ui-radius-xs: var(--radius-sm);
-
-    /* Schatten: Trennung ueber Linien, Schatten nur noch angedeutet */
-    --ui-shadow-xs: var(--elevation-xs);
-    --ui-shadow-sm: var(--elevation-xs);
-    --ui-shadow-md: var(--elevation-sm);
-    --ui-shadow-lg: var(--elevation-md);
-    --ui-shadow-work: var(--elevation-sm);
-  }
-
   /*
    * Shell-Flaechen. Hintergrund, Layout und Sidebar legen fest eingetragene
    * blaue Verlaeufe ueber die Variablen (09-dashboard-cockpit-01, 13-activity-
@@ -145,10 +72,9 @@
   }
 
   /*
-   * Seitenleisten an Karten und Kopfbereichen lesen --ui-blue bzw. --ui-primary
-   * und waeren ueber diese Bruecke orange. Orange ist Handlung, nicht Dekoration:
-   * die Leiste bleibt als ruhige Kante stehen, der Kopfbereich verliert seinen
-   * hellblauen Verlauf.
+   * Seitenleisten an Karten und Kopfbereichen wären in der Aktionsfarbe orange.
+   * Orange ist Handlung, nicht Dekoration: die Leiste bleibt als ruhige Kante
+   * stehen, der Kopfbereich verliert seinen hellblauen Verlauf.
    */
   .page-hero,
   .ai-admin-hero,
@@ -215,13 +141,13 @@
 
   /*
    * Abschnitts-Kicker ("Heute zuerst", "Anlagen", "Maintenance Control Center") waren
-   * ueber --ui-primary orange. Sie ordnen, sie handeln nicht: Typenschild-Label in
+   * über die Aktionsfarbe orange. Sie ordnen, sie handeln nicht: Typenschild-Label in
    * gedaempftem Grau, wie im Werkbank-Brief.
    */
   .page-kicker,
   .section-kicker,
   .control-center-topbar .page-kicker {
-    /* !important nur, weil eine Legacy-Regel die Farbe bereits mit !important auf --ui-primary setzt. */
+    /* !important nur, weil eine ältere Regel die Farbe bereits mit !important setzt. */
     color: var(--color-text-muted) !important;
     font-family: var(--font-label);
     letter-spacing: 0.08em;
