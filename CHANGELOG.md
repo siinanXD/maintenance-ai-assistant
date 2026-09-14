@@ -65,7 +65,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `ai_service.py` (1,100 lines) keeps the provider contract and selection,
   `ai_provider_openai.py` and `ai_provider_mock.py` hold the two providers;
   `retrieval_telemetry_service.py` (1,000 lines) split into analytics, per-source
-  telemetry, SLO metrics and common helpers
+  telemetry, SLO metrics and common helpers; `knowledge_gap_service.py` (990
+  lines) keeps gap tracking, `knowledge_gap_rows.py` the clusters and coverage,
+  `knowledge_gap_actions.py` the recommended actions. No service module is
+  longer than 700 lines any more
 - Frontend: every page folder has `entry.tsx`, `<Page>App.tsx`, API/type/util
   modules and `components/`; entries share `mountPage`. Pages use one
   `PageHeader` and one `StatStrip` instead of eleven header and eight stats components,
