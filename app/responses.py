@@ -46,19 +46,24 @@ def service_error_response(error, status_code=400):
     return error_response(message, status_code)
 
 
-def success_payload(data=None, message="OK"):
-    """Return a consistent API success payload."""
-    payload = {
-        "success": True,
-        "data": data,
-        "message": message,
-    }
+def success_payload(data=None, message=None):
+    """Return a consistent API success payload.
+
+    A dict is the response body: its keys sit on the root next to ``data``,
+    so a result that carries its own ``data`` (agent answers) keeps that shape.
+    ``success`` is always true; ``message`` comes from the argument, else from
+    the body, else ``OK``.
+    """
+    payload = {"success": True, "data": data, "message": "OK"}
     if isinstance(data, dict):
-        payload.update(data)
+        payload.update({key: value for key, value in data.items() if key != "success"})
+    if message is not None:
+        payload["message"] = message
+    payload["message"] = payload["message"] or "OK"
     return payload
 
 
-def success_response(data=None, status_code=200, message="OK"):
+def success_response(data=None, status_code=200, message=None):
     """Return a Flask JSON response for a successful API operation."""
     return jsonify(success_payload(data, message)), status_code
 

@@ -32,9 +32,9 @@ from app.services.ai_audit_service import (
 )
 from app.services.ai_confidence_service import calculate_ai_confidence
 from app.services.ai_observability_service import (
-    _evaluation_quality_actions,
-    _observability_recommended_actions,
     ai_observability_dashboard,
+    evaluation_quality_actions,
+    observability_recommended_actions,
 )
 from app.services.ai_routing import estimate_cost_usd, workflow_profile
 from app.services.ai_service import get_ai_provider
@@ -2060,7 +2060,7 @@ def test_ai_observability_provider_action_outranks_evaluation_action():
         ]
     }
 
-    actions = _observability_recommended_actions(
+    actions = observability_recommended_actions(
         {"knowledge_gaps": {}},
         {},
         quality_metrics,
@@ -2078,7 +2078,7 @@ def test_ai_observability_provider_action_outranks_evaluation_action():
 
 def test_ai_observability_evaluation_warning_action_targets_chunk_structure():
     """Verify chunk-structure evaluation warnings get specific admin guidance."""
-    actions = _evaluation_quality_actions(
+    actions = evaluation_quality_actions(
         latest_eval={"query_count": 1},
         quality_gate={
             "warnings": [

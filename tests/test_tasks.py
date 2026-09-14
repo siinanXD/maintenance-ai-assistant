@@ -456,7 +456,7 @@ def test_prioritize_tasks_local_mode_skips_ai_provider(
         description="Presse steht und muss lokal priorisiert werden",
     )
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         failing_provider,
     )
 
@@ -521,7 +521,7 @@ def test_prioritize_tasks_default_mode_uses_ai_provider(
         description="Routine mit AI Provider",
     )
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         recording_provider,
     )
 
@@ -610,7 +610,7 @@ def test_prioritize_tasks_sends_history_context_to_provider(
         possible_causes="Filter zugesetzt oder Leckage",
     )
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         recording_provider,
     )
 
@@ -744,7 +744,7 @@ def test_prioritize_tasks_sends_shift_handover_history_to_provider(
         db.session.commit()
         handover_id = handover.id
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         recording_provider,
     )
 
@@ -841,7 +841,7 @@ def test_prioritize_tasks_excludes_handover_history_without_permission(
         )
         db.session.commit()
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         recording_provider,
     )
 
@@ -915,7 +915,7 @@ def test_prioritize_tasks_excludes_error_history_without_permission(
         description="Druckabfall am Hydraulikfilter",
     )
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         recording_provider,
     )
 
@@ -964,7 +964,7 @@ def test_prioritize_tasks_uses_local_fallback_on_provider_error(
         description="Presse steht wegen Hydraulikfehler",
     )
     monkeypatch.setattr(
-        "app.services.task_service.get_ai_provider",
+        "app.services.task_ai_service.get_ai_provider",
         failing_provider,
     )
 

@@ -16,13 +16,15 @@ from app.services.attachment_service import delete_attachments_for
 from app.services.maintenance_tag_service import suggest_tags_for_task_payload
 from app.services.operations_tracking_service import record_event
 from app.services.stock_movement_service import task_materials, withdraw_for_task
+from app.services.task_ai_service import (
+    parse_task_priority_mode,
+    prioritize_visible_tasks,
+    suggest_task_from_text,
+)
 from app.services.task_service import (
     create_task,
     delete_task,
-    parse_task_priority_mode,
-    prioritize_visible_tasks,
     start_task,
-    suggest_task_from_text,
     update_task,
     visible_tasks_query,
 )
