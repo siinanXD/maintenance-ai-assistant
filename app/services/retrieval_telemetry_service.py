@@ -15,7 +15,7 @@ from app.extensions import db
 from app.models import AIAuditEvent, AIFeedback, KnowledgeChunk, KnowledgeDocument, KnowledgeGap
 from app.services.ai_confidence_service import LOW_CONFIDENCE_THRESHOLD
 from app.services.knowledge_metadata_service import stored_chunk_metadata
-from app.services.retrieval_evaluation_service import retrieval_evaluation_history
+from app.services.retrieval_evaluation_history import retrieval_evaluation_history
 from app.services.vector_sync_status_service import vector_store_drift_status
 
 DEFAULT_WINDOW_DAYS = 30

@@ -59,7 +59,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   into dashboard, chats, sources, actions, debug and common modules;
   `vector_store_service.py` (1,500 lines) split into the store picker and one
   module per backend (`vector_store_sql`, `vector_store_chroma`,
-  `vector_store_atlas`) plus shared types in `vector_store_common`
+  `vector_store_atlas`) plus shared types in `vector_store_common`;
+  `retrieval_evaluation_service.py` (1,460 lines) split into the harness,
+  retrieved sources, metrics, run history with quality gate, and common helpers
 - Frontend: every page folder has `entry.tsx`, `<Page>App.tsx`, API/type/util
   modules and `components/`; entries share `mountPage`. Pages use one
   `PageHeader` and one `StatStrip` instead of eleven header and eight stats components,

@@ -26,15 +26,17 @@ from app.services.golden_retrieval_question_service import (
     build_golden_questions,
     dummy_source_ids,
 )
+from app.services.retrieval_evaluation_common import RETRIEVAL_MODE_FULL
+from app.services.retrieval_evaluation_history import (
+    evaluation_quality_gate,
+    persist_retrieval_evaluation_result,
+    retrieval_evaluation_history,
+)
 from app.services.retrieval_evaluation_service import (
-    RETRIEVAL_MODE_FULL,
     GoldenRetrievalQuery,
     evaluate_and_persist_golden_queries,
     evaluate_golden_queries,
-    evaluation_quality_gate,
     golden_retrieval_query_from_question,
-    persist_retrieval_evaluation_result,
-    retrieval_evaluation_history,
 )
 from app.services.vector_store_common import VectorSearchResult
 
@@ -248,7 +250,7 @@ def test_golden_retrieval_evaluation_reports_min_source_count_failures(
         ][:limit]
 
     monkeypatch.setattr(
-        "app.services.retrieval_evaluation_service.retrieve_vector_chunks",
+        "app.services.retrieval_evaluation_sources.retrieve_vector_chunks",
         fake_retrieve_vector_chunks,
     )
 
@@ -299,7 +301,7 @@ def test_golden_retrieval_evaluation_tracks_expected_no_result_queries(monkeypat
         return []
 
     monkeypatch.setattr(
-        "app.services.retrieval_evaluation_service.retrieve_vector_chunks",
+        "app.services.retrieval_evaluation_sources.retrieve_vector_chunks",
         fake_retrieve_vector_chunks,
     )
 
@@ -345,7 +347,7 @@ def test_golden_retrieval_evaluation_tracks_query_type_accuracy(monkeypatch):
         return []
 
     monkeypatch.setattr(
-        "app.services.retrieval_evaluation_service.retrieve_vector_chunks",
+        "app.services.retrieval_evaluation_sources.retrieve_vector_chunks",
         fake_retrieve_vector_chunks,
     )
 
@@ -466,7 +468,7 @@ def test_full_retrieval_evaluation_matches_handover_keywords_from_record(
             }
 
         monkeypatch.setattr(
-            "app.services.retrieval_evaluation_service.retrieve_context",
+            "app.services.retrieval_evaluation_sources.retrieve_context",
             fake_retrieve_context,
         )
         result = evaluate_golden_queries(
@@ -527,7 +529,7 @@ def test_full_retrieval_evaluation_matches_task_keywords_from_record(
             }
 
         monkeypatch.setattr(
-            "app.services.retrieval_evaluation_service.retrieve_context",
+            "app.services.retrieval_evaluation_sources.retrieve_context",
             fake_retrieve_context,
         )
         result = evaluate_golden_queries(
@@ -590,7 +592,7 @@ def test_full_retrieval_evaluation_matches_error_keywords_from_record(
             }
 
         monkeypatch.setattr(
-            "app.services.retrieval_evaluation_service.retrieve_context",
+            "app.services.retrieval_evaluation_sources.retrieve_context",
             fake_retrieve_context,
         )
         result = evaluate_golden_queries(
@@ -659,7 +661,7 @@ def test_full_retrieval_evaluation_matches_maintenance_plan_keywords_from_record
             }
 
         monkeypatch.setattr(
-            "app.services.retrieval_evaluation_service.retrieve_context",
+            "app.services.retrieval_evaluation_sources.retrieve_context",
             fake_retrieve_context,
         )
         result = evaluate_golden_queries(

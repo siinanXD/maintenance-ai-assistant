@@ -89,10 +89,8 @@ from app.services.mail_service import mail_config_status
 from app.services.notification_service import delivery_query, send_test_email
 from app.services.operations_tracking_service import aggregate_operations, record_event
 from app.services.payload_parsing_service import parse_bool as parse_optional_bool
-from app.services.retrieval_evaluation_service import (
-    retrieval_evaluation_history,
-    run_admin_golden_retrieval_evaluation,
-)
+from app.services.retrieval_evaluation_history import retrieval_evaluation_history
+from app.services.retrieval_evaluation_service import run_admin_golden_retrieval_evaluation
 from app.services.retrieval_telemetry_service import retrieval_quality_analytics
 from app.services.site_service import create_site, list_sites, update_site
 
