@@ -202,6 +202,42 @@ def test_css_reads_design_tokens_not_legacy_variables():
     assert offenders == {}
 
 
+def test_page_styles_take_colors_from_tokens_so_dark_mode_follows():
+    """Verify page CSS has no fixed colors; only dark shadows, scrims and sidebar highlights stay."""
+    palette = re.compile(
+        r"\b(?:bg|text|border|ring|outline|divide|from|via|to)-(?:white|black|"
+        r"(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|"
+        r"cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3})\b"
+    )
+    hex_color = re.compile(r"#[0-9a-fA-F]{3,8}\b")
+    rgb_color = re.compile(r"rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)")
+    offenders = {}
+    for path in CSS_SRC.rglob("*.css"):
+        if path.parent.name == "00-foundation":
+            continue
+        code = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+        hits = hex_color.findall(code) + palette.findall(code)
+        for red, green, blue in rgb_color.findall(code):
+            channels = {int(red), int(green), int(blue)}
+            # dark shadows/scrims and white highlights on the always-dark sidebar
+            if max(channels) > 60 and min(channels) < 255:
+                hits.append(f"rgb({red}, {green}, {blue})")
+        if hits:
+            offenders[str(path.relative_to(CSS_SRC))] = sorted(set(hits))
+
+    assert offenders == {}
+
+
+def test_base_template_applies_the_stored_or_system_theme_before_paint(client):
+    """Verify the dark design is switched on in the head, before the stylesheet paints."""
+    html = client.get("/login").get_data(as_text=True)
+    head = html.split("</head>")[0]
+
+    assert "maintenance_theme" in head
+    assert "prefers-color-scheme: dark" in head
+    assert "maintenance-dark" in head
+
+
 def test_tailwind_config_carries_no_literal_values_and_no_daisyui():
     """Verify colors and breakpoints live in the tokens and DaisyUI stays removed."""
     config = TAILWIND_CONFIG.read_text(encoding="utf-8")

@@ -49,17 +49,17 @@
 
   .ai-status-overview-card.is-active {
     border-left-color: var(--color-status-success-solid);
-    background: #f8fffb;
+    background: var(--color-bg-surface);
   }
 
   .ai-status-overview-card.is-stale {
     border-left-color: var(--color-status-warning-solid);
-    background: #fffdf7;
+    background: var(--color-status-warning-bg);
   }
 
   .ai-status-overview-card.is-error {
     border-left-color: var(--color-status-danger-solid);
-    background: #fffafa;
+    background: var(--color-bg-surface);
   }
 
   .admin-ai-toolbar {
@@ -85,7 +85,7 @@
     min-height: 6.7rem;
     align-content: start;
     gap: 0.35rem;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-left: 4px solid var(--color-border-strong);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
@@ -94,17 +94,17 @@
 
   .ai-safety-card.is-active {
     border-left-color: var(--color-status-success-solid);
-    background: #fbfffc;
+    background: var(--color-bg-surface);
   }
 
   .ai-safety-card.is-stale {
     border-left-color: var(--color-status-warning-solid);
-    background: #fffdf8;
+    background: var(--color-bg-surface);
   }
 
   .ai-safety-card.is-error {
     border-left-color: var(--color-status-danger-solid);
-    background: #fffafa;
+    background: var(--color-bg-surface);
   }
 
   .ai-safety-card span {
@@ -143,7 +143,7 @@
     display: grid;
     min-width: 0;
     gap: 0.45rem;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-left: 4px solid var(--color-border-strong);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
@@ -153,19 +153,19 @@
   .ai-source-card.is-active,
   .ai-capability-card.is-active {
     border-left-color: var(--color-status-success-solid);
-    background: #fbfffc;
+    background: var(--color-bg-surface);
   }
 
   .ai-source-card.is-stale,
   .ai-capability-card.is-stale {
     border-left-color: var(--color-status-warning-solid);
-    background: #fffdf8;
+    background: var(--color-bg-surface);
   }
 
   .ai-source-card.is-error,
   .ai-capability-card.is-error {
     border-left-color: var(--color-status-danger-solid);
-    background: #fffafa;
+    background: var(--color-bg-surface);
   }
 
   .ai-source-card-header {
@@ -229,7 +229,7 @@
   }
 
   .ai-capability-card.is-muted {
-    border-left-color: #64748b;
+    border-left-color: var(--color-border-strong);
     background: var(--color-bg-canvas);
   }
 
@@ -241,7 +241,7 @@
     display: grid;
     gap: 0.55rem;
     min-width: 0;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
     padding: 0.75rem;
@@ -251,10 +251,10 @@
     overflow: auto;
     max-height: 28rem;
     min-height: 18rem;
-    border: 1px solid #dbe7f3;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.55rem;
-    background: #0f172a;
-    color: #dbeafe;
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
     padding: 0.85rem;
     font-size: 0.74rem;
     line-height: 1.5;
@@ -282,9 +282,9 @@
 
   .training-card.is-selected,
   .training-card:hover {
-    border-color: #9ec9fb;
+    border-color: var(--color-border-default);
     background: var(--color-bg-canvas);
-    box-shadow: 0 8px 18px rgba(11, 114, 231, 0.08);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--color-border-focus) 8%, transparent);
   }
 
   .training-card strong {
@@ -348,7 +348,7 @@
   .training-status-strip {
     align-items: center;
     justify-content: space-between;
-    border: 1px solid #dbeafe;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.5rem;
     background: var(--color-bg-canvas);
     padding: 0.65rem;
@@ -362,7 +362,7 @@
     position: sticky;
     bottom: 0;
     border-top: 1px solid var(--color-border-default);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), #ffffff);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-bg-surface) 72%, transparent), var(--color-bg-surface));
     padding-top: 0.75rem;
   }
 
@@ -378,9 +378,9 @@
     display: grid;
     gap: 1rem;
     margin: 1rem 0;
-    border: 1px solid #dbe7f3;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.65rem;
-    background: linear-gradient(180deg, #fbfdff, #ffffff);
+    background: linear-gradient(180deg, var(--color-bg-surface), var(--color-bg-surface));
     padding: 1rem;
   }
 
@@ -390,14 +390,14 @@
     display: grid;
     min-width: 0;
     gap: 0.45rem;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
     padding: 0.75rem;
   }
 
   .knowledge-network-group-card {
-    background: linear-gradient(180deg, #ffffff, #f8fbff);
+    background: linear-gradient(180deg, var(--color-bg-surface), var(--color-bg-surface));
   }
 
   .knowledge-network-group-header,
@@ -436,7 +436,7 @@
 
   .knowledge-network-node-chip {
     min-height: 1.65rem;
-    border: 1px solid #dbe7f3;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 999px;
     background: var(--color-bg-canvas);
     color: var(--color-text-secondary);
@@ -450,9 +450,9 @@
   .knowledge-network-node-chip:focus-visible,
   .knowledge-network-relation-card:hover,
   .knowledge-network-relation-card:focus-visible {
-    border-color: #93c5fd;
+    border-color: var(--color-border-default);
     outline: none;
-    box-shadow: 0 0 0 3px rgb(59 130 246 / 0.14);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus) 14%, transparent);
   }
 
   .knowledge-network-relation-card {
@@ -464,7 +464,7 @@
     width: fit-content;
     border-radius: 999px;
     background: var(--color-bg-canvas);
-    color: #1d4ed8;
+    color: var(--color-text-link);
     padding: 0.15rem 0.45rem;
     font-size: 0.66rem;
     font-weight: 950;
@@ -505,7 +505,7 @@
     display: grid;
     gap: 0.55rem;
     min-width: 0;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
     padding: 0.85rem;
@@ -561,7 +561,7 @@
 
 @layer components {
   .rag-source-panel {
-    @apply mt-4 rounded-2xl border border-cyan-100 bg-white p-3;
+    @apply mt-4 rounded-2xl border border-border-subtle bg-bg-surface p-3;
   }
 
   .rag-source-list {
@@ -579,9 +579,9 @@
     display: grid;
     gap: 0.65rem;
     justify-items: start;
-    border: 1px solid #d7e7f3;
+    border: 1px solid var(--color-border-subtle);
     border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.7);
+    background: color-mix(in srgb, var(--color-bg-surface) 70%, transparent);
     padding: 0.9rem;
   }
 
@@ -619,8 +619,8 @@
   }
 
   .ai-admin-load-message.is-error {
-    background: rgba(185, 28, 28, 0.08);
-    border-color: rgba(185, 28, 28, 0.28);
+    background: color-mix(in srgb, var(--color-status-danger-solid) 8%, transparent);
+    border-color: color-mix(in srgb, var(--color-status-danger-solid) 28%, transparent);
     color: var(--color-status-danger-solid);
   }
 
@@ -641,9 +641,9 @@
     flex: 0 0 auto;
     width: 2.2rem;
     height: 2.2rem;
-    border: 2px solid #0f766e;
+    border: 2px solid var(--color-text-primary);
     border-radius: 0.65rem;
-    color: #0f766e;
+    color: var(--color-text-secondary);
     font-size: 0.78rem;
     font-weight: 950;
   }
@@ -651,7 +651,7 @@
   .rag-health-list {
     display: grid;
     overflow: hidden;
-    border: 1px solid #dbe4ee;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
   }
@@ -662,7 +662,7 @@
 
   .rag-health-item strong {
     display: block;
-    color: #0f766e;
+    color: var(--color-text-secondary);
     font-size: 1.05rem;
     font-weight: 950;
     line-height: 1.05;
@@ -686,8 +686,8 @@
 
   .rag-health-item.is-watch strong,
   .rag-health-item.is-watch .rag-health-icon {
-    color: #d97706;
-    border-color: #d97706;
+    color: var(--color-status-warning-text);
+    border-color: var(--color-status-warning-solid);
   }
 
   .ai-admin-page:not([data-ai-admin-view="overview"]) .ai-admin-hero > * {
@@ -723,7 +723,7 @@
     gap: 0.6rem;
     min-height: 10.6rem;
     position: relative;
-    border: 1px solid #dbe4ee;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.55rem;
     background: var(--color-bg-surface);
     padding: 0.95rem;
@@ -735,7 +735,7 @@
     display: block;
     height: 0.32rem;
     border-radius: 999px;
-    background: #dbe6ef;
+    background: var(--color-bg-surface-sunken);
   }
 
   .rag-game-board .ai-source-card.is-active::after {
@@ -776,7 +776,7 @@
   }
 
   .ai-source-score strong {
-    color: #0f766e;
+    color: var(--color-text-secondary);
     font-size: 1.55rem;
     font-weight: 950;
     line-height: 1;
@@ -817,7 +817,7 @@
   }
 
   .rag-index-track-panel {
-    border-top: 1px solid #dbe4ee;
+    border-top: 1px solid var(--color-border-subtle);
     padding-top: 0.9rem;
   }
 
@@ -833,7 +833,7 @@
     right: -0.55rem;
     width: 0.4rem;
     height: 2px;
-    background: #9fb1c5;
+    background: var(--color-border-strong);
   }
 
   .rag-index-track b {
@@ -845,7 +845,7 @@
     width: 1.1rem;
     height: 1.1rem;
     border-radius: 999px;
-    background: #16a34a;
+    background: var(--color-status-success-solid);
     color: var(--color-text-inverse);
     font-size: 0.48rem;
     font-weight: 950;
@@ -861,7 +861,7 @@
     min-height: 7rem;
     margin-top: 0.8rem;
     white-space: pre-wrap;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-radius: 0.5rem;
     background: var(--color-bg-canvas);
     padding: 0.85rem;
@@ -879,7 +879,7 @@
   .source-test-source {
     display: grid;
     gap: 0.2rem;
-    border: 1px solid #e2eaf4;
+    border: 1px solid var(--color-border-subtle);
     border-left: 4px solid var(--color-ai-accent);
     border-radius: 0.5rem;
     background: var(--color-bg-surface);
@@ -1027,7 +1027,7 @@
   }
 
   .ai-admin-workflow-card:hover {
-    border-color: #bfd7ff;
+    border-color: var(--color-border-default);
     box-shadow: var(--elevation-sm);
     text-decoration: none;
   }

@@ -1,5 +1,32 @@
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "maintenance_sidebar_collapsed";
 const HIGH_CONTRAST_STORAGE_KEY = "maintenance_high_contrast";
+const THEME_STORAGE_KEY = "maintenance_theme";
+const DARK_THEME = "maintenance-dark";
+const LIGHT_THEME = "maintenance";
+
+/**
+ * Return whether the dark design is active: the stored choice, otherwise the system setting.
+ *
+ * base.html runs the same check inline before the first paint.
+ */
+export function readDarkThemePreference(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (stored) {
+    return stored === "dark";
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+/**
+ * Persist and apply the light or dark design.
+ */
+export function writeDarkThemePreference(isDark: boolean): void {
+  window.localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", isDark ? DARK_THEME : LIGHT_THEME);
+}
 
 /**
  * Read the persisted sidebar collapse preference.

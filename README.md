@@ -26,6 +26,10 @@ Captured at 1440×960 from a fresh `python seed.py demo` database.
 | --- | --- |
 | ![Reorder suggestion](docs/screenshots/inventory.png) | ![Assistant answering from app data](docs/screenshots/ai-features.png) |
 
+| Dark mode |
+| --- |
+| ![Machines in the dark design](docs/screenshots/dark-mode.png) |
+
 <p><img src="docs/screenshots/mobile-cockpit.png" alt="Cockpit on a phone" width="260"> <img src="docs/screenshots/login.png" alt="Login" width="560"></p>
 
 ## What a maintenance team does with it
@@ -129,7 +133,8 @@ flowchart LR
 - **Frontend:** Jinja renders the shell, each page is a React app with its own
   Vite entry, built into `app/static/react`. Pages share one header, stat strip
   and dialog. Styles come from design tokens exported from Figma
-  (`design/tokens`) and Tailwind. See [`frontend/README.md`](frontend/README.md).
+  (`design/tokens`) and Tailwind; light and dark design follow the system
+  setting or the choice in the user menu. See [`frontend/README.md`](frontend/README.md).
 
 Deeper reading: [`docs/AI_AGENT.md`](docs/AI_AGENT.md) (agent and tools),
 [`docs/AI_RAG_ARCHITECTURE.md`](docs/AI_RAG_ARCHITECTURE.md) (retrieval),

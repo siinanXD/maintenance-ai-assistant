@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { apiRequest } from "../api/client";
 import {
   applyHighContrastPreference,
+  readDarkThemePreference,
   readHighContrastPreference,
+  writeDarkThemePreference,
   writeHighContrastPreference
 } from "./shellPreferences";
 
@@ -117,6 +119,26 @@ export function useHighContrastPreference(): readonly [boolean, () => void] {
   }
 
   return [isEnabled, toggleHighContrast] as const;
+}
+
+/**
+ * Keep the light/dark design choice in React state; the first paint is set in base.html.
+ */
+export function useDarkThemePreference(): readonly [boolean, () => void] {
+  const [isDark, setIsDark] = useState<boolean>(() => readDarkThemePreference());
+
+  /**
+   * Switch between the light and dark design and remember the choice.
+   */
+  function toggleDarkTheme(): void {
+    setIsDark((currentValue) => {
+      const nextValue = !currentValue;
+      writeDarkThemePreference(nextValue);
+      return nextValue;
+    });
+  }
+
+  return [isDark, toggleDarkTheme] as const;
 }
 
 /**

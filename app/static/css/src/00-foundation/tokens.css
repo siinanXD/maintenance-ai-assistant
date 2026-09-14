@@ -3,7 +3,8 @@
  * Quelle: design/tokens/tokens.json (Figma-Export) und design/tokens/app.json.
  * Neu erzeugen mit: npm run build:tokens
  *
- * Dunkel ist vorbereitet, aber noch nirgends eingeschaltet: :root[data-theme="maintenance-dark"].
+ * Dunkel schaltet base.html vor dem ersten Paint ein (:root[data-theme="maintenance-dark"]):
+ * gespeicherte Wahl aus dem Benutzermenue, sonst die Systemeinstellung.
  */
 
 @layer base {
@@ -169,5 +170,13 @@
     --color-ai-knowledge: #9ca39a;
     --color-ai-knowledge-bg: #272b27;
     --color-ai-knowledge-text: #c7ccc3;
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  :root[data-theme="maintenance-dark"] {
+    color-scheme: dark;
   }
 }
