@@ -1,7 +1,7 @@
 # Design-Token
 
 Gestaltet wird in Figma, gebaut wird aus diesem Ordner. Werte ändert man nie in
-`tailwind.config.js` und nie in den 60 Feature-CSS-Dateien.
+`tailwind.config.js` und nie direkt in den Seitenstilen.
 
 ## Der Weg eines Werts
 
@@ -15,9 +15,9 @@ design/tokens/app.json               App-eigene Namen, von Hand gepflegt
   ▼
 app/static/css/src/00-foundation/tokens.css   CSS-Custom-Properties, hell und dunkel
 design/tokens/generated/tailwind.cjs     Tailwind-Farben, Breakpoints, Schriften
-  │  90-overrides/legacy-token-bridge.css
+  │  var(--color-…), var(--space-…), var(--radius-…)
   ▼
-das gewachsene Feature-CSS (--ui-*, --ops-*)
+app/static/css/src/10-legacy, 15-pages, 20-components
 ```
 
 Übertragen heißt: Claude Code führt `scripts/figma/export_tokens.js` gegen die
@@ -48,23 +48,19 @@ App-Regeln.
 ## Dunkel
 
 Der dunkle Satz wird unter `:root[data-theme="maintenance-dark"]` erzeugt, ist
-aber **nirgends eingeschaltet**. Rund 1.370 fest eingetragene Farbwerte im
-Feature-CSS würden einem Umschalter nicht folgen. Die Tailwind-Farben verweisen
+aber **nirgends eingeschaltet**. Rund 460 fest eingetragene Farbwerte in den
+älteren Seitenstilen würden einem Umschalter nicht folgen. Die Tailwind-Farben verweisen
 bereits auf die Custom Properties und würden mitziehen.
 
-## Brücke zum Bestand
+## Ältere Seitenstile
 
-`app/static/css/src/90-overrides/legacy-token-bridge.css` biegt die 49 gewachsenen
-`--ui-*`- und `--ops-*`-Variablen (601 Verwendungen) auf Token-Rollen um und
-überschreibt gezielt die Stellen, an denen fest eingetragene Blautöne über den
-Variablen liegen: Shell-Flächen, aktive Navigation, Zähler, Kartenleisten,
-Verweise, Status-Badges.
+Alle Stylesheets lesen die Token direkt. Die früheren `--ui-*`- und
+`--ops-*`-Variablen wurden durch die Token ersetzt, auf die sie zeigten.
+`app/static/css/src/90-overrides/token-overrides.css` setzt die Token dort
+durch, wo ältere Regeln noch feste Blautöne tragen: Shell-Flächen, aktive
+Navigation, Zähler, Kartenleisten, Verweise, Status-Badges.
 
-Ein Teil der Feature-CSS steht außerhalb jeder `@layer` und schlägt damit jede
-gelayerte Regel. Die Überschreibungen dafür stehen am Ende der Brücke ebenfalls
-ungelayert.
-
-Neue Regeln gehören nicht in die Brücke. Neues CSS liest die Token direkt.
+Neue Regeln gehören nicht dorthin. Neues CSS liest die Token direkt.
 
 ## Schriften
 
@@ -81,8 +77,7 @@ her, weil die CI den Node-Generator nicht ausführt. Er schlägt an, wenn
 - Tailwind-Farben, Breakpoints oder Schriften von den Token abweichen,
 - gedämpfter oder sekundärer Text auf Seiten-, Karten- oder abgesenktem
   Hintergrund unter **4,5:1** Kontrast fällt (hell und dunkel),
-- eine `--ui-*`/`--ops-*`-Variable im Feature-CSS keine Brücke hat oder auf ein
-  nicht existierendes Token zeigt,
+- eine `--ui-*`/`--ops-*`-Variable in ein Stylesheet zurückkehrt,
 - Farbliterale, px-Werte oder DaisyUI in die Tailwind-Konfiguration zurückkehren.
 
 ## DaisyUI

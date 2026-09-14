@@ -1,0 +1,569 @@
+@layer components {
+  .table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .modal {
+    @apply fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-950/45 p-4 backdrop-blur-sm;
+  }
+
+  .modal[hidden] {
+    @apply hidden;
+  }
+
+  .modal-box {
+    @apply max-h-[calc(100vh-2rem)] w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl shadow-slate-950/20 sm:p-6;
+  }
+
+  .mobile-nav > summary:focus,
+  .mobile-action-summary:focus {
+    outline: none;
+  }
+
+  .mobile-nav > summary:focus-visible,
+  .mobile-action-summary:focus-visible {
+    @apply ring-2 ring-blue-500 ring-offset-2;
+  }
+
+  .top-nav-link {
+    @apply block rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-blue-50 hover:text-blue-700;
+  }
+
+  .top-nav-link.is-active {
+    @apply bg-blue-600 text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 hover:text-white;
+  }
+
+  .page-hero {
+    @apply mb-4 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:mb-6 sm:flex-row sm:items-end sm:justify-between sm:rounded-3xl sm:p-6 lg:p-8;
+  }
+
+  .page-kicker {
+    @apply text-xs font-bold uppercase tracking-wide text-blue-600 sm:text-sm;
+  }
+
+  .page-title {
+    @apply mt-1 text-2xl font-black leading-tight text-slate-950 sm:mt-2 sm:text-4xl;
+  }
+
+  .page-description {
+    @apply mt-2 max-w-3xl text-sm leading-6 text-slate-600 sm:mt-3 sm:text-base;
+  }
+
+  .hero-command-panel {
+    @apply hidden min-w-40 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-950 shadow-sm sm:block;
+  }
+
+  .hero-command-label {
+    @apply text-xs font-black uppercase tracking-wide text-blue-700;
+  }
+
+  .dashboard-grid {
+    @apply grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-12;
+  }
+
+  .kpi-card {
+    @apply relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/5 sm:p-5;
+  }
+
+  .kpi-card::before {
+    content: "";
+    @apply absolute left-0 top-0 h-full w-1 bg-blue-500;
+  }
+
+  .kpi-label {
+    @apply text-xs font-black uppercase tracking-wide text-slate-500;
+  }
+
+  .kpi-value {
+    @apply mt-2 text-2xl font-black leading-none text-slate-950 sm:text-3xl;
+  }
+
+  .kpi-meta {
+    @apply mt-2 text-xs leading-5 text-slate-500 sm:text-sm;
+  }
+
+  .section-kicker {
+    @apply block text-xs font-black uppercase tracking-wide text-blue-600;
+  }
+
+  .app-card {
+    @apply overflow-hidden border border-slate-200 bg-white shadow-sm transition duration-200 hover:border-blue-100 hover:shadow-lg hover:shadow-blue-950/5;
+  }
+
+  .panel-header {
+    @apply mb-4 flex flex-col items-start gap-2 sm:mb-5 sm:flex-row sm:justify-between sm:gap-3;
+  }
+
+  .panel-title {
+    @apply text-base font-bold text-slate-950 sm:text-lg;
+  }
+
+  .panel-meta {
+    @apply text-sm leading-5 text-slate-500;
+  }
+
+  .panel-meta.is-error,
+  .is-error {
+    @apply text-red-600;
+  }
+
+  .panel-meta.is-success,
+  .is-success {
+    @apply text-green-600;
+  }
+
+  .form-grid {
+    @apply grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2;
+  }
+
+  .field {
+    @apply flex flex-col gap-1.5 sm:gap-2;
+  }
+
+  .field.is-full {
+    @apply md:col-span-2;
+  }
+
+  .field > label,
+  .field > span {
+    @apply text-sm font-semibold text-slate-700;
+  }
+
+  .field .input,
+  .field .select,
+  .field .textarea,
+  .input,
+  .select,
+  .textarea {
+    @apply w-full;
+  }
+
+  .textarea {
+    @apply min-h-28;
+  }
+
+  .toolbar {
+    @apply flex flex-wrap items-center gap-2 sm:gap-3;
+  }
+
+  .form-actions {
+    @apply mt-4 sm:mt-5;
+  }
+
+  .suggestion-box {
+    @apply mt-4 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-3 sm:mt-5 sm:p-4;
+  }
+
+  .table-wrap {
+    @apply w-full overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .bounded-table-wrap {
+    max-height: 34rem;
+    overflow: auto;
+    scrollbar-gutter: stable;
+  }
+
+  .data-table {
+    @apply min-w-[44rem] bg-white text-sm sm:min-w-[48rem];
+  }
+
+  .data-table thead {
+    @apply bg-slate-50 text-xs uppercase text-slate-500;
+  }
+
+  .data-table thead th {
+    @apply sticky top-0 z-10 bg-slate-50;
+  }
+
+  .data-table td,
+  .data-table th {
+    @apply whitespace-nowrap;
+  }
+
+  .data-table td {
+    @apply text-slate-700;
+  }
+
+  .data-table tbody tr {
+    @apply transition hover:bg-slate-50;
+  }
+
+  .table-actions {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .empty-state {
+    @apply rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center text-sm font-medium text-slate-500 sm:p-6;
+  }
+
+  .list-toolbar {
+    @apply mb-3 flex flex-wrap items-end justify-between gap-3;
+  }
+
+  .compact-search-field {
+    @apply grid min-w-[14rem] flex-1 gap-1 text-xs font-bold text-slate-500 sm:max-w-md;
+  }
+
+  .compact-search-field .input {
+    @apply bg-white text-sm font-semibold text-slate-800 placeholder:text-slate-400;
+  }
+
+  .resource-card-grid {
+    @apply grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3;
+  }
+
+  .bounded-list-scroll {
+    max-height: 42rem;
+    overflow: auto;
+    padding-right: 0.25rem;
+    scrollbar-gutter: stable;
+  }
+
+  .resource-card {
+    @apply flex min-h-64 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/5;
+  }
+
+  .resource-card-header {
+    @apply flex flex-col items-start gap-3 sm:flex-row sm:justify-between;
+  }
+
+  .resource-card-title {
+    @apply text-base font-black leading-6 text-slate-950;
+  }
+
+  .resource-card-subtitle {
+    @apply mt-1 text-sm leading-5 text-slate-500;
+  }
+
+  .resource-card-badges {
+    @apply flex max-w-full shrink-0 flex-wrap justify-start gap-2 sm:justify-end;
+  }
+
+  .resource-meta-grid {
+    @apply mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2;
+  }
+
+  .resource-metric {
+    @apply rounded-2xl border border-slate-200 bg-slate-50 p-3;
+  }
+
+  .resource-label {
+    @apply block text-xs font-black uppercase tracking-wide text-slate-500;
+  }
+
+  .resource-value {
+    @apply mt-1 block break-words text-sm font-semibold leading-5 text-slate-800;
+  }
+
+  .resource-note {
+    @apply mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-600;
+  }
+
+  .resource-actions {
+    @apply mt-auto flex flex-wrap gap-2 pt-4;
+  }
+
+  .resource-upload {
+    @apply mt-3 w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-3 text-sm text-slate-600;
+  }
+
+  .resource-upload input {
+    @apply mt-2 text-xs;
+  }
+
+  .upload-check-panel {
+    @apply grid grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end;
+  }
+
+  .badge-list {
+    @apply mt-4 flex flex-wrap gap-2;
+  }
+
+  .timeline-list {
+    @apply mt-5 grid grid-cols-1 gap-3 md:grid-cols-2;
+  }
+
+  .review-score-card {
+    @apply grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3;
+  }
+
+  .review-score-card strong {
+    @apply mt-1 block text-2xl font-black text-slate-950;
+  }
+
+  .badge.is-urgent,
+  .badge-priority.is-urgent {
+    @apply border-red-200 bg-red-50 text-red-700;
+  }
+
+  .badge.is-soon,
+  .badge-priority.is-soon {
+    @apply border-amber-200 bg-amber-50 text-amber-800;
+  }
+
+  .badge.is-normal,
+  .badge-priority.is-normal {
+    @apply border-green-200 bg-green-50 text-green-700;
+  }
+
+  .badge.is-open,
+  .badge-status.is-open {
+    @apply border-slate-200 bg-slate-100 text-slate-700;
+  }
+
+  .badge.is-progress,
+  .badge-status.is-progress {
+    @apply border-blue-200 bg-blue-50 text-blue-700;
+  }
+
+  .badge.is-done,
+  .badge-status.is-done {
+    @apply border-green-200 bg-green-50 text-green-700;
+  }
+
+  .badge.is-cancelled,
+  .badge-status.is-cancelled {
+    @apply border-red-200 bg-red-50 text-red-700;
+  }
+
+  .knowledge-block {
+    @apply max-w-md whitespace-normal rounded-xl border border-slate-200 bg-slate-50 p-3;
+  }
+
+  .knowledge-block.is-cause {
+    @apply border-amber-200 bg-amber-50;
+  }
+
+  .knowledge-block.is-solution {
+    @apply border-green-200 bg-green-50;
+  }
+
+  .ai-response {
+    @apply my-4 rounded-2xl border border-cyan-100 bg-cyan-50 p-4 text-sm font-medium leading-6 text-slate-700;
+  }
+
+  .ai-action-preview {
+    @apply mt-4 flex flex-col gap-3 rounded-2xl border border-cyan-200 bg-cyan-50 p-3 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .ai-action-preview strong {
+    @apply block text-sm font-black text-slate-950;
+  }
+
+  .ai-action-preview span {
+    @apply mt-1 block text-sm font-semibold leading-5 text-slate-600;
+  }
+
+  .stats-list {
+    @apply mt-2 flex flex-col gap-3;
+  }
+
+  .stat-row {
+    @apply flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm sm:p-4;
+  }
+
+  .stat-row strong {
+    @apply text-lg font-black text-slate-950;
+  }
+
+  .stat-label {
+    @apply mt-2 text-sm leading-6 text-slate-500;
+  }
+
+  #sp-dialog {
+    max-width: 90vw;
+    border: 0;
+    border-radius: 0.75rem;
+    padding: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  }
+
+  #sp-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+  }
+
+  .print-only {
+    display: none;
+  }
+
+  @media print {
+    @page {
+      size: A4 landscape;
+      margin: 12mm;
+    }
+
+    .no-print,
+    nav,
+    header,
+    footer,
+    .page-hero,
+    .mobile-action-section {
+      display: none !important;
+    }
+
+    .print-only {
+      display: block !important;
+    }
+
+    #sp-table-wrap {
+      display: block !important;
+    }
+  }
+
+  .code-block {
+    @apply overflow-x-auto rounded-2xl bg-slate-950 p-4 font-mono text-sm leading-6 text-cyan-100;
+  }
+
+  .button {
+    @apply inline-flex min-h-9 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700;
+  }
+
+  .button.is-primary {
+    @apply border-blue-600 bg-blue-600 text-white hover:border-blue-700 hover:bg-blue-700 hover:text-white;
+  }
+
+  .button.is-danger {
+    @apply border-red-600 bg-red-600 text-white hover:border-red-700 hover:bg-red-700 hover:text-white;
+  }
+
+  .surface-panel {
+    @apply rounded-xl border border-slate-100 bg-slate-50 p-4;
+  }
+
+  .stacked-list {
+    @apply mt-3 flex flex-col gap-2 text-sm text-slate-600;
+  }
+
+  .stacked-list-row {
+    @apply flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2;
+  }
+
+  .mobile-primary-card {
+    @apply max-lg:order-1;
+  }
+
+  .mobile-action-section,
+  .mobile-secondary-card {
+    @apply max-lg:order-2;
+  }
+
+  .mobile-action-summary {
+    @apply hidden;
+  }
+
+  @media (max-width: 639px) {
+    .mobile-action-section {
+      @apply rounded-2xl;
+    }
+
+    .mobile-action-summary {
+      @apply flex cursor-pointer list-none items-center justify-between gap-3 border-b border-slate-100 px-4 py-3;
+    }
+
+    .mobile-action-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mobile-action-summary::after {
+      content: "+";
+      @apply text-base font-black text-slate-400;
+    }
+
+    .mobile-action-section[open] > .mobile-action-summary::after {
+      content: "-";
+      @apply text-blue-600;
+    }
+
+    .mobile-action-title {
+      @apply block text-sm font-black text-slate-950;
+    }
+
+    .mobile-action-meta {
+      @apply mt-1 block text-xs font-medium leading-5 text-slate-500;
+    }
+
+    .mobile-action-section > .card-body > .panel-header,
+    .mobile-action-section > form > .card-body > .panel-header {
+      @apply hidden;
+    }
+
+    .mobile-action-section:not([open]) > .card-body,
+    .mobile-action-section:not([open]) > form {
+      @apply hidden;
+    }
+
+    .table th,
+    .table td {
+      @apply px-3 py-2.5;
+    }
+
+    .data-table thead th {
+      @apply sticky top-0 z-10 bg-slate-50;
+    }
+
+    .data-table th:first-child,
+    .data-table td:first-child {
+      @apply sticky left-0 z-10 bg-white shadow-[8px_0_12px_-14px_rgba(15,23,42,0.5)];
+    }
+
+    .data-table thead th:first-child {
+      @apply z-20 bg-slate-50;
+    }
+
+    .btn {
+      @apply min-h-10 px-3;
+    }
+
+    .btn-sm {
+      @apply min-h-9 px-2.5;
+    }
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  /* ── Priority score cards (ersetzt die Tabelle in tasks.html) ──────────── */
+
+  /* ── KPI icon badges ───────────────────────────────────────────────────── */
+
+  /* ── Cockpit-Spalten farbig differenziert ─────────────────────────────── */
+
+  /* ── Verbesserte page-hero Variante mit Gradient ──────────────────────── */
+
+  .app-body {
+    @apply bg-slate-100 text-slate-900;
+  }
+
+  .app-shell-layout {
+    @apply bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.10),transparent_28rem),linear-gradient(180deg,#f8fafc,#eef2f7)];
+  }
+
+  .app-main {
+    @apply max-w-[92rem];
+  }
+
+  .page-hero {
+    @apply rounded-[1.35rem] border-slate-200/80 bg-white/95 shadow-lg shadow-slate-950/5;
+  }
+
+  .app-card,
+  .kpi-card {
+    @apply border-slate-200/80 bg-white/95 shadow-md shadow-slate-950/5;
+  }
+
+  .kpi-card {
+    @apply rounded-[1.1rem] p-4;
+  }
+
+  @media (min-width: 1024px) {
+
+    .app-main {
+      max-width: none !important;
+      padding: 1.5rem 1.75rem 5rem;
+    }
+  }
+
+}

@@ -18,7 +18,6 @@ TOKENS_FILE = TOKENS_DIR / "tokens.json"
 APP_FILE = TOKENS_DIR / "app.json"
 CSS_SRC = REPO_ROOT / "app" / "static" / "css" / "src"
 TOKEN_CSS = CSS_SRC / "00-foundation" / "tokens.css"
-BRIDGE_CSS = CSS_SRC / "90-overrides" / "legacy-token-bridge.css"
 TAILWIND_FILE = TOKENS_DIR / "generated" / "tailwind.cjs"
 TAILWIND_CONFIG = REPO_ROOT / "tailwind.config.js"
 
@@ -28,7 +27,6 @@ DARK_SELECTOR = ':root[data-theme="maintenance-dark"]'
 SANS_FALLBACK = ["ui-sans-serif", "system-ui", "Segoe UI", "sans-serif"]
 MONO_FALLBACK = ["ui-monospace", "SFMono-Regular", "Consolas", "monospace"]
 ALIAS = re.compile(r"^\{([^}]+)\}$")
-LEGACY_SPACING = {"--ui-section-gap", "--ui-panel-gap"}
 
 
 def _flatten(node, prefix=()):
@@ -193,30 +191,15 @@ def test_muted_text_meets_wcag_aa_on_every_ground():
                 assert ratio >= 4.5, f"{text_role} auf {ground}: {ratio:.2f}:1"
 
 
-def test_legacy_bridge_points_every_legacy_variable_at_an_existing_token():
-    """Verify each --ui-*/--ops-* the feature CSS defines is redirected to a token."""
-    defined = set()
-    for path in CSS_SRC.rglob("*.css"):
-        if path.name == BRIDGE_CSS.name:
-            continue
-        defined.update(
-            re.findall(
-                r"^\s*(--(?:ui|ops)-[\w-]+)\s*:", path.read_text(encoding="utf-8"), re.MULTILINE
-            )
-        )
-    bridge = dict(
-        re.findall(
-            r"^\s*(--(?:ui|ops)-[\w-]+)\s*:\s*var\((--[\w-]+)\);",
-            BRIDGE_CSS.read_text(encoding="utf-8"),
-            re.MULTILINE,
-        )
-    )
-    properties = _css_block(":root")
+def test_css_reads_design_tokens_not_legacy_variables():
+    """Verify no stylesheet declares or reads the old --ui-*/--ops-* variables."""
+    offenders = {
+        str(path.relative_to(CSS_SRC)): sorted(set(re.findall(r"--(?:ui|ops)-[\w-]+", text)))
+        for path in CSS_SRC.rglob("*.css")
+        if re.search(r"--(?:ui|ops)-[\w-]+", text := path.read_text(encoding="utf-8"))
+    }
 
-    missing = sorted(defined - LEGACY_SPACING - set(bridge))
-    assert not missing, f"Legacy-Variablen ohne Bruecke: {missing}"
-    for legacy, target in bridge.items():
-        assert target[2:] in properties, f"{legacy} zeigt auf unbekanntes Token {target}"
+    assert offenders == {}
 
 
 def test_tailwind_config_carries_no_literal_values_and_no_daisyui():

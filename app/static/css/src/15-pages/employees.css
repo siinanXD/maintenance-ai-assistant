@@ -1,0 +1,11 @@
+/* Seite: employees (aus 10-legacy übernommen, Reihenfolge unverändert). */
+
+@layer components {
+  .employee-card-grid .resource-card:nth-child(3n + 1) {
+    border-left-color: var(--color-ai-accent);
+  }
+
+  .employee-card-grid .resource-card:nth-child(3n + 2) {
+    border-left-color: var(--color-status-warning-solid);
+  }
+}

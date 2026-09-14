@@ -11,7 +11,7 @@ Living notes for maintainers. For product scope see [`FEATURES.md`](FEATURES.md)
 | Small | Datetime usage | Replace remaining `datetime.utcnow()` with timezone-aware UTC |
 | Small | SQLAlchemy access | Prefer `db.session.get()` over legacy query `.get()` |
 | Small | Seeds | Overlap between `seed.py` and `seed_demo.py` |
-| Medium | `app/static/css/src/10-legacy/` | About 9,400 lines of grown page styles in their original cascade order (overridden declarations and unused selectors are already removed). Move pages to `20-components/` one at a time and delete their legacy rules; see `app/static/css/README.md` |
+| Medium | `app/static/css/src/15-pages/` | Page styles are separated per page and read tokens, but still carry about 460 fixed colour values that `90-overrides/token-overrides.css` covers. Move one page at a time onto `20-components/` and delete its override entries; see `app/static/css/README.md` |
 | Small | `frontend/src/admin-ai/` | Largest page (views for operations, observability, answers, prompts, knowledge); the section components are still long single files |
 | Small | `app/agent/mock_policy.py` | Offline keyword policy grows with every tool; keep golden cases in `app/agent/evals.py` in sync and prefer new `list_*` parameters over new keyword branches |
 

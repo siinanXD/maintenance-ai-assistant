@@ -1,0 +1,27 @@
+/* Seite: inventory (aus 10-legacy übernommen, Reihenfolge unverändert). */
+
+@layer components {
+  .forecast-unmatched-list {
+    @apply mt-4 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4;
+  }
+
+  .inventory-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .inventory-card {
+    min-height: 14rem;
+  }
+
+  .inventory-card.is-low-stock {
+    border-color: rgba(201, 119, 8, 0.32);
+    border-left-color: var(--color-status-warning-solid);
+    background:
+    linear-gradient(180deg, rgba(255, 248, 235, 0.75), rgba(255, 255, 255, 0.98)),
+    var(--color-bg-surface);
+  }
+
+  .inventory-card-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
