@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -35,6 +36,11 @@ STRUCTURED_TOOLS = (
     "list_inventory",
     "machine_incident_report",
 )
+
+
+def _plant_today():
+    """Return today's date at the plant (the tools' default PLANT_TIMEZONE)."""
+    return datetime.now(ZoneInfo("Europe/Berlin")).date()
 
 
 def _user(user_id):
@@ -122,7 +128,7 @@ def test_list_tasks_filters_status_priority_and_due(app, make_user, make_task):
         "Ueberfaellig",
         user["username"],
         department_name="Produktion",
-        due_date_value=date.today() - timedelta(days=3),
+        due_date_value=_plant_today() - timedelta(days=3),
     )
 
     with app.app_context():
@@ -253,7 +259,7 @@ def test_list_employees_availability_uses_approved_vacations(app, make_user, mak
     )
     absent_id = make_employee(personnel_number="P-10", name="Urlaub Ute", department="Produktion")
     make_employee(personnel_number="P-11", name="Da Dieter", department="Produktion")
-    tomorrow = date.today() + timedelta(days=1)
+    tomorrow = _plant_today() + timedelta(days=1)
     with app.app_context():
         db.session.add(
             VacationRequest(
@@ -267,8 +273,8 @@ def test_list_employees_availability_uses_approved_vacations(app, make_user, mak
         db.session.add(
             VacationRequest(
                 employee_id=absent_id,
-                start_date=date.today(),
-                end_date=date.today(),
+                start_date=_plant_today(),
+                end_date=_plant_today(),
                 days_used=1,
                 status="pending",
             )
@@ -310,8 +316,8 @@ def test_list_vacations_own_scope_works_without_employee_permission(app, make_us
         db.session.add(
             VacationRequest(
                 employee_id=employee_id,
-                start_date=date.today() + timedelta(days=10),
-                end_date=date.today() + timedelta(days=12),
+                start_date=_plant_today() + timedelta(days=10),
+                end_date=_plant_today() + timedelta(days=12),
                 days_used=3,
                 status="pending",
             )
@@ -428,19 +434,19 @@ def test_list_shift_entries_uses_published_plans_and_redacts_names(
         personnel_number="P-40", name="Schicht Sabine", department="Produktion"
     )
     machine_id = make_machine(name="Schicht-Anlage")
-    tomorrow = date.today() + timedelta(days=1)
-    next_monday = date.today() + timedelta(days=7 - date.today().weekday())
+    tomorrow = _plant_today() + timedelta(days=1)
+    next_monday = _plant_today() + timedelta(days=7 - _plant_today().weekday())
     with app.app_context():
         published = ShiftPlan(
             title="Plan",
-            start_date=date.today(),
+            start_date=_plant_today(),
             days=7,
             department="Produktion",
             status="published",
         )
         draft = ShiftPlan(
             title="Entwurf",
-            start_date=date.today(),
+            start_date=_plant_today(),
             days=7,
             department="Produktion",
             status="draft",
@@ -666,7 +672,7 @@ def test_count_records_admin_sees_all_scopes(app, make_user, scope):
 
 def test_list_maintenance_plans_reports_overdue_inspections(app, make_user, make_machine):
     """Verify the agent lists overdue inspections with legal basis and last proof."""
-    from datetime import date, timedelta
+    from datetime import timedelta
 
     from app.models import Department, MaintenancePlan
 
@@ -683,7 +689,7 @@ def test_list_maintenance_plans_reports_overdue_inspections(app, make_user, make
                     kind="inspection",
                     legal_basis="DGUV Vorschrift 3",
                     interval_days=365,
-                    next_due_date=date.today() - timedelta(days=2),
+                    next_due_date=_plant_today() - timedelta(days=2),
                     machine_id=machine_id,
                     department=department,
                     created_by=admin["id"],
@@ -691,7 +697,7 @@ def test_list_maintenance_plans_reports_overdue_inspections(app, make_user, make
                 MaintenancePlan(
                     title="Filterwechsel",
                     interval_days=30,
-                    next_due_date=date.today() + timedelta(days=60),
+                    next_due_date=_plant_today() + timedelta(days=60),
                     department=department,
                     created_by=admin["id"],
                 ),

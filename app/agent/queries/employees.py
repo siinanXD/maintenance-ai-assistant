@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import timedelta
 
 from app.models import Employee, VacationRequest
 from app.permissions import can_read_employee_context
@@ -20,6 +20,7 @@ from .common import (
     QueryOutcome,
     build_structured_context,
     denied_outcome,
+    plant_today,
 )
 
 AVAILABILITY_MODES = {"available_today", "absent_today", "absent_tomorrow"}
@@ -123,7 +124,7 @@ def _department_list(user, department):
 
 def _availability(user, mode):
     """Return available or absent employees for today or tomorrow."""
-    target_date = date.today() + timedelta(days=1 if mode.endswith("tomorrow") else 0)
+    target_date = plant_today() + timedelta(days=1 if mode.endswith("tomorrow") else 0)
     label = "morgen" if mode.endswith("tomorrow") else "heute"
     if mode == "available_today":
         employees = (

@@ -118,9 +118,9 @@ def _filtered_incident_query(user, filters):
             today_bounds() if filters["time_range"] == "today" else yesterday_bounds()
         )
         if status == "done":
-            query = query.filter(ErrorEntry.closed_at >= start_at, ErrorEntry.closed_at <= end_at)
+            query = query.filter(ErrorEntry.closed_at >= start_at, ErrorEntry.closed_at < end_at)
         else:
-            query = query.filter(ErrorEntry.created_at >= start_at, ErrorEntry.created_at <= end_at)
+            query = query.filter(ErrorEntry.created_at >= start_at, ErrorEntry.created_at < end_at)
     return query
 
 

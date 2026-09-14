@@ -196,6 +196,7 @@ DOCUMENTS_FOLDER=documents
 MANUALS_FOLDER=manuals
 ATTACHMENT_MAX_BYTES=10485760   # photos and PDFs on incidents and tasks
 PUBLIC_BASE_URL=                # address printed into machine QR labels
+PLANT_TIMEZONE=Europe/Berlin     # "today", "tomorrow" and "this week" in assistant answers
 MAIL_ENABLED=false
 MAIL_HOST=
 MAIL_PORT=587

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date
-
 from app.extensions import db
 from app.models import Department, Priority, Task, TaskStatus
 from app.security import has_dashboard_permission
@@ -18,6 +16,7 @@ from .common import (
     build_structured_context,
     denied_outcome,
     filter_summary,
+    plant_today,
     today_bounds,
     yesterday_bounds,
 )
@@ -106,14 +105,14 @@ def _filtered_task_query(user, filters):
             today_bounds() if filters["time_range"] == "today" else yesterday_bounds()
         )
         if status == "done":
-            query = query.filter(Task.completed_at >= start_at, Task.completed_at <= end_at)
+            query = query.filter(Task.completed_at >= start_at, Task.completed_at < end_at)
         else:
-            query = query.filter(Task.created_at >= start_at, Task.created_at <= end_at)
+            query = query.filter(Task.created_at >= start_at, Task.created_at < end_at)
     if filters.get("due") == "today":
-        query = query.filter(Task.due_date == date.today())
+        query = query.filter(Task.due_date == plant_today())
     elif filters.get("due") == "overdue":
         query = query.filter(
-            Task.due_date < date.today(),
+            Task.due_date < plant_today(),
             Task.status.notin_([TaskStatus.DONE, TaskStatus.CANCELLED]),
         )
     return query

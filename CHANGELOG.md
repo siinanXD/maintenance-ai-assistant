@@ -40,8 +40,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   handler cleared the session but stopped the click before `auth.js` saw it
 - Shift plan and user administration pages showed "Maintenance Assistant" as
   topbar title
-- The assistant's "uploaded this week" document filter compared the local date
-  with UTC timestamps
+- Relative dates in assistant answers ("today", "yesterday", "tomorrow", "this
+  week", overdue) follow the plant calendar (`PLANT_TIMEZONE`, default
+  Europe/Berlin) instead of comparing the server's local date with UTC timestamps
 - The shift plan publish button received its label text as CSS class
 
 ### Changed

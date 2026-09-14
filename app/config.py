@@ -383,6 +383,7 @@ class Config:
     MANUALS_FOLDER = os.getenv("MANUALS_FOLDER", str(BASE_DIR / "manuals"))
     ATTACHMENT_MAX_BYTES = int(os.getenv("ATTACHMENT_MAX_BYTES", str(10 * 1024 * 1024)))
     PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "")
+    PLANT_TIMEZONE = os.getenv("PLANT_TIMEZONE", "Europe/Berlin")
     KNOWLEDGE_FOLDER = os.getenv("KNOWLEDGE_FOLDER", str(BASE_DIR / "knowledge"))
     BACKUP_FOLDER = os.getenv("BACKUP_FOLDER", str(BASE_DIR / "backups"))
     LOG_DIR = os.getenv("LOG_DIR", str(BASE_DIR / "logs"))
