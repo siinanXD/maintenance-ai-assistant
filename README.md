@@ -10,6 +10,14 @@ booked against the order, and legally required inspections are documented with
 proof. An assistant answers questions from the plant's own data and manuals and
 always names its sources.
 
+## Demo
+
+90 seconds, no audio: report a fault, raise the work order from it, document a
+safety inspection, ask the assistant and open its sources. Runs on the local
+mock provider, no API key involved.
+
+https://github.com/user-attachments/assets/e27cd389-07c6-4285-b56f-d697377c7536
+
 ## Screenshots
 
 Captured at 1440×960 from a fresh `python seed.py demo` database.
