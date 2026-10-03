@@ -48,3 +48,11 @@ You are a senior software engineer working on the Maintenance Assistant App.
 - For AI/RAG changes, prefer focused pytest suites under `tests/test_ai_*`, `tests/test_rag_services.py`, `tests/test_retrieval_*`, and workflow tests.
 - Run Ruff for touched Python files when practical.
 - Explain residual risk and propose an exact commit message.
+
+## Claude als Ersatz-Agent (SIN-205)
+
+- Cursor zuerst. Hat Cursor kein Guthaben, setze das Label `claude` auf das Issue oder kommentiere `@claude`.
+- Der Workflow `.github/workflows/claude.yml` startet Claude (`claude-code-action@v1`, nur für Nutzer mit Schreibrechten).
+- Immer Draft-PR, nie selbst mergen.
+- Commit-Nachrichten enthalten `Part of SIN-xxx` (die Issue-Nummer des Auftrags).
+- Maximal 3 Reparaturrunden pro Pull Request, dann stoppen und den Blocker melden.
