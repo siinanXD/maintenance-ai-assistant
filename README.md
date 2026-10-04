@@ -199,6 +199,10 @@ builds the Docker image.
 | Demo questions for the assistant | [`docs/AI_DEMO_QUESTIONS.md`](docs/AI_DEMO_QUESTIONS.md) |
 | Changelog | [`CHANGELOG.md`](CHANGELOG.md) |
 
+## Pull requests
+
+Every PR is checked automatically (CI, `pr-title`, `merge-gate`). PRs labeled `risk:low` or `risk:medium` merge on their own once all checks are green; `risk:high` waits for the owner label `freigegeben`. Details: `AGENTS.md`, section "Pull Requests und Merge".
+
 ## License
 
 MIT
