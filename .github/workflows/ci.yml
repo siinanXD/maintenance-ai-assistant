@@ -3,6 +3,8 @@ name: CI
 on:
   push:
   pull_request:
+  # Startet post-merge.yml nach einem Auto-Merge (SIN-213).
+  workflow_dispatch:
 
 permissions:
   contents: read
