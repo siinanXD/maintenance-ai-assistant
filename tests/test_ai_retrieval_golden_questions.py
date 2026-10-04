@@ -1,6 +1,7 @@
 """Golden tests for AI chat retrieval questions."""
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from app.agent.mock_policy import _choose_tool_calls
 from app.agent.tools import TOOL_REGISTRY, available_tools, execute_tool
@@ -237,7 +238,7 @@ def test_demo_golden_handover_questions_include_expected_keywords():
 
 def _seed_golden_sources(user):
     """Create deterministic project data used by golden AI retrieval tests."""
-    today = date.today()
+    today = datetime.now(ZoneInfo("Europe/Berlin")).date()
     machine = Machine(
         name="Presse Golden 7",
         produced_item="Hydraulikdeckel",
