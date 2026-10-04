@@ -3,6 +3,7 @@
 from datetime import UTC, date, datetime
 from itertools import count
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -25,6 +26,11 @@ from app.models import (
 from app.permissions import upsert_default_permissions
 
 _USER_COUNTER = count(1)
+
+
+def _plant_today():
+    """Return today's date at the plant (default PLANT_TIMEZONE), not the server clock."""
+    return datetime.now(ZoneInfo("Europe/Berlin")).date()
 
 
 @pytest.fixture(autouse=True)
@@ -208,7 +214,7 @@ def make_task(app):
                 description=description,
                 priority=priority,
                 status=status,
-                due_date=due_date_value or date.today(),
+                due_date=due_date_value or _plant_today(),
                 department=department,
                 created_by=user.id,
             )
